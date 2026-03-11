@@ -1,0 +1,559 @@
+const { createApp, ref, computed, watch, nextTick, onMounted } = Vue;
+
+// V13.5.1 (Backend Integrated - Refactored)
+const APP_VERSION = '13.5.1';
+
+createApp({
+    setup() {
+        const sidebarOpen = ref(false);
+        const showSettings = ref(false);
+        const showAdvSettings = ref(false);
+        const showRpgForm = ref(false);
+        const input = ref('');
+        const inputRef = ref(null);
+        const isLoading = ref(false);
+        let abortController = null; 
+        const quickPasteConfig = ref(''); 
+        const enableStream = ref(true); 
+
+        const showPromptEditor = ref(false);
+        const showCoT = ref(false);
+        
+        // --- Backend API Utils ---
+        const api = {
+            async get(url) {
+                const res = await fetch(url);
+                return await res.json();
+            },
+            async post(url, data) {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                return await res.json();
+            },
+            async delete(url) {
+                const res = await fetch(url, { method: 'DELETE' });
+                return await res.json();
+            }
+        };
+
+        const systemPrompts = ref([]);
+        const activeSystemPromptId = ref(null);
+        const activeSystemPrompt = computed(() => systemPrompts.value.find(p => p.id === activeSystemPromptId.value) || systemPrompts.value[0]);
+
+        // 初始化预设引擎
+        const initPrompts = async () => {
+            const data = await api.get('/api/prompts');
+            if (data && data.length > 0) {
+                systemPrompts.value = data;
+                // 确保内置引擎内容最新
+                const defaultRpg = systemPrompts.value.find(p => p.id === 'sp_default_rpg');
+                if (defaultRpg) {
+                    defaultRpg.content = DEFAULT_RPG_PROMPT;
+                    await api.post('/api/prompts', defaultRpg);
+                }
+            } else {
+                // 初始化默认数据
+                const defaults = [
+                    { id: 'sp_default_rpg', name: '通用RPG引擎', content: DEFAULT_RPG_PROMPT },
+                    { id: 'sp_chat', name: '通用助手', content: DEFAULT_CHAT_PROMPT },
+                    { id: 'sp_novel', name: '小说家模式', content: '你是一位专业的小说家...' }
+                ];
+                for (const p of defaults) {
+                    await api.post('/api/prompts', p);
+                }
+                systemPrompts.value = defaults;
+            }
+            activeSystemPromptId.value = systemPrompts.value[0].id;
+        };
+
+        const toast = ref({ show: false, message: '' });
+        const showToast = (message) => { toast.value.message = message; toast.value.show = true; setTimeout(() => { toast.value.show = false; }, 2000); };
+
+        const addNewSystemPrompt = async () => {
+            const newId = 'sp_' + Date.now();
+            const newPrompt = { id: newId, name: '新预设', content: '在此输入 System Prompt...' };
+            systemPrompts.value.push(newPrompt);
+            activeSystemPromptId.value = newId;
+            await api.post('/api/prompts', newPrompt);
+        };
+
+        const deleteSystemPrompt = async (id) => {
+            const protectedIds = ['sp_default_rpg', 'sp_chat', 'sp_novel', 'sp_official_4', 'sp_official_5'];
+            if (protectedIds.includes(id)) return showToast('核心内置预设，禁止删除');
+
+            if (systemPrompts.value.length <= 1) return showToast('至少保留一个预设');
+            if (confirm('确定删除此预设吗？')) {
+                await api.delete(`/api/prompts/${id}`);
+                const idx = systemPrompts.value.findIndex(p => p.id === id);
+                systemPrompts.value.splice(idx, 1);
+                if (activeSystemPromptId.value === id) activeSystemPromptId.value = systemPrompts.value[0].id;
+            }
+        };
+
+        // 监听预设内容变化并自动保存
+        watch(() => systemPrompts.value, (newVal) => {
+            if (showPromptEditor.value && activeSystemPrompt.value) {
+                api.post('/api/prompts', JSON.parse(JSON.stringify(activeSystemPrompt.value)));
+            }
+        }, { deep: true });
+
+        const profiles = ref([]);
+        const activeProfileId = ref(null);
+        const activeProfile = computed(() => profiles.value.find(p => p.id === activeProfileId.value) || profiles.value[0] || {});
+
+        const initProfiles = async () => {
+            const data = await api.get('/api/profiles');
+            if (data && data.length > 0) {
+                profiles.value = data;
+                activeProfileId.value = profiles.value[0].id;
+            } else {
+                const defaultProfile = { id: 'p1', name: '默认引擎', baseUrl: 'https://api.openai.com/v1', apiKey: '', model: 'gpt-3.5-turbo', memoryLength: 4, stmLength: 6, tempRpg: 0.8, tempChat: 0.6 };
+                await api.post('/api/profiles', defaultProfile);
+                profiles.value = [defaultProfile];
+                activeProfileId.value = 'p1';
+            }
+        };
+
+        // 监听配置变化并自动保存
+        watch(() => profiles.value, (newVal) => {
+            if (showSettings.value || showAdvSettings.value) {
+                const active = profiles.value.find(p => p.id === activeProfileId.value);
+                if (active) api.post('/api/profiles', JSON.parse(JSON.stringify(active)));
+            }
+        }, { deep: true });
+
+        const addNewProfile = async () => { 
+            const newId = 'p_' + Date.now(); 
+            const newProfile = { id: newId, name: '新节点', baseUrl: '', apiKey: '', model: '', memoryLength: 4, stmLength: 6, tempRpg: 0.8, tempChat: 0.6 };
+            profiles.value.push(newProfile); 
+            activeProfileId.value = newId; 
+            await api.post('/api/profiles', newProfile);
+        };
+
+        const deleteActiveProfile = async () => {
+            if (profiles.value.length <= 1) { showToast('无法删除最后一个配置'); return; }
+            const indexToDelete = profiles.value.findIndex(p => p.id === activeProfileId.value);
+            if (indexToDelete === -1) return;
+            if (confirm(`确认删除配置 [${profiles.value[indexToDelete].name}] 吗？`)) {
+                await api.delete(`/api/profiles/${activeProfileId.value}`);
+                profiles.value.splice(indexToDelete, 1);
+                activeProfileId.value = profiles.value[Math.min(indexToDelete, profiles.value.length - 1)].id;
+                showToast('配置已删除');
+            }
+        };
+        
+        const applyQuickPaste = async () => {
+            const lines = quickPasteConfig.value.split('\n').filter(line => line.trim() !== '');
+            if (lines.length === 0) return showToast('输入为空');
+            let addedCount = 0;
+            for (const line of lines) {
+                const parts = line.split(',').map(s => s.trim());
+                if (parts.length >= 4) {
+                    const newProfile = {
+                        id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                        name: parts[0], baseUrl: parts[1], apiKey: parts[2], model: parts[3],
+                        memoryLength: 4, stmLength: 6, tempRpg: 0.8, tempChat: 0.6
+                    };
+                    profiles.value.push(newProfile);
+                    await api.post('/api/profiles', newProfile);
+                    addedCount++;
+                }
+            }
+            if (addedCount > 0) { showToast(`已添加 ${addedCount} 个配置`); quickPasteConfig.value = ''; }
+        };
+
+        const sessions = ref([]);
+        const currentSessionId = ref(null);
+        const currentSession = computed(() => sessions.value.find(s => s.id === currentSessionId.value) || null);
+        const editingSessionId = ref(null);
+        const editTempTitle = ref('');
+
+        const initSessions = async () => {
+            const data = await api.get('/api/sessions');
+            if (data && data.length > 0) {
+                sessions.value = data;
+                currentSessionId.value = sessions.value[0].id;
+            } else {
+                await createNewSession('chat');
+            }
+        };
+
+        const visibleMessages = computed(() => {
+            if (!currentSession.value) return[];
+            return currentSession.value.messages.map((msg, index) => ({ ...msg, originalIndex: index })).filter(msg => msg.role !== 'system');
+        });
+
+        // 监听当前会话消息变化并自动保存
+        watch(() => currentSession.value?.messages, (newVal) => {
+            if (newVal && currentSession.value) {
+                api.post('/api/sessions', JSON.parse(JSON.stringify(currentSession.value)));
+            }
+        }, { deep: true });
+
+        const rpgForm = ref({ 
+            world: '', rules: '', name: '', gender: '', race: '', age: '', appearance: '', 
+            personality: '', pov: '第一人称', style: '', custom: '', opening: '', 
+            identity: '', item: '' 
+        });
+
+        const rpgLocks = ref({ 
+            world: false, rules: false, name: false, gender: false, race: false, age: false, 
+            appearance: false, personality: false, style: false, custom: false, opening: false, 
+            identity: false, item: false 
+        });
+
+        const activeRandomTheme = ref('通用');
+
+        const randomInput = (field) => {
+            if (rpgLocks.value[field]) return; 
+            if (field === 'age') {
+                rpgForm.value.age = Math.floor(Math.random() * 99) + 1;
+                return;
+            }
+            if (themeLibs[activeRandomTheme.value] && themeLibs[activeRandomTheme.value][field]) {
+                const arr = themeLibs[activeRandomTheme.value][field];
+                rpgForm.value[field] = arr[Math.floor(Math.random() * arr.length)];
+            }
+        };
+
+        const randomAll = () => {
+            const fields = ['world', 'name', 'gender', 'race', 'age', 'appearance', 'personality', 'style', 'opening', 'identity', 'item'];
+            fields.forEach(f => randomInput(f));
+            showToast('已根据当前词库完成一键随机');
+        };
+
+        watch(activeRandomTheme, (newTheme) => {
+            const fields = ['gender', 'race', 'style'];
+            fields.forEach(field => {
+                if (!rpgLocks.value[field] && themeLibs[newTheme] && themeLibs[newTheme][field]) {
+                    const arr = themeLibs[newTheme][field];
+                    rpgForm.value[field] = arr[Math.floor(Math.random() * arr.length)];
+                }
+            });
+        });
+
+        const rpgPromptPreview = computed(() => {
+            let res = `---世界设定---\n世界观：${rpgForm.value.world || '默认'}\n`;
+            if(rpgForm.value.rules) res += `附加规则：${rpgForm.value.rules}\n`;
+            res += `\n---角色基础信息---\n`;
+            if(rpgForm.value.name) res += `姓名：${rpgForm.value.name}\n`;
+            if(rpgForm.value.identity) res += `身份/职业：${rpgForm.value.identity}\n`;
+            if(rpgForm.value.gender) res += `性别：${rpgForm.value.gender}\n`;
+            if(rpgForm.value.race) res += `种族：${rpgForm.value.race}\n`;
+            if(rpgForm.value.age) res += `年龄：${rpgForm.value.age}\n`;
+            if(rpgForm.value.appearance) res += `外貌：${rpgForm.value.appearance}\n`;
+            if(rpgForm.value.personality) res += `性格：${rpgForm.value.personality}\n`;
+            res += `描写人称：${rpgForm.value.pov}\n`;
+            res += `文风增强：${rpgForm.value.style || '无'}\n`;
+            if(rpgForm.value.item) res += `初始携带：${rpgForm.value.item}\n`;
+            if(rpgForm.value.custom) res += `\n---自定义核心设定---\n${rpgForm.value.custom}\n`;
+            if (rpgForm.value.style) {
+                res += `\n【系统最高优先级指令：文风协议】\n你必须严格模仿[${rpgForm.value.style}]的笔触进行描写。拒绝平铺直叙。你的每一个形容词、每一个动词都必须符合该文风的调性。\n`;
+            }
+            res += `\n【初始行动】：${rpgForm.value.opening || '读取设定，自动生成初始面板并开启剧情。'}`;
+            return res;
+        });
+
+        const exportRpgModule = () => {
+            const moduleData = { version: APP_VERSION, type: "WorldForge_Module", rpgSettings: rpgForm.value, systemPrompt: activeSystemPrompt.value };
+            const data = JSON.stringify(moduleData, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const date = new Date();
+            const timeStr = `${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}_${date.getHours().toString().padStart(2,'0')}${date.getMinutes().toString().padStart(2,'0')}`;
+            const safeCharName = (rpgForm.value.name || '未命名').replace(/[\\/:*?"<>|]/g, '_');
+            const safeEngineName = (activeSystemPrompt.value.name || 'UnknownEngine').replace(/[\\/:*?"<>|]/g, '_');
+            a.download = `WF_MOD_${safeCharName}_${safeEngineName}_${timeStr}.json`;
+            a.click();
+            showToast('模组导出成功！');
+        };
+
+        const importRpgModule = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.rpgSettings) rpgForm.value = { ...rpgForm.value, ...data.rpgSettings };
+                    if (data.systemPrompt) {
+                        const exists = systemPrompts.value.find(p => p.id === data.systemPrompt.id || p.content === data.systemPrompt.content);
+                        if (exists) {
+                            activeSystemPromptId.value = exists.id;
+                            showToast(`已切换至现有核心: ${exists.name}`);
+                        } else {
+                            const newPrompt = { ...data.systemPrompt, id: 'sp_mod_' + Date.now() };
+                            systemPrompts.value.push(newPrompt);
+                            activeSystemPromptId.value = newPrompt.id;
+                            await api.post('/api/prompts', newPrompt);
+                            showToast(`模组核心已安装并激活`);
+                        }
+                    }
+                    showToast('RPG 模组加载完毕！');
+                } catch (err) { showToast('模组解析失败: ' + err.message); }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; 
+        };
+
+        const exportProfiles = () => {
+            const data = JSON.stringify(profiles.value, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `api_profiles.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('配置导出成功！');
+        };
+
+        const importProfiles = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const newProfiles = JSON.parse(e.target.result);
+                    if (!Array.isArray(newProfiles)) throw new Error("格式错误");
+                    for (const p of newProfiles) await api.post('/api/profiles', p);
+                    profiles.value = newProfiles;
+                    if (newProfiles.length > 0) activeProfileId.value = newProfiles[0].id;
+                    showToast('配置加载成功！');
+                } catch (err) { showToast('失败: ' + err.message); }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; 
+        };
+
+        const exportCurrentSession = () => {
+            if (!currentSession.value) return showToast("无会话");
+            const sessionData = { version: APP_VERSION, ...currentSession.value };
+            const data = JSON.stringify(sessionData, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const date = new Date();
+            const timeStr = `${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}_${date.getHours().toString().padStart(2,'0')}${date.getMinutes().toString().padStart(2,'0')}`;
+            const safeTitle = (currentSession.value.title || '未命名').replace(/[\\/:*?"<>|]/g, '_');
+            a.download = `WF_SAVE_${safeTitle}_${timeStr}.json`;
+            a.click();
+            showToast('存档导出成功！');
+        };
+
+        const importSession = (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const newSession = JSON.parse(e.target.result);
+                    if (!newSession.id || !newSession.messages) throw new Error("无效存档");
+                    newSession.id = Date.now().toString(); 
+                    await api.post('/api/sessions', newSession);
+                    sessions.value.unshift(newSession);
+                    currentSessionId.value = newSession.id;
+                    showToast('存档读取成功！');
+                } catch (err) { showToast('存档无效'); }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        };
+
+        const addCoreMemory = () => {
+            const mem = prompt('📌 强制写入核心记忆(MTM)：');
+            if (mem && mem.trim()) {
+                const instruction = `\n\n【系统指令：请在本次推演的面板更新中，强制将以下事实永久写入“核心记忆 (MTM)”表：${mem.trim()}】`;
+                input.value = input.value + instruction;
+                nextTick(autoResize);
+            }
+        };
+
+        onMounted(async () => {
+            await initPrompts(); 
+            await initProfiles();
+            await initSessions();
+            nextTick(autoResize);
+        });
+
+        const startEditTitle = (session) => { editingSessionId.value = session.id; editTempTitle.value = session.title; };
+        const saveEditTitle = async (session) => { 
+            if (editTempTitle.value.trim()) {
+                session.title = editTempTitle.value.trim(); 
+                await api.post('/api/sessions', JSON.parse(JSON.stringify(session)));
+            }
+            editingSessionId.value = null; 
+        };
+
+        const createNewSession = async (type = 'chat') => {
+            const newId = Date.now().toString();
+            let initialPromptContent = '';
+            if (type === 'chat') {
+                const chatPromptObj = systemPrompts.value.find(p => p.id === 'sp_chat');
+                initialPromptContent = chatPromptObj ? chatPromptObj.content : DEFAULT_CHAT_PROMPT;
+            } else initialPromptContent = activeSystemPrompt.value.content;
+
+            const newSession = { id: newId, type: type, title: type === 'chat' ? '新对话' : '未命名剧本', messages:[{ role: 'system', content: initialPromptContent }], updatedAt: Date.now() };
+            await api.post('/api/sessions', newSession);
+            sessions.value.unshift(newSession);
+            currentSessionId.value = newId;
+            if (window.innerWidth < 768) sidebarOpen.value = false;
+        };
+
+        const openRpgForm = () => { 
+            showRpgForm.value = true; 
+            if (window.innerWidth < 768) sidebarOpen.value = false; 
+            Object.keys(rpgLocks.value).forEach(key => rpgLocks.value[key] = false);
+        };
+
+        const copyRpgInfo = () => { navigator.clipboard.writeText(rpgPromptPreview.value).then(() => showToast('已复制！')); };
+
+        const startRpgGame = async () => {
+            const requiredFields = ['world', 'name', 'gender', 'race', 'age', 'appearance', 'personality', 'opening', 'identity'];
+            const emptyFields = requiredFields.filter(f => !rpgForm.value[f] || (typeof rpgForm.value[f] === 'string' && rpgForm.value[f].trim() === ''));
+            if (emptyFields.length > 0) return showToast('请填写所有必填项 (带*号)');
+
+            await createNewSession('rpg'); 
+            const session = currentSession.value;
+            const charName = rpgForm.value.name || '未命名角色';
+            const engineName = activeSystemPrompt.value.name || '未知引擎';
+            session.title = `${charName} - ${engineName}`;
+            session.messages.push({ role: 'user', content: rpgPromptPreview.value });
+            await api.post('/api/sessions', JSON.parse(JSON.stringify(session)));
+            showRpgForm.value = false;
+            callApi(rpgPromptPreview.value.length);
+        };
+
+        const handleSessionClick = (id) => { currentSessionId.value = id; if (window.innerWidth < 768) sidebarOpen.value = false; setTimeout(scrollToBottom, 100); };
+        const deleteSingleSession = async (id) => { 
+            if (confirm('确定删除吗？')) { 
+                await api.delete(`/api/sessions/${id}`);
+                sessions.value = sessions.value.filter(s => s.id !== id); 
+                if (currentSessionId.value === id) currentSessionId.value = sessions.value.length > 0 ? sessions.value[0].id : null; 
+            } 
+        };
+        const copyMessage = (text) => { navigator.clipboard.writeText(text).then(() => showToast('内容已复制')); };
+        const deleteMessage = (idx) => { if (confirm('删除此条对话？')) currentSession.value.messages.splice(idx, 1); };
+        const editMessage = (idx) => {
+            const s = currentSession.value;
+            if (s.messages[idx].role === 'user') {
+                input.value = s.messages[idx].content;
+                s.messages = s.messages.slice(0, idx); 
+                nextTick(() => { autoResize(); inputRef.value.focus(); });
+            } else showToast('请通过编辑您(玩家)的话语来改变剧情走向。');
+        };
+        const regenerateMessage = (idx) => {
+            const s = currentSession.value;
+            if (confirm('重新生成将抹除此节点后的所有剧情分支。')) {
+                s.messages = s.messages.slice(0, idx); 
+                callApi(0); 
+            }
+        };
+
+        const formatDate = (ts) => { const d = new Date(ts); return `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`; };
+        const renderMarkdown = (text) => { 
+            if (!text) return '';
+            let processedText = text.replace(/<cot>([\s\S]*?)<\/cot>/gi, '<details class="cot-box"><summary><i class="fas fa-brain"></i> 思维链推演 (CoT)</summary><div class="cot-content">$1</div></details>');
+            try { return marked.parse(processedText); } catch (e) { return processedText.replace(/\n/g, '<br>'); } 
+        };
+
+        const scrollToBottom = async (smooth = false) => { await nextTick(); const c = document.getElementById('chat-container'); if(c) c.scrollTo({ top: c.scrollHeight, behavior: smooth ? 'smooth' : 'auto' }); };
+        const autoResize = () => { const el = inputRef.value; if (!el) return; el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; };
+        const handleEnter = (e) => { if (e.shiftKey) nextTick(autoResize); else sendMessage(); };
+        const stopGeneration = () => { 
+            if (abortController) { 
+                abortController.abort(); abortController = null; isLoading.value = false;
+                const msgs = currentSession.value.messages;
+                if (msgs.length > 0 && msgs[msgs.length - 1].role === 'assistant') { msgs[msgs.length - 1].wasInterrupted = true; msgs[msgs.length - 1].isStreaming = false; }
+            } 
+        };
+
+        const sendMessage = () => {
+            if (!input.value.trim() || isLoading.value) return;
+            if (!currentSession.value) createNewSession('chat');
+            const session = currentSession.value;
+            const userWordCount = input.value.length; 
+            if (session.messages.length === 1 && session.messages[0].role === 'system') session.title = input.value.substring(0, 15); 
+            session.messages.push({ role: 'user', content: input.value });
+            input.value = '';
+            nextTick(autoResize);
+            callApi(userWordCount);
+        };
+
+        const callApi = async (userWordCount = 0) => {
+            if (!activeProfile.value.apiKey) { showToast("请先配置 API Key"); showSettings.value = true; return; }
+            const session = currentSession.value;
+            session.updatedAt = Date.now();
+            session.messages.push({ role: 'assistant', content: '', isStreaming: enableStream.value, wasInterrupted: false });
+            const msgIndex = session.messages.length - 1;
+            isLoading.value = true; scrollToBottom();
+            abortController = new AbortController();
+            try {
+                let messagesToSend =[...session.messages.slice(0, -1)]; 
+                let systemPrompt = Object.assign({}, messagesToSend[0]); 
+                let historyMsgs = messagesToSend.slice(1);
+                const maxMemory = parseInt(activeProfile.value.memoryLength) || 4; 
+                if (historyMsgs.length > maxMemory) historyMsgs = historyMsgs.slice(-maxMemory); 
+                if (session.type === 'rpg' && systemPrompt.role === 'system') {
+                     const stmRule = `\n\n【系统强制指令】检测到当前STM归纳阈值为 ${activeProfile.value.stmLength} 条。请检查上方 STM 表格，若条目数达到或超过此数值，必须立即执行压缩归纳，将旧 STM 概括并移入 LTM 表中！`;
+                     systemPrompt.content += stmRule;
+                }
+                const payloadMessages =[systemPrompt, ...historyMsgs];
+                const currentTemp = session.type === 'rpg' ? parseFloat(activeProfile.value.tempRpg) : parseFloat(activeProfile.value.tempChat);
+                const baseUrl = activeProfile.value.baseUrl.replace(/\/+$/, '');
+                const requestBody = { model: activeProfile.value.model, messages: payloadMessages, temperature: currentTemp, stream: enableStream.value };
+                if(enableStream.value) requestBody.stream_options = { include_usage: true };
+                const response = await fetch(`${baseUrl}/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${activeProfile.value.apiKey}` }, body: JSON.stringify(requestBody), signal: abortController.signal });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (enableStream.value) {
+                    const reader = response.body.getReader(); const decoder = new TextDecoder();
+                    let aiContent = ''; let finalUsage = null;
+                    while (true) {
+                        const { done, value } = await reader.read(); if (done) break;
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        for (const line of lines) {
+                            if (line.trim() === '' || line.trim() === 'data: [DONE]') continue;
+                            if (line.startsWith('data: ')) {
+                                try {
+                                    const json = JSON.parse(line.substring(6));
+                                    if (json.choices && json.choices.length > 0 && json.choices[0].delta.content) { aiContent += json.choices[0].delta.content; session.messages[msgIndex].content = aiContent; scrollToBottom(); }
+                                    if (json.usage) finalUsage = json.usage;
+                                } catch (e) {}
+                            }
+                        }
+                    }
+                    session.messages[msgIndex].isStreaming = false;
+                    const usage = finalUsage || { prompt_tokens: 0, completion_tokens: 0 };
+                    session.messages[msgIndex].usage = { user_words: userWordCount, ai_words: aiContent.length, prompt_tokens: usage.prompt_tokens, completion_tokens: usage.completion_tokens };
+                } else {
+                    const data = await response.json(); const aiContent = data.choices[0].message.content;
+                    session.messages[msgIndex].content = aiContent; session.messages[msgIndex].isStreaming = false;
+                    const usage = data.usage || { prompt_tokens: 0, completion_tokens: 0 };
+                    session.messages[msgIndex].usage = { user_words: userWordCount, ai_words: aiContent.length, prompt_tokens: usage.prompt_tokens, completion_tokens: usage.completion_tokens };
+                }
+            } catch (error) { if (error.name !== 'AbortError') session.messages[msgIndex].content += `\n\n**[网络中断]:** ${error.message}`; session.messages[msgIndex].isStreaming = false; }
+            finally { isLoading.value = false; abortController = null; scrollToBottom(); if (currentSession.value) api.post('/api/sessions', JSON.parse(JSON.stringify(currentSession.value))); }
+        };
+
+        return {
+            sidebarOpen, showSettings, showAdvSettings, showRpgForm, input, inputRef, isLoading, rpgForm, rpgLocks, activeRandomTheme, rpgPromptPreview,
+            profiles, activeProfileId, activeProfile, addNewProfile, deleteActiveProfile, quickPasteConfig, applyQuickPaste,
+            sessions, currentSessionId, currentSession, visibleMessages,
+            editingSessionId, editTempTitle, startEditTitle, saveEditTitle,
+            createNewSession, openRpgForm, copyRpgInfo, startRpgGame, handleSessionClick, 
+            deleteSingleSession, copyMessage, deleteMessage, editMessage, regenerateMessage, 
+            sendMessage, handleEnter, stopGeneration, renderMarkdown, autoResize, formatDate,
+            exportCurrentSession, importSession, exportRpgModule, importRpgModule, scrollToBottom,
+            enableStream, addCoreMemory, exportProfiles, importProfiles, toast,
+            showPromptEditor, systemPrompts, activeSystemPromptId, activeSystemPrompt, addNewSystemPrompt, deleteSystemPrompt,
+            showCoT, randomInput, randomAll, themeLibs
+        };
+    }
+}).mount('#app');

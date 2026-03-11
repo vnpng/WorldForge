@@ -1,0 +1,72 @@
+import sqlite3
+import json
+import os
+
+DB_PATH = os.path.join("data", "worldforge.db")
+
+def get_db_connection():
+    """获取数据库连接"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row  # 返回字典格式
+    return conn
+
+def init_db():
+    """初始化数据库表结构"""
+    if not os.path.exists("data"):
+        os.makedirs("data")
+        
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 1. Sessions 表 (会话与存档)
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Sessions (
+        id TEXT PRIMARY KEY,
+        type TEXT NOT NULL,
+        title TEXT,
+        messages TEXT, -- 存储 JSON 字符串
+        updatedAt INTEGER
+    )
+    ''')
+
+    # 2. SystemPrompts 表 (引擎预设)
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS SystemPrompts (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        content TEXT
+    )
+    ''')
+
+    # 3. Profiles 表 (API 节点设置)
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Profiles (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        baseUrl TEXT,
+        apiKey TEXT,
+        model TEXT,
+        memoryLength INTEGER DEFAULT 6,
+        stmLength INTEGER DEFAULT 6,
+        tempRpg REAL DEFAULT 1.0,
+        tempChat REAL DEFAULT 0.6
+    )
+    ''')
+
+    # 4. SystemConfig 表 (系统元数据)
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS SystemConfig (
+        key TEXT PRIMARY KEY,
+        value TEXT
+    )
+    ''')
+    
+    # 初始化数据库版本
+    cursor.execute("INSERT OR IGNORE INTO SystemConfig (key, value) VALUES ('db_version', '13.5.0')")
+
+    conn.commit()
+    conn.close()
+
+if __name__ == "__main__":
+    init_db()
+    print("数据库初始化完成。")
