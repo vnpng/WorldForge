@@ -1207,8 +1207,8 @@ export default {
       }
     }
 
-    function confirmDeleteExec() {
-      if (confirmCb.value) confirmCb.value();
+    async function confirmDeleteExec() {
+      if (confirmCb.value) await confirmCb.value();
       showConfirm.value = false;
       confirmTarget.value = null;
       confirmCb.value = null;
@@ -1216,13 +1216,19 @@ export default {
 
     const confirmDelete = (item, type) => {
       confirmTarget.value = item;
-      confirmCb.value = () => {
-        if (type === 'engine') {
-          systemPrompts.value = systemPrompts.value.filter(x => x.id !== item.id);
-        } else if (type === 'world') {
-          worlds.value = worlds.value.filter(x => x.id !== item.id);
-        } else if (type === 'char') {
-          characters.value = characters.value.filter(x => x.id !== item.id);
+      confirmCb.value = async () => {
+        const endpoint = type === 'world' ? `/api/worlds/${item.id}` : (type === 'char' ? `/api/characters/${item.id}` : `/api/prompts/${item.id}`);
+        try {
+          await apiFetch(endpoint, { method: 'DELETE' });
+          if (type === 'engine') {
+            systemPrompts.value = systemPrompts.value.filter(x => x.id !== item.id);
+          } else if (type === 'world') {
+            worlds.value = worlds.value.filter(x => x.id !== item.id);
+          } else if (type === 'char') {
+            characters.value = characters.value.filter(x => x.id !== item.id);
+          }
+        } catch (e) {
+          alert('删除失败，可能是权限不足或网络异常。');
         }
       };
       showConfirm.value = true;
@@ -1332,14 +1338,40 @@ export default {
       { id: 2, name: 'Claude 3.5 Sonnet (文字推演)', model: 'claude-3-5-sonnet' }
     ]);
 
-    // ── Mock Data: 玩家个人资产库 (带详细字段) ──
-    const worlds = ref([
-      { id: 1, name: '深渊神殿', intro: '一个被黑暗与诅咒笼罩的远古遗迹。', desc: '黑暗神殿的入口大厅。加入了一些额外的魔法变异规则。', society:'封建制', history:'三百年前魔法战争', geography:'北部冰原', magic_system:'元素亲和体系', rules:'死亡即重置', extra_rules:'', conflict:'生者与远古亡者的存亡之战' }
-    ]);
-    const characters = ref([
-      { id: 1, name: '银翼·克劳德', gender: '男', age: '28', race: '人类', identity: '流亡骑士', appearance:'银色长发', personality:'外冷内热', item:'断剑', style:'沉默寡言，字字珠玑', custom:'' },
-      { id: 2, name: '星游者·艾莉亚', gender: '女', age: '22', race: '星灵', identity: '星际走私客', appearance:'红发', personality:'狡猾爱财', item:'等离子手枪', style:'语速快，喜欢用比喻', custom:'' }
-    ]);
+    // ── 真实资产库 (打通后端) ──
+    const worlds = ref([]);
+    const characters = ref([]);
+
+    // 统一资产拉取函数
+    async function loadAssets() {
+      if (!loggedIn.value) return;
+      try {
+        const [wRes, cRes, pRes] = await Promise.all([
+          apiFetch('/api/worlds'),
+          apiFetch('/api/characters'),
+          apiFetch('/api/prompts')
+        ]);
+        worlds.value = await wRes.json();
+        characters.value = await cRes.json();
+        const pData = await pRes.json();
+        
+        // 适配引擎字典 (后端是 content，前端暂用 desc)
+        systemPrompts.value = pData.map(p => ({ 
+          ...p, 
+          desc: p.content, 
+          active: false, 
+          type: (p.name && p.name.includes('Chat')) ? 'chat' : 'rpg',
+          isPublic: p.is_public === 1
+        }));
+      } catch (e) {
+        console.error('加载资产失败:', e);
+      }
+    }
+
+    // 监听登录状态：一旦登录成功，立刻拉取数据
+    watch(loggedIn, (newVal) => {
+      if (newVal) loadAssets();
+    }, { immediate: true });
 
     // ── 资产编辑状态与方法 ──
     const editingWorld = ref(null);
@@ -1355,10 +1387,27 @@ export default {
       originalEditData.value = JSON.stringify(c);
     };
 
-    const saveEdit = (type) => {
+    const saveEdit = async (type) => {
       const data = type === 'world' ? editingWorld.value : (type === 'char' ? editingChar.value : editingEngine.value);
-      originalEditData.value = JSON.stringify(data);
-      alert('✅ 保存成功！');
+      const endpoint = type === 'world' ? '/api/worlds' : (type === 'char' ? '/api/characters' : '/api/prompts');
+      
+      const payload = { ...data };
+      if (type === 'engine') {
+        payload.content = payload.desc || '';
+        payload.is_public = payload.isPublic ? 1 : 0;
+      }
+      
+      try {
+        await apiFetch(endpoint, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        originalEditData.value = JSON.stringify(data);
+        alert('✅ 保存并同步至云端成功！');
+        await loadAssets(); // 保存后重新拉取
+      } catch (e) {
+        alert('保存失败，请检查网络。');
+      }
     };
 
     const exitEdit = (type) => {
@@ -1378,12 +1427,12 @@ export default {
     };
 
     const addNewWorld = () => {
-      const nw = { id: Date.now(), name: '新世界', intro: '', desc: '', society: '', history: '', geography: '', magic_system: '', rules: '', extra_rules: '', conflict: '' };
+      const nw = { id: String(Date.now()), name: '新世界', intro: '', desc: '', society: '', history: '', geography: '', magic_system: '', rules: '', extra_rules: '', conflict: '' };
       worlds.value.push(nw);
       editWorld(nw);
     };
     const addNewChar = () => {
-      const nc = { id: Date.now(), name: '新角色', gender: '', age: '', race: '', identity: '', appearance: '', personality: '', item: '', style: '', custom: '' };
+      const nc = { id: String(Date.now()), name: '新角色', gender: '', age: '', race: '', identity: '', appearance: '', personality: '', item: '', style: '', custom: '' };
       characters.value.push(nc);
       editChar(nc);
     };
@@ -1562,13 +1611,7 @@ export default {
     // ── Current User Mock (已废弃，迁至顶部真实状态) ──
 
     // ── Presets ──
-    const systemPrompts = ref([
-      { id:1, name:'世界观强化引擎', type:'rpg',  active:true,  desc:'强制 AI 遵守世界观设定，禁止出戏。', isPublic: true },
-      { id:2, name:'CoT 推演模板',   type:'rpg',  active:true,  desc:'要求 AI 用标签展示推演过程。', isPublic: true },
-      { id:3, name:'角色扮演守则',   type:'rpg',  active:true,  desc:'限制 AI 响应长度，保持叙事节奏。', isPublic: false },
-      { id:4, name:'代码助手',       type:'chat', active:false, desc:'专注代码生成与调试。', isPublic: true },
-      { id:5, name:'简洁回复模式',   type:'chat', active:false, desc:'要求 AI 用最短语言给出答案。', isPublic: false },
-    ]);
+    const systemPrompts = ref([]);
     const editingEngine = ref(null);
 
     const editEngine = (e) => {
@@ -1576,7 +1619,7 @@ export default {
       originalEditData.value = JSON.stringify(e);
     };
     const addNewEngine = () => {
-      const ne = { id: Date.now(), name: '新引擎预设', type: 'rpg', active: false, desc: '', isPublic: false };
+      const ne = { id: String(Date.now()), name: '新引擎预设', type: 'rpg', active: false, desc: '', isPublic: false };
       systemPrompts.value.push(ne);
       editEngine(ne);
     };
@@ -1687,16 +1730,26 @@ export default {
     const worldListRef = ref(null);
     const charListRef = ref(null);
 
-    const initSortable = (el, listRef) => {
+    const initSortable = (el, listRef, type) => {
       if (!el || el._sortable) return;
       el._sortable = new Sortable(el, {
         handle: '.drag-handle',
         animation: 150,
-        onEnd: (evt) => {
+        onEnd: async (evt) => {
           const { oldIndex, newIndex } = evt;
           if (oldIndex === newIndex) return;
           const item = listRef.value.splice(oldIndex, 1)[0];
           listRef.value.splice(newIndex, 0, item);
+          
+          listRef.value.forEach((x, i) => { x.sort_index = i; });
+          
+          const endpoint = type === 'world' ? '/api/worlds/reorder' : (type === 'char' ? '/api/characters/reorder' : '/api/prompts/reorder');
+          const payload = listRef.value.map(x => ({ id: x.id, sort_index: x.sort_index }));
+          try {
+            await apiFetch(endpoint, { method: 'PUT', body: JSON.stringify(payload) });
+          } catch (e) {
+            console.error('排序同步失败:', e);
+          }
         }
       });
     };
@@ -1704,11 +1757,11 @@ export default {
     watch(currentView, async (newVal) => {
       await nextTick();
       if (newVal === 'engine-mgr' && engineListRef.value) {
-        initSortable(engineListRef.value, systemPrompts);
+        initSortable(engineListRef.value, systemPrompts, 'engine');
       } else if (newVal === 'world-mgr' && worldListRef.value) {
-        initSortable(worldListRef.value, worlds);
+        initSortable(worldListRef.value, worlds, 'world');
       } else if (newVal === 'char-mgr' && charListRef.value) {
-        initSortable(charListRef.value, characters);
+        initSortable(charListRef.value, characters, 'char');
       }
     }, { immediate: true });
 
