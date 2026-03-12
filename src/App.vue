@@ -342,7 +342,7 @@
                   <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
                     <div class="preset-name">{{w.name}}</div>
                   </div>
-                  <div class="preset-desc">{{w.desc || '暂无描述'}}</div>
+                  <div class="preset-desc">{{w.intro || '暂无简介'}}</div>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center">
                   <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click="editWorld(w)"><i class="fas fa-pen"></i></div>
