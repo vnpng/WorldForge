@@ -833,7 +833,9 @@
                 </transition>
 
                 <div class="tool-btn"><i class="fas fa-microphone"></i></div>
-                <button class="send-btn-gemini" @click="sendFromWelcome" :disabled="!inputText.trim()"><i class="fas fa-arrow-up"></i></button>
+                <button class="send-btn-gemini" @click="isStreaming ? stopStreaming() : sendFromWelcome()" :disabled="!inputText.trim() && !isStreaming" :style="isStreaming ? 'background:var(--danger)' : ''">
+                  <i :class="isStreaming ? 'fas fa-stop' : 'fas fa-arrow-up'"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -1094,7 +1096,9 @@
                 </transition>
 
                 <div class="tool-btn"><i class="fas fa-microphone"></i></div>
-                <button class="send-btn-gemini" @click="sendMessage" :disabled="!inputText.trim()"><i class="fas fa-arrow-up"></i></button>
+                <button class="send-btn-gemini" @click="isStreaming ? stopStreaming() : sendMessage()" :disabled="!inputText.trim() && !isStreaming" :style="isStreaming ? 'background:var(--danger)' : ''">
+                  <i :class="isStreaming ? 'fas fa-stop' : 'fas fa-arrow-up'"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -1962,6 +1966,16 @@ export default {
     const mainInputEl = ref(null);
     const welcomeInputEl = ref(null);
     const showScrollBottom = ref(false);
+    const isStreaming = ref(false);
+    const currentReader = ref(null);
+
+    const stopStreaming = () => {
+      if (currentReader.value) {
+        currentReader.value.cancel();
+        currentReader.value = null;
+      }
+      isStreaming.value = false;
+    };
 
     const scrollToBottom = async (smooth = false) => {
       await nextTick();
@@ -2052,6 +2066,7 @@ export default {
       });
 
       // 4. 发起真实流式请求
+      isStreaming.value = true;
       try {
         const response = await apiFetch('/api/chat', {
           method: 'POST',
@@ -2068,13 +2083,13 @@ export default {
           })
         });
 
-        const reader = response.body.getReader();
+        currentReader.value = response.body.getReader();
         const decoder = new TextDecoder();
         let fullText = "";
         let firstChunk = true;
 
         while (true) {
-          const { done, value } = await reader.read();
+          const { done, value } = await currentReader.value.read();
           if (done) break;
 
           const chunk = decoder.decode(value);
@@ -2153,7 +2168,14 @@ export default {
         await syncSession(currentSessionId.value);
 
       } catch (err) {
-        aiMsg.content = `<span style="color:var(--danger)">[网络异常] 无法连接到后厨，请检查后端程序是否运行。</span>`;
+        if (err.name === 'AbortError') {
+          aiMsg.content += '<br><span style="color:var(--grey)">[已停止生成]</span>';
+        } else {
+          aiMsg.content = `<span style="color:var(--danger)">[网络异常] 无法连接到后厨，请检查后端程序是否运行。</span>`;
+        }
+      } finally {
+        isStreaming.value = false;
+        currentReader.value = null;
       }
     }
 
@@ -2314,7 +2336,8 @@ export default {
       charStats, inventory, actionChips,
       rowRefs, scrollRow, startDrag, stopDrag, onDrag,
       engineListRef, worldListRef, charListRef,
-      showScrollBottom, scrollToBottom, onChatScroll
+      showScrollBottom, scrollToBottom, onChatScroll,
+      isStreaming, stopStreaming, currentReader
     };
   }
 }
