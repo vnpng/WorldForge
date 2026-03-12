@@ -535,7 +535,6 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
 
 # [强制指令]
 1. 必须使用 <cot> 标签进行剧情逻辑推演。
-2. 在回复末尾，请以 [推荐行动] 格式给出 3 个后续行动建议，每个建议占一行。
 """
 
     # 3. 准备历史消息 (Context)
