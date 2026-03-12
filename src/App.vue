@@ -958,7 +958,7 @@
                   </div>
                 </transition>
 
-                <div class="tool-btn-text" @click.stop="showEngineParams=true; showToolsMenu=false; showCharDrawer=false; showActionList=false">
+                <div class="tool-btn-text" @click.stop="showEngineParams=true; showToolsMenu=false; showProfileMenu=false; showCharDrawer=false; showActionList=false">
                   <i class="fas fa-sliders-h"></i> 调节
                 </div>
 
