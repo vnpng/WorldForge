@@ -720,11 +720,11 @@
                     </div>
                     <div class="form-field full">
                       <div class="form-label">Base URL</div>
-                      <input class="form-input" v-model="editingProfile.url"/>
+                      <input class="form-input" v-model="editingProfile.baseUrl" placeholder="https://api.openai.com/v1"/>
                     </div>
                     <div class="form-field full">
                       <div class="form-label">API Key</div>
-                      <input class="form-input" v-model="editingProfile.key" type="password" placeholder="sk-..."/>
+                      <input class="form-input" v-model="editingProfile.apiKey" type="password" placeholder="sk-..."/>
                     </div>
                     <div class="form-field full">
                       <div class="form-label">Model Name</div>
