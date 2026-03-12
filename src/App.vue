@@ -1523,6 +1523,8 @@ export default {
       currentView.value = 'chat';
       // 立即持久化到后端
       await syncSession(id);
+      // 自动触发序章生成
+      await sendMessage('开始游戏，请生成序章。', true);
     };
 
     const quickSetup = reactive({ characterId: null, engineId: 1 });
