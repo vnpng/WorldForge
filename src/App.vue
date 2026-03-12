@@ -1526,9 +1526,7 @@ export default {
         engine_id: setupForm.engineId,
         world_id: setupForm.worldId,
         char_id: setupForm.characterId,
-        messages: [
-          { id: Date.now(), role: 'ai', content: '世界正在生成，命运的齿轮开始转动...', usage: { user_words:0, prompt_tokens:120, ai_words:18, completion_tokens:22 } }
-        ],
+        messages: [],
         updatedAt: Date.now()
       };
       currentSessionId.value = id;
