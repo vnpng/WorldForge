@@ -2288,7 +2288,7 @@ export default {
       worlds, setupForm, canStartRPG, startRPG,
       editingWorld, editingChar, addNewWorld, addNewChar,
       editWorld, editChar, saveEdit, exitEdit,
-      editUserMsg, copyMsg, deleteMsg, regenMsg,
+      editUserMsg, copyMsg, deleteMsg, regenMsg, copiedMsgId,
       currentUser, editingEngine, addNewEngine, editEngine, confirmDelete,
       charStats, inventory, actionChips,
       rowRefs, scrollRow, startDrag, stopDrag, onDrag,
