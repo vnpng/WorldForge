@@ -2000,7 +2000,7 @@ export default {
       const msgs = activeSession.value.messages;
       // [沉浸式] 如果是非静默模式，才将用户消息推入 UI 列表
       if (!silent) {
-        msgs.push({ id: Date.now(), role: 'user', content: text });
+        msgs.push({ id: Date.now(), role: 'user', content: text.replace(/\n/g, '<br>') });
       } else {
         // 静默模式下，依然推入消息但标记为 hidden，以便同步到后端维持上下文，但在前端隐藏
         msgs.push({ id: Date.now(), role: 'user', content: text, hidden: true });
