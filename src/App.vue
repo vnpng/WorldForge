@@ -191,11 +191,13 @@
             <div class="status-api"><div class="status-dot"></div>{{activeProfile.name}} · {{activeProfile.model}}</div>
             <div class="status-right">
               <template v-if="currentMode==='rpg'">
-                <span class="toggle-label">调试 Prompt</span>
-                <label class="toggle">
-                  <input type="checkbox" :checked="showDebug" @change="showDebug=!showDebug"/>
-                  <div class="toggle-track"></div><div class="toggle-thumb"></div>
-                </label>
+                <template v-if="currentUser.role === 'superadmin'">
+                  <span class="toggle-label">调试 Prompt</span>
+                  <label class="toggle">
+                    <input type="checkbox" :checked="showDebug" @change="showDebug=!showDebug"/>
+                    <div class="toggle-track"></div><div class="toggle-thumb"></div>
+                  </label>
+                </template>
                 <span class="toggle-label" style="margin-left:4px">CoT</span>
                 <label class="toggle">
                   <input type="checkbox" :checked="showCoT" @change="showCoT=!showCoT"/>
@@ -827,7 +829,7 @@
               <!-- Bubble -->
               <div class="bubble" :class="msg.role">
                 <template v-if="msg.role==='ai' && currentMode==='rpg'">
-                  <details class="debug-box" v-if="msg.debug || msg.usage">
+                  <details class="debug-box" v-if="msg.role === 'ai'">
                     <summary><i class="fas fa-bug" style="font-size:10px"></i> 调试 Prompt</summary>
                     <div class="debug-content">
                       <div v-if="msg.usage" class="inner-stats" style="padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,165,0,0.15); display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px;">
@@ -1899,9 +1901,15 @@ export default {
                   const cotMatch = fullText.match(/<cot>([\s\S]*?)<\/cot>/);
                   if (cotMatch) {
                     aiMsg.cot = cotMatch[1];
-                    aiMsg.content = marked.parse(fullText.replace(/<cot>[\s\S]*?<\/cot>/g, '').trim());
+                    const visibleText = fullText.replace(/<cot>[\s\S]*?<\/cot>/g, '').trim();
+                    if (visibleText) {
+                      aiMsg.content = marked.parse(visibleText);
+                    }
                   } else {
-                    aiMsg.content = marked.parse(fullText.trim());
+                    const visibleText = fullText.trim();
+                    if (visibleText) {
+                      aiMsg.content = marked.parse(visibleText);
+                    }
                   }
 
                   // 实时提取 [推荐行动]
