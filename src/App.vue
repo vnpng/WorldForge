@@ -1240,31 +1240,42 @@ export default {
       { key:'data',      icon:'fas fa-database',     label:'数据管理', desc:'导入、导出、重置' },
     ];
 
-    // ── Sessions ──
-    let nextId = 25;
-    const sessionsData = reactive({
-      1: { id:1, name:'深渊神殿·序章', mode:'rpg', messages:[
-        { id:1, role:'ai', content:'黑暗神殿的石门在你的身后轰然关闭，厚重的撞击声在空旷的大厅中久久回响。火把的光芒勉强照亮前方五米的区域，空气中弥漫着腐朽与古老香料混合的气息。',
-          cot:'场景设定：封闭、孤立感强。应先建立紧张氛围，再给予探索提示。角色当前持有火把，视野受限是合理的资源约束。',
-          debug:'[SYSTEM] 世界观：黑暗奇幻。规则：死亡即重置。角色：流亡骑士。当前场景：神殿入口大厅。',
-          usage:{ user_words:8, prompt_tokens:1240, ai_words:62, completion_tokens:88 } },
-        { id:2, role:'user', content:'我举起火炬，仔细观察四周的壁画。' },
-        { id:3, role:'ai', content:'壁画描绘了一场远古的战争——骑龙的战士与持剑的人类并肩作战，对抗一个形如黑雾的存在。画面最右侧，一位独眼战士手持断剑，站在所有人的最前方。<br><br>你注意到那位独眼战士的盔甲与你身上的破损铠甲纹饰极为相似。',
-          cot:'利用角色背景（独眼、断剑）与环境产生联系，增强代入感。埋下"主角前世/血脉"伏笔，为后续剧情留坑。',
-          debug:'[SYSTEM] 叙事节点：发现线索。触发：玩家主动探索。伏笔权重：高。',
-          usage:{ user_words:11, prompt_tokens:1480, ai_words:89, completion_tokens:126 } },
-        { id:4, role:'user', content:'我走近那幅壁画，用手指描摹那位独眼战士的轮廓。' },
-      ]},
-      2: { id:2, name:'代码重构讨论',  mode:'chat', messages:[
-        { id:1, role:'ai', content:'你好！我是你的 AI 助手。有什么代码问题需要帮忙？', usage:{ user_words:0, prompt_tokens:80, ai_words:18, completion_tokens:20 } },
-        { id:2, role:'user', content:'帮我解释一下 Vue 3 的 Composition API 和 Options API 的区别。' },
-        { id:3, role:'ai', content:'两者都是 Vue 3 的编写方式：<br><br><b>Options API</b> 是 Vue 2 的经典写法，用 data、methods、computed 等选项分类组织代码，适合简单组件和初学者。<br><br><b>Composition API</b> 是 Vue 3 引入的新方式，用 setup() 函数将相关逻辑集中在一起，更适合复杂组件、逻辑复用（Composables）和 TypeScript 支持。', usage:{ user_words:22, prompt_tokens:320, ai_words:96, completion_tokens:140 } },
-      ]},
-      3: { id:3, name:'银河边疆·续集', mode:'rpg', messages:[] },
-      4: { id:4, name:'旅行计划助手',  mode:'chat', messages:[] }
+    // ── Sessions (打通后端) ──
+    const sessionsData = reactive({});
+    const sessions = computed(() => {
+        return Object.values(sessionsData).sort((a, b) => b.updatedAt - a.updatedAt);
     });
-    const sessions = computed(() => Object.values(sessionsData));
-    const currentSessionId = ref(null); // null = welcome state
+    const currentSessionId = ref(null);
+
+    async function loadSessions() {
+      try {
+        const res = await apiFetch('/api/sessions');
+        const data = await res.json();
+        // 转换为响应式字典
+        Object.keys(sessionsData).forEach(key => delete sessionsData[key]);
+        data.forEach(s => {
+          sessionsData[s.id] = { ...s, name: s.title || '未命名会话' };
+        });
+      } catch (e) { console.error('加载会话失败'); }
+    }
+
+    // 同步保存会话到后端
+    async function syncSession(id) {
+      const s = sessionsData[id];
+      if (!s) return;
+      try {
+        await apiFetch('/api/sessions', {
+          method: 'POST',
+          body: JSON.stringify({
+            id: s.id,
+            type: s.mode,
+            title: s.name,
+            messages: s.messages,
+            updatedAt: Date.now()
+          })
+        });
+      } catch (e) { console.error('同步会话失败'); }
+    } // null = welcome state
 
     const isWelcome = computed(() => currentSessionId.value === null);
     const activeSession = computed(() => currentSessionId.value ? sessionsData[currentSessionId.value] : null);
@@ -1346,11 +1357,22 @@ export default {
     async function loadAssets() {
       if (!loggedIn.value) return;
       try {
-        const [wRes, cRes, pRes] = await Promise.all([
+        const [wRes, cRes, pRes, profRes, sessRes] = await Promise.all([
           apiFetch('/api/worlds'),
           apiFetch('/api/characters'),
-          apiFetch('/api/prompts')
+          apiFetch('/api/prompts'),
+          apiFetch('/api/profiles'),
+          loadSessions() // Sessions 内部已处理响应式赋值
         ]);
+        worlds.value = await wRes.json();
+        characters.value = await cRes.json();
+        const pData = await pRes.json();
+        profiles.value = await profRes.json();
+        
+        // 恢复 API 节点选中状态
+        if (!activeProfileId.value && profiles.value.length > 0) {
+          activeProfileId.value = profiles.value[0].id;
+        }
         worlds.value = await wRes.json();
         characters.value = await cRes.json();
         const pData = await pRes.json();
@@ -1490,46 +1512,66 @@ export default {
       showConfirm.value = true;
     }
 
-    // ── Profiles ──
-    const activeProfileId = ref(1);
-    const editingProfileId = activeProfileId; // 统一状态，选择即生效
-    const profiles = ref([
-      { id:1, name:'Gemini Pro',   url:'https://generativelanguage.googleapis.com/v1', key:'', model:'gemini-2.5-pro' },
-      { id:2, name:'Claude API',   url:'https://api.anthropic.com/v1',                key:'', model:'claude-sonnet-4-6' },
-      { id:3, name:'Local Ollama', url:'http://localhost:11434/api',                  key:'', model:'qwen3:14b' },
-    ]);
+    // ── Profiles (打通后端) ──
+    const activeProfileId = ref(localStorage.getItem('wf_active_profile') || null);
+    const editingProfileId = ref(null);
+    const profiles = ref([]);
     
-    const activeProfile = computed(() => profiles.value.find(p => p.id === activeProfileId.value) || profiles.value[0]);
-    const editingProfile = computed(() => profiles.value.find(p => p.id === editingProfileId.value) || null);
+    // 自动追踪最后选中的节点
+    watch(activeProfileId, (newVal) => {
+      if (newVal) localStorage.setItem('wf_active_profile', newVal);
+    });
+
+    const activeProfile = computed(() => {
+      const found = profiles.value.find(p => p.id === activeProfileId.value);
+      return found || (profiles.value.length > 0 ? profiles.value[0] : { name: '未配置', model: 'N/A' });
+    });
+
+    const editingProfile = computed(() => profiles.value.find(p => p.id === (editingProfileId.value || activeProfileId.value)) || null);
+
+    async function loadProfiles() {
+      try {
+        const res = await apiFetch('/api/profiles');
+        profiles.value = await res.json();
+        // 如果没有选中的，或者选中的已被删，默认选第一个
+        if (!activeProfileId.value && profiles.value.length > 0) {
+          activeProfileId.value = profiles.value[0].id;
+        }
+      } catch (e) { console.error('加载节点失败'); }
+    }
     
     const importInput = ref(null);
     const quickAddText = ref('');
 
-    const addProfile = () => {
-      const newId = Date.now();
-      profiles.value.push({ id: newId, name: '新建节点', url: 'https://...', key: '', model: 'gpt-4o' });
-      editingProfileId.value = newId;
-    };
+    async function addProfile() {
+      const newId = String(Date.now());
+      const newP = { id: newId, name: '新建节点', baseUrl: '', apiKey: '', model: 'gpt-4o' };
+      try {
+        await apiFetch('/api/profiles', { method: 'POST', body: JSON.stringify(newP) });
+        await loadProfiles();
+        activeProfileId.value = newId;
+      } catch (e) { alert('新建失败'); }
+    }
 
-    const deleteProfile = (id) => {
-      const idx = profiles.value.findIndex(p => p.id === id);
-      if (idx === -1) return;
-      profiles.value.splice(idx, 1);
-      
-      // 删空防呆：如果没有节点了，自动建一个占位空节点
-      if (profiles.value.length === 0) {
-        const dummyId = Date.now();
-        profiles.value.push({ id: dummyId, name: '[空] 待配置节点', url: '', key: '', model: '' });
-      }
-      
-      // 默认重新指向列表第一个节点
-      editingProfileId.value = profiles.value[0].id;
+    async function deleteProfile(id) {
+      if (!confirm('确定删除此 API 节点吗？')) return;
+      try {
+        await apiFetch(`/api/profiles/${id}`, { method: 'DELETE' });
+        await loadProfiles();
+        if (activeProfileId.value === id) {
+          activeProfileId.value = profiles.value.length > 0 ? profiles.value[0].id : null;
+        }
+      } catch (e) { alert('删除失败'); }
+    }
 
-      // 顺位继承逻辑：如果删掉的是正在使用的主节点，让主节点随之继承
-      if (activeProfileId.value === id) {
-         activeProfileId.value = profiles.value[0].id;
+    // 监听实时保存：只要编辑框内容变了，自动同步到后端
+    watch(editingProfile, async (newVal, oldVal) => {
+      if (newVal && oldVal && newVal.id === oldVal.id) {
+        try {
+          await apiFetch('/api/profiles', { method: 'POST', body: JSON.stringify(newVal) });
+        } catch (e) { console.error('自动保存节点失败'); }
       }
-    };
+    }, { deep: true });
 
     const saveApiConfig = () => {
       alert('✅ 配置已保存');
