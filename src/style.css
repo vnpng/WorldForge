@@ -850,7 +850,8 @@ body.light .char-drawer { background: var(--ink-soft); border-color: rgba(0,0,0,
 /* ══ TOOLS DROPDOWN MENU ══ */
 .tools-menu {
   position: absolute; bottom: calc(100% + 12px); left: 0;
-  width: 200px; background: var(--ink-soft);
+  width: max-content; min-width: 100%; max-width: 300px;
+  background: var(--ink-soft);
   border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
   padding: 8px; box-shadow: var(--shadow-lg); z-index: 95;
 }
@@ -861,7 +862,10 @@ body.light .char-drawer { background: var(--ink-soft); border-color: rgba(0,0,0,
 }
 .menu-item:hover { background: rgba(255,255,255,0.08); }
 
-.menu-item-label { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; color: var(--white-soft); }
+.menu-item-label { 
+  display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; color: var(--white-soft); 
+  white-space: nowrap;
+}
 
 /* 菜单动画 */
 .menu-pop-enter-active, .menu-pop-leave-active { transition: all 0.2s ease; }
