@@ -1923,11 +1923,6 @@ export default {
       }
     }
 
-      } catch (err) {
-        aiMsg.content = `<span style="color:var(--danger)">[网络异常] 无法连接到后厨，请检查后端程序是否运行。</span>`;
-      }
-    }
-
     const welcomeHints = ['开始新的冒险', '帮我写一段代码', '继续上次剧情', '头脑风暴想法'];
 
     // ── Drag & Drop Sortable ──
