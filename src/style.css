@@ -520,30 +520,18 @@ body.light .chat .msg-avatar.ai { background: rgba(92,168,0,.15); color: #4a9000
   padding: 10px 12px;
 }
 
-/* AI 回复中的 details 折叠框样式 */
-.bubble details {
+/* AI 回复中的 top-info-bar 样式 */
+.bubble .top-info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 8px;
-  padding: 0;
-  margin: 8px 0;
-  overflow: hidden;
-}
-.bubble details summary {
   padding: 8px 12px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 13px;
+  margin: 8px 0;
   background: rgba(255,255,255,0.05);
-  user-select: none;
-}
-.bubble details summary:hover {
-  background: rgba(255,255,255,0.08);
-}
-.bubble details[open] summary {
-  border-bottom: 1px solid rgba(255,255,255,0.12);
-}
-.bubble details > *:not(summary) {
-  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
 }
 .rpg  .bubble.ai   { background: transparent; border: none; padding: 8px 0; margin-left: 36px; }
 .rpg  .bubble.user { background: var(--bubble-rpg-user); border-radius: 16px 4px 16px 16px; color: #fff; }
