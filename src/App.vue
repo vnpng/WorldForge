@@ -1729,7 +1729,6 @@ export default {
     // ── Current User Mock (已废弃，迁至顶部真实状态) ──
 
     // ── Presets ──
-    const systemPrompts = ref([]);
     const editingEngine = ref(null);
 
     const editEngine = (e) => {
