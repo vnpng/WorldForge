@@ -17,12 +17,18 @@ def upgrade_tables(cursor):
     表结构自动升级逻辑：检测字段是否存在，若不存在则使用 ALTER TABLE 追加。
     这种方式可以确保从旧版本平滑升级，且存量数据无损。
     """
-    # 1. 升级 Sessions 表：增加 user_id
+    # 1. 升级 Sessions 表：增加 user_id 和新字段
     cursor.execute("PRAGMA table_info(Sessions)")
     columns = [row[1] for row in cursor.fetchall()]
     if 'user_id' not in columns:
         print("正在为 Sessions 表追加 user_id 字段...")
         cursor.execute("ALTER TABLE Sessions ADD COLUMN user_id TEXT")
+    
+    # 补全置顶与 ID 字段
+    for field, ftype in {'is_pinned': 'INTEGER DEFAULT 0', 'engine_id': 'TEXT', 'world_id': 'TEXT', 'char_id': 'TEXT'}.items():
+        if field not in columns:
+            print(f"正在为 Sessions 表追加 {field} 字段...")
+            cursor.execute(f"ALTER TABLE Sessions ADD COLUMN {field} {ftype}")
 
     # 2. 升级 SystemPrompts 表
     cursor.execute("PRAGMA table_info(SystemPrompts)")
@@ -103,7 +109,12 @@ def init_db():
         type TEXT NOT NULL,
         title TEXT,
         messages TEXT,
-        updatedAt INTEGER
+        updatedAt INTEGER,
+        user_id TEXT,
+        is_pinned INTEGER DEFAULT 0,
+        engine_id TEXT,
+        world_id TEXT,
+        char_id TEXT
     )
     ''')
 

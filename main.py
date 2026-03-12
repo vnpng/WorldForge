@@ -61,6 +61,9 @@ class SessionSchema(BaseModel):
     messages: List[Any] = []
     updatedAt: Optional[int] = int(time.time() * 1000)
     is_pinned: Optional[int] = 0 # [NEW] 置顶字段
+    engine_id: Optional[str] = None
+    world_id: Optional[str] = None
+    char_id: Optional[str] = None
 
 class SystemPromptSchema(BaseModel):
     id: str
@@ -246,9 +249,9 @@ async def save_session(session: SessionSchema, user: dict = Depends(get_current_
         conn.close()
         raise HTTPException(status_code=403, detail="禁止覆盖他人数据")
     cursor.execute('''
-    INSERT OR REPLACE INTO Sessions (id, type, title, messages, updatedAt, user_id, is_pinned)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (session.id, session.type, session.title, json.dumps(session.messages), session.updatedAt, user["id"], session.is_pinned))
+    INSERT OR REPLACE INTO Sessions (id, type, title, messages, updatedAt, user_id, is_pinned, engine_id, world_id, char_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (session.id, session.type, session.title, json.dumps(session.messages), session.updatedAt, user["id"], session.is_pinned, session.engine_id, session.world_id, session.char_id))
     conn.commit()
     conn.close()
     return {"status": "success"}
