@@ -928,7 +928,7 @@
             <textarea class="main-input" :placeholder="currentMode==='rpg'?'描述你的行动…':'问问 WorldForge...'" v-model="inputText" ref="mainInputEl" @keydown.enter.exact.prevent="sendMessage" @input="autoResize($event)" rows="1"></textarea>
             <div class="input-tools">
               <div class="tools-left" style="position: relative;">
-                <div class="tool-btn-text" @click.stop="showToolsMenu=!showToolsMenu; showCharDrawer=false; showActionList=false; showEngineParams=false" :style="{color: showToolsMenu ? 'var(--purple-lt)' : ''}">
+                <div class="tool-btn-text" @click.stop="showToolsMenu=!showToolsMenu; showProfileMenu=false; showCharDrawer=false; showActionList=false; showEngineParams=false" :style="{color: showToolsMenu ? 'var(--purple-lt)' : ''}">
                   <i class="fas fa-bars"></i> 功能
                 </div>
 
