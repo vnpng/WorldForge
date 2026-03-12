@@ -814,6 +814,7 @@
             <div
               v-for="msg in currentMessages" :key="msg.id"
               class="msg-group" :class="msg.role"
+              v-show="!msg.hidden"
             >
               <!-- AI header -->
               <div class="msg-header" v-if="msg.role==='ai'">
@@ -1788,8 +1789,8 @@ export default {
       sendMessage();
     }
 
-    async function sendMessage() {
-      let text = inputText.value.trim();
+    async function sendMessage(overrideText = null, silent = false) {
+      let text = overrideText || inputText.value.trim();
       if (!text || !activeSession.value) return;
 
       // 1. 数字快捷选择逻辑
@@ -1805,14 +1806,20 @@ export default {
       showToolsMenu.value = false;
 
       const msgs = activeSession.value.messages;
-      msgs.push({ id: Date.now(), role: 'user', content: text });
+      // [沉浸式] 如果是非静默模式，才将用户消息推入 UI 列表
+      if (!silent) {
+        msgs.push({ id: Date.now(), role: 'user', content: text });
+      } else {
+        // 静默模式下，依然推入消息但标记为 hidden，以便同步到后端维持上下文，但在前端隐藏
+        msgs.push({ id: Date.now(), role: 'user', content: text, hidden: true });
+      }
       inputText.value = '';
 
-      // 3. 准备 AI 占位消息
+      // 3. 准备 AI 占位消息 (显示构思中动画)
       const aiMsg = reactive({ 
         id: Date.now() + 1, 
         role: 'ai', 
-        content: streamingEnabled.value ? '' : '<i class="fas fa-spinner fa-spin"></i> AI 正在思考中...', 
+        content: '<i class="fas fa-brain fa-pulse"></i> AI 正在构思中...', 
         cot: '', 
         debug: '',
         usage: null 
@@ -1845,6 +1852,7 @@ export default {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let fullText = "";
+        let firstChunk = true;
 
         while (true) {
           const { done, value } = await reader.read();
@@ -1864,6 +1872,10 @@ export default {
                 
                 // 处理 OpenAI 格式的流式数据
                 const content = data.choices?.[0]?.delta?.content || "";
+                if (content && firstChunk) {
+                  aiMsg.content = ''; // 收到首个有效字符，清除“构思中”状态
+                  firstChunk = false;
+                }
                 fullText += content;
                 
                 // [逻辑闭环] 仅在开启流式输出时才实时更新 UI
@@ -1890,7 +1902,7 @@ export default {
           }
         }
         
-        // [逻辑闭环] 流式传输结束后的最终渲染 (如果是关闭流式状态，此时才真正写入内容)
+        // [逻辑闭环] 流式传输结束后的最终渲染
         const finalCotMatch = fullText.match(/<cot>([\s\S]*?)<\/cot>/);
         if (finalCotMatch) aiMsg.cot = finalCotMatch[1];
         aiMsg.content = marked.parse(fullText.replace(/<cot>[\s\S]*?<\/cot>/g, '').trim());
@@ -1905,6 +1917,11 @@ export default {
 
         // 5. 保存会话存档
         await syncSession(currentSessionId.value);
+
+      } catch (err) {
+        aiMsg.content = `<span style="color:var(--danger)">[网络异常] 无法连接到后厨，请检查后端程序是否运行。</span>`;
+      }
+    }
 
       } catch (err) {
         aiMsg.content = `<span style="color:var(--danger)">[网络异常] 无法连接到后厨，请检查后端程序是否运行。</span>`;
