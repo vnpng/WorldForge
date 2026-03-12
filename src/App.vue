@@ -1062,6 +1062,8 @@ export default {
 
     // ── Auth ──
     const loggedIn  = ref(false);
+    const showCoT          = ref(false);
+    const showDebug        = ref(false);
     const isLoginMode = ref(true);
     const loginUser = ref('');
     const loginPass = ref('');
@@ -1212,8 +1214,6 @@ export default {
     const confirmTarget    = ref(null);
     const confirmCb        = ref(null);
     const settingsTab      = ref('basic');
-    const showCoT          = ref(false);
-    const showDebug        = ref(false);
     const openDropdown     = ref(null);
     const showCharDrawer   = ref(false);
     const showToolsMenu    = ref(false);
