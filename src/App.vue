@@ -1270,7 +1270,14 @@ export default {
     // ── Sessions (打通后端) ──
     const sessionsData = reactive({});
     const sessions = computed(() => {
-        return Object.values(sessionsData).sort((a, b) => b.updatedAt - a.updatedAt);
+      return Object.values(sessionsData).sort((a, b) => {
+        // 1. 优先按置顶状态降序 (1 为置顶，0 为普通)
+        if ((b.is_pinned || 0) !== (a.is_pinned || 0)) {
+          return (b.is_pinned || 0) - (a.is_pinned || 0);
+        }
+        // 2. 其次按更新时间降序
+        return (b.updatedAt || 0) - (a.updatedAt || 0);
+      });
     });
     const currentSessionId = ref(null);
 
