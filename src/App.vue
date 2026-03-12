@@ -1647,6 +1647,9 @@ export default {
       currentSessionId.value = id;
       openDropdown.value = null;
       currentView.value = 'chat'; // Ensure we switch to chat view when selecting a session
+      nextTick(() => {
+        if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
+      });
     }
 
     async function togglePin(id) {
