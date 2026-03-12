@@ -1265,8 +1265,11 @@ export default {
 
 
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && showCharDrawer.value) {
-        showCharDrawer.value = false;
+      if (e.key === 'Escape') {
+        showCharDrawer.value   = false;
+        showToolsMenu.value    = false;
+        showProfileMenu.value  = false;
+        showEngineParams.value = false;
       }
     });
 
