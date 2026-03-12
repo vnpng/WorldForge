@@ -1476,16 +1476,19 @@ export default {
     const setupForm = reactive({ worldId: null, characterId: null, engineId: null });
     const canStartRPG = computed(() => setupForm.worldId && setupForm.characterId && setupForm.engineId);
 
-    const startRPG = () => {
+    const startRPG = async () => {
       if (!canStartRPG.value) return;
-      const id = nextId++;
+      const id = String(Date.now());
       sessionsData[id] = {
         id, name: '新RPG开局', mode: 'rpg', messages: [
-          { id: 1, role: 'ai', content: '世界正在生成，命运的齿轮开始转动...', usage: { user_words:0, prompt_tokens:120, ai_words:18, completion_tokens:22 } }
-        ]
+          { id: Date.now(), role: 'ai', content: '世界正在生成，命运的齿轮开始转动...', usage: { user_words:0, prompt_tokens:120, ai_words:18, completion_tokens:22 } }
+        ],
+        updatedAt: Date.now()
       };
       currentSessionId.value = id;
       currentView.value = 'chat';
+      // 立即持久化到后端
+      await syncSession(id);
     };
 
     const quickSetup = reactive({ characterId: null, engineId: 1 });
@@ -1705,23 +1708,25 @@ export default {
       el.style.height = Math.min(el.scrollHeight, 200) + 'px';
     }
 
-    function sendFromWelcome() {
+    async function sendFromWelcome() {
       const text = inputText.value.trim();
       if (!text) return;
-      const id = nextId++;
+      const id = String(Date.now());
       const mode = 'chat'; 
+      // 1. 创建空会话容器（sendMessage 会负责填充第一条消息）
       sessionsData[id] = {
         id, name: text.slice(0, 24) + (text.length > 24 ? '…' : ''), mode,
-        messages: [{ id: 1, role: 'user', content: text }]
+        messages: [],
+        updatedAt: Date.now()
       };
       currentSessionId.value = id;
-      inputText.value = '';
       actionChips.value = []; // 清空欢迎页残留
-      nextTick(() => {
-        if (mainInputEl.value) {
-          mainInputEl.value.style.height = 'auto';
-        }
-      });
+      
+      // 2. 立即持久化到后端，防止刷新丢失
+      await syncSession(id);
+      
+      // 3. 自动触发发送逻辑，让 AI 开始回话
+      sendMessage();
     }
 
     async function sendMessage() {
