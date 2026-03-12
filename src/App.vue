@@ -779,7 +779,7 @@
               <div class="tools-left">
               </div>
               <div class="tools-right" style="position: relative;">
-                <div class="tool-btn-text" @click.stop="showProfileMenu=!showProfileMenu; showToolsMenu=false">
+                <div class="tool-btn-text" @click.stop="showProfileMenu=!showProfileMenu; showToolsMenu=false; showCharDrawer=false; showEngineParams=false">
                   {{ activeProfile?.name || 'API' }} <i class="fas fa-chevron-down" style="font-size:10px"></i>
                 </div>
 
@@ -1029,7 +1029,7 @@
                 </div>
               </div>
               <div class="tools-right" style="position: relative;">
-                <div class="tool-btn-text" @click.stop="showProfileMenu=!showProfileMenu; showToolsMenu=false">
+                <div class="tool-btn-text" @click.stop="showProfileMenu=!showProfileMenu; showToolsMenu=false; showCharDrawer=false; showEngineParams=false">
                   {{ activeProfile?.name || 'API' }} <i class="fas fa-chevron-down" style="font-size:10px"></i>
                 </div>
 
