@@ -132,7 +132,47 @@ def init_db():
     )
     ''')
 
-    # 6. SystemConfig 表
+    # 6. Worlds 表 (V14 NEW)
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Worlds (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        intro TEXT NOT NULL,
+        desc TEXT,
+        conflict TEXT,
+        society TEXT,
+        history TEXT,
+        geography TEXT,
+        magic_system TEXT,
+        rules TEXT,
+        extra_rules TEXT,
+        sort_index INTEGER DEFAULT 0,
+        created_at INTEGER
+    )
+    ''')
+
+    # 7. Characters 表 (V14 NEW)
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Characters (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        gender TEXT NOT NULL,
+        age TEXT NOT NULL,
+        race TEXT,
+        identity TEXT NOT NULL,
+        appearance TEXT,
+        personality TEXT,
+        item TEXT,
+        style TEXT,
+        custom TEXT,
+        sort_index INTEGER DEFAULT 0,
+        created_at INTEGER
+    )
+    ''')
+
+    # 8. SystemConfig 表
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS SystemConfig (
         key TEXT PRIMARY KEY,
@@ -145,11 +185,11 @@ def init_db():
     init_legacy_data(cursor)
     
     # 更新系统版本标识
-    cursor.execute("INSERT OR REPLACE INTO SystemConfig (key, value) VALUES ('db_version', '13.6.0')")
+    cursor.execute("INSERT OR REPLACE INTO SystemConfig (key, value) VALUES ('db_version', '14.0.0')")
 
     conn.commit()
     conn.close()
 
 if __name__ == "__main__":
     init_db()
-    print("V13.6.0 数据库架构升级(排序字段)完成。")
+    print("V14.0.0 数据库架构升级(新增Worlds和Characters表)完成。")

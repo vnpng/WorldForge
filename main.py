@@ -69,6 +69,38 @@ class ProfileSchema(BaseModel):
     tempRpg: Optional[float] = 1.0
     tempChat: Optional[float] = 0.6
 
+class WorldSchema(BaseModel):
+    id: str
+    name: str
+    intro: str
+    desc: Optional[str] = ""
+    conflict: Optional[str] = ""
+    society: Optional[str] = ""
+    history: Optional[str] = ""
+    geography: Optional[str] = ""
+    magic_system: Optional[str] = ""
+    rules: Optional[str] = ""
+    extra_rules: Optional[str] = ""
+    sort_index: Optional[int] = 0
+
+class CharacterSchema(BaseModel):
+    id: str
+    name: str
+    gender: str
+    age: str
+    race: Optional[str] = ""
+    identity: str
+    appearance: Optional[str] = ""
+    personality: Optional[str] = ""
+    item: Optional[str] = ""
+    style: Optional[str] = ""
+    custom: Optional[str] = ""
+    sort_index: Optional[int] = 0
+
+class ReorderItem(BaseModel):
+    id: str
+    sort_index: int
+
 # --- 鉴权辅助函数 ---
 
 def get_password_hash(password: str) -> str:
@@ -318,6 +350,112 @@ async def delete_profile(profile_id: str, user: dict = Depends(get_current_user)
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM Profiles WHERE id = ? AND user_id = ?", (profile_id, user["id"]))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+# --- Worlds API ---
+@app.get("/api/worlds", response_model=List[WorldSchema])
+async def get_worlds(user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Worlds WHERE user_id = ? ORDER BY sort_index ASC", (user["id"],))
+    rows = cursor.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+@app.post("/api/worlds")
+async def save_world(world: WorldSchema, user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    existing = cursor.execute("SELECT user_id FROM Worlds WHERE id = ?", (world.id,)).fetchone()
+    if existing and existing["user_id"] != user["id"]:
+        conn.close()
+        raise HTTPException(status_code=403, detail="禁止覆盖他人数据")
+    
+    current_time = int(time.time())
+    cursor.execute('''
+    INSERT OR REPLACE INTO Worlds 
+    (id, user_id, name, intro, desc, conflict, society, history, geography, magic_system, rules, extra_rules, sort_index, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE((SELECT created_at FROM Worlds WHERE id = ?), ?))
+    ''', (world.id, user["id"], world.name, world.intro, world.desc, world.conflict, world.society, world.history, world.geography, world.magic_system, world.rules, world.extra_rules, world.sort_index, world.id, current_time))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+@app.put("/api/worlds/reorder")
+async def reorder_worlds(items: List[ReorderItem], user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        for item in items:
+            cursor.execute("UPDATE Worlds SET sort_index = ? WHERE id = ? AND user_id = ?", (item.sort_index, item.id, user["id"]))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))
+    conn.close()
+    return {"status": "success"}
+
+@app.delete("/api/worlds/{world_id}")
+async def delete_world(world_id: str, user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Worlds WHERE id = ? AND user_id = ?", (world_id, user["id"]))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+# --- Characters API ---
+@app.get("/api/characters", response_model=List[CharacterSchema])
+async def get_characters(user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Characters WHERE user_id = ? ORDER BY sort_index ASC", (user["id"],))
+    rows = cursor.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+@app.post("/api/characters")
+async def save_character(char: CharacterSchema, user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    existing = cursor.execute("SELECT user_id FROM Characters WHERE id = ?", (char.id,)).fetchone()
+    if existing and existing["user_id"] != user["id"]:
+        conn.close()
+        raise HTTPException(status_code=403, detail="禁止覆盖他人数据")
+    
+    current_time = int(time.time())
+    cursor.execute('''
+    INSERT OR REPLACE INTO Characters 
+    (id, user_id, name, gender, age, race, identity, appearance, personality, item, style, custom, sort_index, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, COALESCE((SELECT created_at FROM Characters WHERE id = ?), ?))
+    ''', (char.id, user["id"], char.name, char.gender, char.age, char.race, char.identity, char.appearance, char.personality, char.item, char.style, char.custom, char.sort_index, char.id, current_time))
+    conn.commit()
+    conn.close()
+    return {"status": "success"}
+
+@app.put("/api/characters/reorder")
+async def reorder_characters(items: List[ReorderItem], user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        for item in items:
+            cursor.execute("UPDATE Characters SET sort_index = ? WHERE id = ? AND user_id = ?", (item.sort_index, item.id, user["id"]))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        conn.close()
+        raise HTTPException(status_code=500, detail=str(e))
+    conn.close()
+    return {"status": "success"}
+
+@app.delete("/api/characters/{char_id}")
+async def delete_character(char_id: str, user: dict = Depends(get_current_user)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Characters WHERE id = ? AND user_id = ?", (char_id, user["id"]))
     conn.commit()
     conn.close()
     return {"status": "success"}
