@@ -289,7 +289,7 @@
             <div style="display:flex; align-items:center; gap: 16px; margin-bottom: 32px;">
               <div class="icon-btn" @click="exitEdit('engine')" style="background:var(--ink-muted)"><i class="fas fa-arrow-left"></i></div>
               <div>
-                <div class="discover-title">编辑引擎</div>
+                <div class="discover-title">{{ editingEngine.user_id ? '编辑引擎' : '新建引擎' }}</div>
                 <div class="discover-sub" style="margin-top:4px;">修改预设的系统级 Prompt。</div>
               </div>
             </div>
@@ -355,7 +355,7 @@
             <div style="display:flex; align-items:center; gap: 16px; margin-bottom: 32px;">
               <div class="icon-btn" @click="exitEdit('world')" style="background:var(--ink-muted)"><i class="fas fa-arrow-left"></i></div>
               <div>
-                <div class="discover-title">编辑世界</div>
+                <div class="discover-title">{{ editingWorld.user_id ? '编辑世界' : '新建世界' }}</div>
                 <div class="discover-sub" style="margin-top:4px;">修改世界观的详细设定。</div>
               </div>
             </div>
@@ -457,7 +457,7 @@
             <div style="display:flex; align-items:center; gap: 16px; margin-bottom: 32px;">
               <div class="icon-btn" @click="exitEdit('char')" style="background:var(--ink-muted)"><i class="fas fa-arrow-left"></i></div>
               <div>
-                <div class="discover-title">编辑角色</div>
+                <div class="discover-title">{{ editingChar.user_id ? '编辑角色' : '新建角色' }}</div>
                 <div class="discover-sub" style="margin-top:4px;">修改角色的详细设定。</div>
               </div>
             </div>
