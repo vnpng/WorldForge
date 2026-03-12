@@ -701,7 +701,7 @@
                   <div class="config-section" style="padding:16px; margin-bottom:20px; display:flex; gap:10px; align-items:center; background:var(--ink-muted);">
                     <div style="flex:1">
                       <div style="font-size:12px; color:var(--grey); margin-bottom:6px; font-weight:700">配置切换</div>
-                      <select class="form-select" v-model="editingProfileId" style="padding:8px 12px; height:40px;">
+                      <select class="form-select" v-model="activeProfileId" style="padding:8px 12px; height:40px;">
                         <option v-for="p in profiles" :key="p.id" :value="p.id">
                           {{ p.name }}
                         </option>
@@ -709,7 +709,7 @@
                     </div>
                     <div style="display:flex; gap:8px; margin-top:24px;">
                       <button class="btn btn-primary" style="background:#10b981; width:40px; height:40px; justify-content:center" @click="addProfile" title="新建节点"><i class="fas fa-plus"></i></button>
-                      <button class="btn btn-danger" style="width:40px; height:40px; justify-content:center" @click="deleteProfile(editingProfileId)" title="删除当前节点"><i class="fas fa-trash"></i></button>
+                      <button class="btn btn-danger" style="width:40px; height:40px; justify-content:center" @click="deleteProfile(activeProfileId)" title="删除当前节点"><i class="fas fa-trash"></i></button>
                     </div>
                   </div>
 
