@@ -1059,7 +1059,9 @@ export default {
       rpgTemp: 0.8,
       chatTemp: 0.6
     });
-    const actionChips      = ref([]); 
+    const actionChips = ref([]); 
+    const showActionList = ref(false); 
+    const systemPrompts = ref([]); 
 
     // ── Auth ──
     const loggedIn  = ref(false);
