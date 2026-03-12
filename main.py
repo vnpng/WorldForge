@@ -510,7 +510,7 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="未找到选中的 API 配置")
 
     # 2. 拼装 System Prompt
-    system_content = "你是一个全能的 AI 助手。"
+    system_content = "你是 WorldForge 的 AI 助手，一个专注于文字冒险与创意写作的平台。你擅长帮助用户构建世界观、创作角色、设计剧情，也可以进行普通对话和创意写作辅助。请用自然、友好的语气与用户交流。"
     if req.mode == 'rpg':
         # 获取世界设定
         world = cursor.execute("SELECT * FROM Worlds WHERE id = ? AND user_id = ?", (req.world_id, user["id"])).fetchone() if req.world_id else None
