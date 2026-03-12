@@ -303,8 +303,14 @@
                   <input class="form-input" v-model="editingEngine.name" placeholder="输入引擎预设名称..."/>
                 </div>
                 <div class="form-field full">
+                  <div class="form-label">
+                    <div class="form-label-left">引擎简介</div>
+                  </div>
+                  <input class="form-input" v-model="editingEngine.intro" placeholder="一句话描述这个引擎的作用..."/>
+                </div>
+                <div class="form-field full">
                   <div class="form-label"><div class="form-label-left"><i class="fas fa-terminal" style="color:var(--purple-lt);font-size:11px"></i> 引擎内容 (System Prompt)</div></div>
-                  <textarea class="form-textarea" v-model="editingEngine.desc" placeholder="输入详细的系统级提示词约束..."></textarea>
+                  <textarea class="form-textarea" v-model="editingEngine.desc" placeholder="输入详细的系统级提示词约束..." style="height: 600px;"></textarea>
                 </div>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
