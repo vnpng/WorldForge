@@ -37,7 +37,7 @@
   </div>
 
   <!-- APP -->
-  <div id="app-layout" v-if="loggedIn" :class="{'hide-cot':!showCoT,'hide-debug':!showDebug}" @click="closeAllDropdowns(); showToolsMenu=false; showCharDrawer=false; showActionList=false">
+  <div id="app-layout" v-if="loggedIn" :class="{'hide-cot':!showCoT,'hide-debug':!showDebug}" @click="closeAllDropdowns(); showToolsMenu=false; showProfileMenu=false; showCharDrawer=false; showActionList=false">
     
     <!-- SIDEBAR -->
     <div class="sidebar" :class="{collapsed:sidebarCollapsed}">
