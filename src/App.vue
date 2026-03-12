@@ -703,7 +703,7 @@
                   
                   <div class="config-section" style="padding:16px; margin-bottom:20px; display:flex; gap:10px; align-items:center; background:var(--ink-muted);">
                     <div style="flex:1">
-                      <div style="font-size:12px; color:var(--grey); margin-bottom:6px; font-weight:700">配置切换</div>
+                      <div style="font-size:12px; color:var(--grey); margin-bottom:6px; font-weight:700">配置切换（选中即切换）</div>
                       <select class="form-select" v-model="activeProfileId" style="padding:8px 12px; height:40px;">
                         <option v-for="p in profiles" :key="p.id" :value="p.id">
                           {{ p.name }}
@@ -1096,6 +1096,7 @@
 import { ref, reactive, computed, nextTick, watch, onMounted } from 'vue'
 import Sortable from 'sortablejs'
 import { marked } from 'marked'
+marked.setOptions({ html: true });
 
 export default {
   setup() {
