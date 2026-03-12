@@ -1297,7 +1297,8 @@ export default {
             type: s.mode,
             title: s.name,
             messages: s.messages,
-            updatedAt: Date.now()
+            updatedAt: Date.now(),
+            is_pinned: s.is_pinned || 0 // [修复] 补全置顶状态同步
           })
         });
       } catch (e) { console.error('同步会话失败'); }
