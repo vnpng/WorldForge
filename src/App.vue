@@ -882,12 +882,26 @@
               <div class="msg-actions">
                 <template v-if="msg.role==='user'">
                   <div class="action-btn" @click="editUserMsg(msg)"><i class="fas fa-pen" style="font-size:10px"></i> 编辑</div>
-                  <div class="action-btn" @click="copyMsg(msg, $event)"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
+                                    <div class="action-btn" @click="copyMsg(msg)" style="min-width:52px;justify-content:center">
+                    <template v-if="copiedMsgId === msg.id">
+                      <i class="fas fa-check" style="font-size:10px;color:var(--green)"></i> 已复制
+                    </template>
+                    <template v-else>
+                      <i class="fas fa-copy" style="font-size:10px"></i> 复制
+                    </template>
+                  </div>
                   <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
                 </template>
                 <template v-else>
                   <div class="action-btn regen" @click="regenMsg(msg)"><i class="fas fa-sync-alt" style="font-size:10px"></i> 重新生成</div>
-                  <div class="action-btn" @click="copyMsg(msg, $event)"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
+                                    <div class="action-btn" @click="copyMsg(msg)" style="min-width:52px;justify-content:center">
+                    <template v-if="copiedMsgId === msg.id">
+                      <i class="fas fa-check" style="font-size:10px;color:var(--green)"></i> 已复制
+                    </template>
+                    <template v-else>
+                      <i class="fas fa-copy" style="font-size:10px"></i> 复制
+                    </template>
+                  </div>
                   <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
                 </template>
               </div>
@@ -1125,7 +1139,7 @@ export default {
     const actionChips = ref([]); 
     const showActionList = ref(false); 
     const systemPrompts = ref([]); 
-
+    const copiedMsgId = ref(null);
     // ── Auth ──
     const loggedIn  = ref(false);
     const showCoT          = ref(false);
@@ -2130,7 +2144,8 @@ export default {
     const copyMsg = async (msg) => {
       try {
         await navigator.clipboard.writeText(stripHtml(msg.content));
-        // 可选：添加一个小提示
+        copiedMsgId.value = msg.id;
+        setTimeout(() => { copiedMsgId.value = null; }, 1500);
       } catch (err) { console.error('复制失败'); }
     };
 
