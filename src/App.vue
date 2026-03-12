@@ -962,7 +962,7 @@
                   <i class="fas fa-sliders-h"></i> 调节
                 </div>
 
-                <div class="tool-btn-text" v-if="currentMode==='rpg'" @click.stop="showCharDrawer=!showCharDrawer; showToolsMenu=false; showActionList=false; showEngineParams=false" :style="{color: showCharDrawer ? 'var(--purple-lt)' : ''}">
+                <div class="tool-btn-text" v-if="currentMode==='rpg'" @click.stop="showCharDrawer=!showCharDrawer; showToolsMenu=false; showActionList=false; showEngineParams=false; showProfileMenu=false" :style="{color: showCharDrawer ? 'var(--purple-lt)' : ''}">
                   <i class="fas fa-user-shield"></i> 角色与背包
                 </div>
 
