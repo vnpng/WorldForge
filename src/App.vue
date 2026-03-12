@@ -882,12 +882,12 @@
               <div class="msg-actions">
                 <template v-if="msg.role==='user'">
                   <div class="action-btn" @click="editUserMsg(msg)"><i class="fas fa-pen" style="font-size:10px"></i> 编辑</div>
-                  <div class="action-btn" @click="copyMsg(msg)"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
+                  <div class="action-btn" @click="copyMsg(msg, $event)"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
                   <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
                 </template>
                 <template v-else>
                   <div class="action-btn regen" @click="regenMsg(msg)"><i class="fas fa-sync-alt" style="font-size:10px"></i> 重新生成</div>
-                  <div class="action-btn" @click="copyMsg(msg)"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
+                  <div class="action-btn" @click="copyMsg(msg, $event)"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
                   <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
                 </template>
               </div>
