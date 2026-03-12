@@ -2296,3 +2296,41 @@ export default {
   }
 }
 </script>
+
+<style>
+.bubble ul, .bubble ol {
+  padding-left: 20px;
+  margin: 6px 0;
+}
+.bubble ul li {
+  list-style: disc;
+  margin: 3px 0;
+}
+.bubble ol li {
+  list-style: decimal;
+  margin: 3px 0;
+}
+.bubble pre {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 8px 0;
+  overflow-x: auto;
+}
+.bubble code {
+  font-family: monospace;
+  font-size: 13px;
+}
+.bubble p code {
+  background: rgba(255,255,255,0.08);
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+.bubble blockquote {
+  border-left: 3px solid var(--purple-lt);
+  padding-left: 12px;
+  margin: 8px 0;
+  color: var(--grey);
+}
+</style>
