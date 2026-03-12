@@ -108,15 +108,21 @@
               style="position:relative"
             >
               <div class="session-dot"><div class="dot-inner" :style="s.mode==='rpg'?'background:#7D39EB':'background:var(--green)'"></div></div>
-              <div class="session-name">{{s.name}}</div>
+              <div class="session-name">
+                <i v-if="s.is_pinned" class="fas fa-thumbtack" style="font-size:10px; color:var(--purple-lt); margin-right:4px;"></i>
+                {{s.name}}
+              </div>
               <div class="session-menu-btn" @click.stop="toggleDropdown(s.id)">
                 <i class="fas fa-ellipsis-v"></i>
               </div>
               <transition name="menu-pop">
                 <div class="dropdown" v-if="openDropdown===s.id" @click.stop>
-                  <div class="dropdown-item"><i class="fas fa-thumbtack" style="font-size:13px;color:var(--grey)"></i> 置顶</div>
-                  <div class="dropdown-item"><i class="fas fa-pen" style="font-size:13px;color:var(--grey)"></i> 重命名</div>
-                  <div class="dropdown-item" @click="alert('导出功能开发中，即将接入旧版单会话导出逻辑...')"><i class="fas fa-file-export" style="font-size:13px;color:var(--grey)"></i> 导出对话</div>
+                  <div class="dropdown-item" @click="togglePin(s.id)">
+                    <i class="fas fa-thumbtack" style="font-size:13px;color:var(--grey)"></i> 
+                    {{ s.is_pinned ? '取消置顶' : '置顶会话' }}
+                  </div>
+                  <div class="dropdown-item" @click="renameSession(s.id)"><i class="fas fa-pen" style="font-size:13px;color:var(--grey)"></i> 重命名</div>
+                  <div class="dropdown-item" @click="exportSession(s.id)"><i class="fas fa-file-export" style="font-size:13px;color:var(--grey)"></i> 导出对话 (JSON)</div>
                   <div class="dropdown-item danger" @click="deleteSession(s.id)"><i class="fas fa-trash" style="font-size:13px"></i> 删除</div>
                 </div>
               </transition>
@@ -1532,16 +1538,50 @@ export default {
       currentView.value = 'chat'; // Ensure we switch to chat view when selecting a session
     }
 
-    function newSession(mode) {
-      currentSessionId.value = null; // go to welcome
+    async function togglePin(id) {
+      const s = sessionsData[id];
+      if (!s) return;
+      s.is_pinned = s.is_pinned ? 0 : 1;
+      await syncSession(id);
+      openDropdown.value = null;
+    }
+
+    async function renameSession(id) {
+      const s = sessionsData[id];
+      if (!s) return;
+      const newName = prompt('请输入新的会话名称：', s.name);
+      if (newName && newName.trim()) {
+        s.name = newName.trim();
+        await syncSession(id);
+      }
+      openDropdown.value = null;
+    }
+
+    function exportSession(id) {
+      const s = sessionsData[id];
+      if (!s) return;
+      const dataStr = JSON.stringify(s, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `WorldForge_Session_${s.name}_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      openDropdown.value = null;
     }
 
     function deleteSession(id) {
       openDropdown.value = null;
       confirmTarget.value = sessionsData[id];
-      confirmCb.value = () => {
-        delete sessionsData[id];
-        if (currentSessionId.value === id) currentSessionId.value = null;
+      confirmCb.value = async () => {
+        try {
+          await apiFetch(`/api/sessions/${id}`, { method: 'DELETE' });
+          delete sessionsData[id];
+          if (currentSessionId.value === id) currentSessionId.value = null;
+        } catch (e) {
+          alert('删除失败，请检查网络。');
+        }
       };
       showConfirm.value = true;
     }

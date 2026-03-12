@@ -60,6 +60,7 @@ class SessionSchema(BaseModel):
     title: Optional[str] = ""
     messages: List[Any] = []
     updatedAt: Optional[int] = int(time.time() * 1000)
+    is_pinned: Optional[int] = 0 # [NEW] 置顶字段
 
 class SystemPromptSchema(BaseModel):
     id: str
@@ -225,7 +226,8 @@ async def generate_invite(current_user: dict = Depends(get_current_user)):
 async def get_sessions(user: dict = Depends(get_current_user)):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Sessions WHERE user_id = ? ORDER BY updatedAt DESC", (user["id"],))
+    # [适配] 修改查询逻辑，优先按 is_pinned 排序，再按 updatedAt 倒序
+    cursor.execute("SELECT * FROM Sessions WHERE user_id = ? ORDER BY is_pinned DESC, updatedAt DESC", (user["id"],))
     rows = cursor.fetchall()
     conn.close()
     result = []
@@ -244,9 +246,9 @@ async def save_session(session: SessionSchema, user: dict = Depends(get_current_
         conn.close()
         raise HTTPException(status_code=403, detail="禁止覆盖他人数据")
     cursor.execute('''
-    INSERT OR REPLACE INTO Sessions (id, type, title, messages, updatedAt, user_id)
-    VALUES (?, ?, ?, ?, ?, ?)
-    ''', (session.id, session.type, session.title, json.dumps(session.messages), session.updatedAt, user["id"]))
+    INSERT OR REPLACE INTO Sessions (id, type, title, messages, updatedAt, user_id, is_pinned)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (session.id, session.type, session.title, json.dumps(session.messages), session.updatedAt, user["id"], session.is_pinned))
     conn.commit()
     conn.close()
     return {"status": "success"}
