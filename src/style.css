@@ -850,10 +850,17 @@ body.light .char-drawer { background: var(--ink-soft); border-color: rgba(0,0,0,
 /* ══ TOOLS DROPDOWN MENU ══ */
 .tools-menu {
   position: absolute; bottom: calc(100% + 12px); left: 0;
-  width: max-content; min-width: 100%; max-width: 300px;
+  width: 200px;
   background: var(--ink-soft);
   border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
   padding: 8px; box-shadow: var(--shadow-lg); z-index: 95;
+}
+
+/* API 节点专用的自适应宽度下拉框 */
+.tools-menu.profile-menu {
+  width: max-content;
+  min-width: 100%;
+  max-width: 300px;
 }
 
 .menu-item {
