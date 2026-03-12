@@ -848,7 +848,7 @@
           </div>
         </div>
 
-        <div class="chat-area" :class="currentMode" ref="chatAreaEl" v-else>
+        <div class="chat-area" :class="currentMode" ref="chatAreaEl" @scroll="onChatScroll" v-else>
           <div class="chat-inner">
             <div
               v-for="msg in currentMessages" :key="msg.id"
@@ -961,6 +961,11 @@
                 <i class="fas fa-lightbulb"></i> 推荐行动
               </div>
             </div>
+
+            <button class="send-btn-gemini" v-show="showScrollBottom && !isWelcome" @click="scrollToBottom(true)" style="position: absolute; top: -48px; right: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); z-index: 10;">
+              <i class="fas fa-arrow-down"></i>
+            </button>
+
             <textarea class="main-input" :placeholder="currentMode==='rpg'?'描述你的行动…':'问问 WorldForge...'" v-model="inputText" ref="mainInputEl" @keydown.enter.exact.prevent="sendMessage" @input="autoResize($event)" rows="1"></textarea>
             <div class="input-tools">
               <div class="tools-left" style="position: relative;">
@@ -1956,6 +1961,20 @@ export default {
     const chatAreaEl  = ref(null);
     const mainInputEl = ref(null);
     const welcomeInputEl = ref(null);
+    const showScrollBottom = ref(false);
+
+    const scrollToBottom = async (smooth = false) => {
+      await nextTick();
+      if (chatAreaEl.value) {
+        chatAreaEl.value.scrollTo({ top: chatAreaEl.value.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+      }
+    };
+
+    const onChatScroll = () => {
+      if (!chatAreaEl.value) return;
+      const { scrollTop, clientHeight, scrollHeight } = chatAreaEl.value;
+      showScrollBottom.value = scrollHeight - scrollTop - clientHeight > 100;
+    };
 
     function autoResize(e) {
       const el = e.target;
@@ -2294,7 +2313,8 @@ export default {
       currentUser, editingEngine, addNewEngine, editEngine, confirmDelete,
       charStats, inventory, actionChips,
       rowRefs, scrollRow, startDrag, stopDrag, onDrag,
-      engineListRef, worldListRef, charListRef
+      engineListRef, worldListRef, charListRef,
+      showScrollBottom, scrollToBottom, onChatScroll
     };
   }
 }
