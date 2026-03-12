@@ -134,14 +134,13 @@
         <div class="sb-footer-inner" @click="currentView='profile'; currentSessionId=null" title="个人中心">
           <div class="user-card-sb">
             <div class="user-avatar-sb">
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kirin" alt="avatar">
+              <img :src="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" alt="avatar">
             </div>
-            <div class="user-name-sb">探险者·麒麟</div>
+            <div class="user-name-sb">{{ currentUser.name }}</div>
           </div>
           <div class="settings-btn"><i class="fas fa-cog"></i></div>
         </div>
-      </div>
-    </div>
+      </div>    </div>
 
     <!-- MAIN STAGE -->
     <div class="main-stage">
@@ -642,8 +641,11 @@
                     <input class="form-input" value="WorldForge"/>
                   </div>
                   <div class="form-field">
-                    <div class="form-label"><div class="form-label-left">用户昵称</div></div>
-                    <input class="form-input" value="探险者·麒麟"/>
+                    <div class="form-label">
+                      <div class="form-label-left">用户昵称</div>
+                      <span v-if="currentUser.role === 'superadmin'" style="color:var(--purple-lt);font-size:12px;"><i class="fas fa-crown"></i> 超管</span>
+                    </div>
+                    <input class="form-input" :value="currentUser.name" readonly style="opacity: 0.7; cursor: not-allowed;"/>
                   </div>
                   <div class="form-field full">
                     <div class="form-label"><div class="form-label-left">默认语言</div></div>
@@ -678,6 +680,15 @@
                     <div class="setting-row-desc">发送和接收消息时播放提示音</div>
                   </div>
                   <label class="toggle"><input type="checkbox"/><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="setting-row" style="cursor: pointer; justify-content: center;" @click="doLogout">
+                  <div class="setting-row-info" style="text-align: center;">
+                    <div class="setting-row-label" style="color: var(--danger); font-weight: bold;"><i class="fas fa-sign-out-alt"></i> 退出登录</div>
+                    <div class="setting-row-desc">清除本地缓存并返回登录界面</div>
+                  </div>
                 </div>
               </template>
 
@@ -1040,19 +1051,86 @@ export default {
     const loginUser = ref('');
     const loginPass = ref('');
     const inviteCode = ref('');
+    // 真实用户状态
+    const currentUser = ref({ id: '', name: '未登录', role: 'user' });
 
-    function doLogin() { if (loginUser.value.trim()) loggedIn.value = true; }
-    function doRegister() {
+    // 页面初始化：读取本地存储恢复登录状态
+    onMounted(() => {
+      const token = localStorage.getItem('wf_token');
+      const userStr = localStorage.getItem('wf_user');
+      if (token && userStr) {
+        try {
+          const userObj = JSON.parse(userStr);
+          currentUser.value = { id: userObj.id, name: userObj.username, role: userObj.role };
+          loggedIn.value = true;
+        } catch (e) {
+          localStorage.removeItem('wf_token');
+          localStorage.removeItem('wf_user');
+        }
+      }
+    });
+
+    async function doLogin() {
       if (!loginUser.value.trim() || !loginPass.value.trim()) {
         alert('请输入用户名和密码');
         return;
       }
-      if (!inviteCode.value.trim()) {
-        alert('请输入邀请码');
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: loginUser.value.trim(), password: loginPass.value })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert('登录失败: ' + (data.detail || '未知错误'));
+          return;
+        }
+        // 保存 Token 和用户信息
+        localStorage.setItem('wf_token', data.access_token);
+        localStorage.setItem('wf_user', JSON.stringify(data.user));
+        currentUser.value = { id: data.user.id, name: data.user.username, role: data.user.role };
+        loggedIn.value = true;
+      } catch (e) {
+        alert('网络错误，无法连接到服务器');
+      }
+    }
+
+    async function doRegister() {
+      if (!loginUser.value.trim() || !loginPass.value.trim()) {
+        alert('请输入用户名和密码');
         return;
       }
-      alert('注册成功，即将进入世界！');
-      loggedIn.value = true;
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            username: loginUser.value.trim(), 
+            password: loginPass.value,
+            invite_code: inviteCode.value.trim() || null 
+          })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          alert('注册失败: ' + (data.detail || '未知错误'));
+          return;
+        }
+        alert('注册成功，正在为您自动登录...');
+        await doLogin(); 
+      } catch (e) {
+        alert('网络错误，无法连接到服务器');
+      }
+    }
+
+    function doLogout() {
+      if (confirm('确定要退出登录吗？')) {
+        localStorage.removeItem('wf_token');
+        localStorage.removeItem('wf_user');
+        loggedIn.value = false;
+        loginPass.value = ''; 
+        currentUser.value = { id: '', name: '未登录', role: 'user' };
+      }
     }
 
     // ── Layout ──
@@ -1451,8 +1529,7 @@ export default {
       { label:'Timeout',     value:'60s' },
     ]);
 
-    // ── Current User Mock ──
-    const currentUser = ref({ name: '探险者·麒麟', role: 'superadmin' });
+    // ── Current User Mock (已废弃，迁至顶部真实状态) ──
 
     // ── Presets ──
     const systemPrompts = ref([
@@ -1626,7 +1703,7 @@ export default {
     ]);
 
     return {
-      loggedIn, isLoginMode, loginUser, loginPass, inviteCode, doLogin, doRegister,
+      loggedIn, isLoginMode, loginUser, loginPass, inviteCode, doLogin, doRegister, doLogout,
       currentView,
       sidebarCollapsed, charPanelOpen, sessionsOpen,
       showConfirm, confirmTarget, confirmDeleteExec,

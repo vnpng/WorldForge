@@ -15,26 +15,28 @@
 
 ---
 
-## 二、 目录结构规范
-```
+## 二、 目录结构规范 (同根目录混合部署)
+系统当前采用前后端在同一项目根目录下混合共存的结构，开发期利用 Vite 代理，生产期由 FastAPI 挂载静态文件。
+
 /
 ├── main.py              # 后端 FastAPI 入口，API 路由、JWT 鉴权、静态资源挂载
 ├── database.py          # 数据库初始化、表结构升级、连接管理
+├── package.json         # 前端 npm 依赖管理
+├── vite.config.js       # 前端 Vite 构建与开发代理配置
+├── index.html           # 前端 Vite 入口 HTML
 ├── data/
-│   └── worldforge.db    # 持久化数据库文件
-├── frontend/            # Vite 前端项目根目录
-│   ├── index.html
-│   ├── vite.config.js
-│   ├── src/
-│   │   ├── main.js      # Vue 应用入口
-│   │   ├── App.vue      # 根组件
-│   │   ├── style.css    # 全局样式（含 Markdown 渲染、气泡 UI、CoT 折叠）
-│   │   ├── constants/
-│   │   │   ├── default_prompts.js   # 内置 System Prompt 种子数据
-│   │   │   └── random_libs.js       # 多主题开局随机词库
-│   │   └── components/  # 各视图组件
+│   └── worldforge.db    # 持久化数据库文件 (SQLite)
+├── public/              # Vite 公共资源目录 (不参与编译)
+├── src/                 # 前端 Vue 3 源码目录
+│   ├── main.js          # Vue 应用入口
+│   ├── App.vue          # 根组件 (单文件承载所有视图与核心逻辑)
+│   ├── style.css        # 全局样式（含 Markdown 渲染、气泡 UI、CoT 折叠等）
+│   ├── assets/          # 前端内部静态资源
+│   └── components/      # (可选) Vue 局部组件拆分目录
+├── static/              # 后端挂载的静态资源目录 (遗留资产与外部配置)
+│   ├── default_prompts.js   # 内置 System Prompt 种子数据
+│   └── random_libs.js       # 多主题开局随机词库
 └── docs/                # 技术文档与行为规范
-```
 
 ---
 
