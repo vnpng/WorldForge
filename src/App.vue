@@ -1123,13 +1123,43 @@ export default {
       }
     }
 
-    function doLogout() {
-      if (confirm('确定要退出登录吗？')) {
+    function doLogout(force = false) {
+      if (force || confirm('确定要退出登录吗？')) {
         localStorage.removeItem('wf_token');
         localStorage.removeItem('wf_user');
         loggedIn.value = false;
         loginPass.value = ''; 
         currentUser.value = { id: '', name: '未登录', role: 'user' };
+      }
+    }
+
+    // ── API Wrapper (智能信使：统一处理 Token 与 401 拦截) ──
+    async function apiFetch(url, options = {}) {
+      const token = localStorage.getItem('wf_token');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers
+      };
+      
+      // 如果本地有 Token，自动夹在请求头里
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      try {
+        const response = await fetch(url, { ...options, headers });
+        
+        // 如果后端返回 401，说明 Token 过期或伪造，直接强制踢回登录页
+        if (response.status === 401) {
+          alert('登录身份已过期，请重新登录。');
+          doLogout(true); // 传入 true 代表强制登出，不弹窗询问
+          throw new Error('Unauthorized');
+        }
+        
+        return response;
+      } catch (error) {
+        console.error('API 请求异常:', error);
+        throw error;
       }
     }
 
