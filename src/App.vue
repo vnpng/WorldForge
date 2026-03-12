@@ -1053,6 +1053,7 @@ export default {
     const inviteCode = ref('');
     // 真实用户状态
     const currentUser = ref({ id: '', name: '未登录', role: 'user' });
+    let nextId = Date.now(); // [新增] 定义全局自增 ID 起点
 
     // 页面初始化：读取本地存储恢复登录状态
     onMounted(() => {
@@ -1383,9 +1384,15 @@ export default {
           isPublic: p.is_public === 1
         }));
 
-        // 4. 恢复 API 节点选中状态
+        // 4. 恢复 API 节点选中状态与新建开局默认选中
         if (!activeProfileId.value && profiles.value.length > 0) {
           activeProfileId.value = profiles.value[0].id;
+        }
+        // [新增] 自动选中第一个资产，防止 ID 不匹配导致无法开局
+        if (!setupForm.worldId && worlds.value.length > 0) setupForm.worldId = worlds.value[0].id;
+        if (!setupForm.characterId && characters.value.length > 0) setupForm.characterId = characters.value[0].id;
+        if (!setupForm.engineId && systemPrompts.value.filter(p => p.type === 'rpg').length > 0) {
+          setupForm.engineId = systemPrompts.value.filter(p => p.type === 'rpg')[0].id;
         }
       } catch (e) {
         console.error('加载资产失败:', e);
@@ -1461,7 +1468,7 @@ export default {
     };
 
     // ── RPG Start Form (新建开局状态) ──
-    const setupForm = reactive({ worldId: 1, characterId: 1, engineId: 1 });
+    const setupForm = reactive({ worldId: null, characterId: null, engineId: null });
     const canStartRPG = computed(() => setupForm.worldId && setupForm.characterId && setupForm.engineId);
 
     const startRPG = () => {
