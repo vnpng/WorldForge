@@ -1123,7 +1123,11 @@
 import { ref, reactive, computed, nextTick, watch, onMounted } from 'vue'
 import Sortable from 'sortablejs'
 import { marked } from 'marked'
-marked.setOptions({ html: true });
+marked.setOptions({
+  html: true,
+  gfm: true,
+  breaks: true
+});
 
 export default {
   setup() {
