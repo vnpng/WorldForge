@@ -881,14 +881,14 @@
               <!-- Action buttons -->
               <div class="msg-actions">
                 <template v-if="msg.role==='user'">
-                  <div class="action-btn"><i class="fas fa-pen" style="font-size:10px"></i> 编辑</div>
-                  <div class="action-btn"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
-                  <div class="action-btn danger"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
+                  <div class="action-btn" @click="editUserMsg(msg)"><i class="fas fa-pen" style="font-size:10px"></i> 编辑</div>
+                  <div class="action-btn" @click="copyMsg(msg)"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
+                  <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
                 </template>
                 <template v-else>
-                  <div class="action-btn regen"><i class="fas fa-sync-alt" style="font-size:10px"></i> 重新生成</div>
-                  <div class="action-btn"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
-                  <div class="action-btn danger"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
+                  <div class="action-btn regen" @click="regenMsg(msg)"><i class="fas fa-sync-alt" style="font-size:10px"></i> 重新生成</div>
+                  <div class="action-btn" @click="copyMsg(msg)"><i class="fas fa-copy" style="font-size:10px"></i> 复制</div>
+                  <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
                 </template>
               </div>
             </div>
@@ -2124,6 +2124,51 @@ export default {
 
     const welcomeHints = ['开始新的冒险', '帮我写一段代码', '继续上次剧情', '头脑风暴想法'];
 
+    // --- Message Actions Logic ---
+    const stripHtml = (html) => html.replace(/<[^>]*>/g, '').trim();
+
+    const copyMsg = async (msg) => {
+      try {
+        await navigator.clipboard.writeText(stripHtml(msg.content));
+        // 可选：添加一个小提示
+      } catch (err) { console.error('复制失败'); }
+    };
+
+    const deleteMsg = async (msg) => {
+      const msgs = activeSession.value.messages;
+      const idx = msgs.findIndex(m => m.id === msg.id);
+      if (idx !== -1) {
+        msgs.splice(idx, 1);
+        await syncSession(currentSessionId.value);
+      }
+    };
+
+    const editUserMsg = async (msg) => {
+      const msgs = activeSession.value.messages;
+      const idx = msgs.findIndex(m => m.id === msg.id);
+      if (idx !== -1) {
+        inputText.value = stripHtml(msg.content);
+        msgs.splice(idx); // 删除从该条开始的所有消息
+        await syncSession(currentSessionId.value);
+        // 自动聚焦输入框
+        nextTick(() => { if (mainInputEl.value) mainInputEl.value.focus(); });
+      }
+    };
+
+    const regenMsg = async (msg) => {
+      const msgs = activeSession.value.messages;
+      const aiIdx = msgs.findIndex(m => m.id === msg.id);
+      if (aiIdx > 0) {
+        const userMsg = msgs[aiIdx - 1];
+        if (userMsg.role === 'user') {
+          const userText = stripHtml(userMsg.content);
+          msgs.splice(aiIdx - 1, 2); // 删除用户消息和AI消息
+          await syncSession(currentSessionId.value);
+          await sendMessage(userText); // 重新发送
+        }
+      }
+    };
+
     // ── Drag & Drop Sortable ──
     const engineListRef = ref(null);
     const worldListRef = ref(null);
@@ -2228,6 +2273,7 @@ export default {
       worlds, setupForm, canStartRPG, startRPG,
       editingWorld, editingChar, addNewWorld, addNewChar,
       editWorld, editChar, saveEdit, exitEdit,
+      editUserMsg, copyMsg, deleteMsg, regenMsg,
       currentUser, editingEngine, addNewEngine, editEngine, confirmDelete,
       charStats, inventory, actionChips,
       rowRefs, scrollRow, startDrag, stopDrag, onDrag,
