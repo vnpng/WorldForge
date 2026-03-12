@@ -1353,43 +1353,43 @@ export default {
     const worlds = ref([]);
     const characters = ref([]);
 
-    // 统一资产拉取函数
+    // 统一资产拉取函数 (已修复变量重名问题)
     async function loadAssets() {
       if (!loggedIn.value) return;
       try {
-        const [wRes, cRes, pRes, profRes, sessRes] = await Promise.all([
+        const [wRes, cRes, pRes, profRes] = await Promise.all([
           apiFetch('/api/worlds'),
           apiFetch('/api/characters'),
           apiFetch('/api/prompts'),
-          apiFetch('/api/profiles'),
-          loadSessions() // Sessions 内部已处理响应式赋值
+          apiFetch('/api/profiles')
         ]);
+
+        // 1. 加载会话 (独立处理)
+        await loadSessions();
+
+        // 2. 加载世界与角色
         worlds.value = await wRes.json();
         characters.value = await cRes.json();
-        const pData = await pRes.json();
         profiles.value = await profRes.json();
-        
-        // 恢复 API 节点选中状态
-        if (!activeProfileId.value && profiles.value.length > 0) {
-          activeProfileId.value = profiles.value[0].id;
-        }
-        worlds.value = await wRes.json();
-        characters.value = await cRes.json();
-        const pData = await pRes.json();
-        
-        // 适配引擎字典 (后端是 content，前端暂用 desc)
-        systemPrompts.value = pData.map(p => ({ 
+
+        // 3. 加载并适配引擎预设
+        const pRawData = await pRes.json();
+        systemPrompts.value = pRawData.map(p => ({ 
           ...p, 
           desc: p.content, 
           active: false, 
           type: (p.name && p.name.includes('Chat')) ? 'chat' : 'rpg',
           isPublic: p.is_public === 1
         }));
+
+        // 4. 恢复 API 节点选中状态
+        if (!activeProfileId.value && profiles.value.length > 0) {
+          activeProfileId.value = profiles.value[0].id;
+        }
       } catch (e) {
         console.error('加载资产失败:', e);
       }
     }
-
     // 监听登录状态：一旦登录成功，立刻拉取数据
     watch(loggedIn, (newVal) => {
       if (newVal) loadAssets();
