@@ -962,7 +962,7 @@
               </div>
             </div>
 
-            <button class="send-btn-gemini" v-show="showScrollBottom && !isWelcome" @click="scrollToBottom(true)" style="position: absolute; top: -48px; left: 50%; transform: translateX(-50%); box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); z-index: 10;">
+            <button class="send-btn-gemini" v-show="showScrollBottom && !isWelcome" @click="scrollToBottom(true)" style="position: absolute; top: -48px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.3) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); z-index: 10;">
               <i class="fas fa-arrow-down"></i>
             </button>
 
