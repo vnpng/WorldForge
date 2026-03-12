@@ -753,16 +753,41 @@
 
               <template v-if="settingsTab==='data'">
                 <div class="s-title">数据管理</div>
-                <div class="s-sub">导入、导出或重置本地数据。</div>
+                <div class="s-sub">导出备份或导入恢复你的核心数据。</div>
                 <div style="display:flex;flex-direction:column;gap:10px">
+                  <!-- Sessions -->
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:14px;font-weight:700">导出所有数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">将配置、预设、会话记录导出为 JSON</div></div>
-                    <button class="btn btn-ghost btn-sm"><i class="fas fa-file-export"></i> 导出</button>
+                    <div><div style="font-size:14px;font-weight:700">导出所有对话/存档数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">将所有会话记录导出为 JSON 文件</div></div>
+                    <button class="btn btn-ghost btn-sm" @click="exportSessions"><i class="fas fa-file-export"></i> 导出</button>
                   </div>
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:14px;font-weight:700">导入数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">从 JSON 文件恢复配置和会话记录</div></div>
-                    <button class="btn btn-ghost btn-sm"><i class="fas fa-file-import"></i> 导入</button>
+                    <div><div style="font-size:14px;font-weight:700">导入对话/存档数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">从 JSON 文件恢复会话记录，每条作为新存档导入</div></div>
+                    <button class="btn btn-ghost btn-sm" @click="$refs.importSessionsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
+                    <input type="file" ref="importSessionsInput" style="display:none" accept=".json" @change="importSessions">
                   </div>
+
+                  <!-- Worlds -->
+                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
+                    <div><div style="font-size:14px;font-weight:700">导出所有世界数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">将所有世界设定导出为 JSON 文件</div></div>
+                    <button class="btn btn-ghost btn-sm" @click="exportWorlds"><i class="fas fa-file-export"></i> 导出</button>
+                  </div>
+                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
+                    <div><div style="font-size:14px;font-weight:700">导入单个/多个世界数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">从 JSON 文件导入世界设定，每条作为新记录导入</div></div>
+                    <button class="btn btn-ghost btn-sm" @click="$refs.importWorldsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
+                    <input type="file" ref="importWorldsInput" style="display:none" accept=".json" @change="importWorlds">
+                  </div>
+
+                  <!-- Characters -->
+                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
+                    <div><div style="font-size:14px;font-weight:700">导出所有角色数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">将所有角色设定导出为 JSON 文件</div></div>
+                    <button class="btn btn-ghost btn-sm" @click="exportChars"><i class="fas fa-file-export"></i> 导出</button>
+                  </div>
+                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
+                    <div><div style="font-size:14px;font-weight:700">导入单个/多个角色数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">从 JSON 文件导入角色设定，每条作为新记录导入</div></div>
+                    <button class="btn btn-ghost btn-sm" @click="$refs.importCharsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
+                    <input type="file" ref="importCharsInput" style="display:none" accept=".json" @change="importChars">
+                  </div>
+
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between;border-color:rgba(229,62,62,.2)">
                     <div><div style="font-size:14px;font-weight:700;color:var(--danger)">重置所有数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">清除全部本地数据，不可撤销</div></div>
                     <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> 重置</button>
@@ -1692,7 +1717,91 @@ export default {
     }
     
     const importInput = ref(null);
+    const importSessionsInput = ref(null);
+    const importWorldsInput = ref(null);
+    const importCharsInput = ref(null);
     const quickAddText = ref('');
+
+    // --- Data Management Logic ---
+    const downloadJson = (data, filename) => {
+      const dataStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+    const exportSessions = async () => {
+      try {
+        const res = await apiFetch('/api/sessions');
+        const data = await res.json();
+        downloadJson(data, `wf_sessions_${Date.now()}.json`);
+      } catch (e) { alert('导出失败'); }
+    };
+
+    const exportWorlds = () => downloadJson(worlds.value, `wf_worlds_${Date.now()}.json`);
+    const exportChars = () => downloadJson(characters.value, `wf_chars_${Date.now()}.json`);
+
+    const genNewId = () => String(Date.now()) + Math.random().toString(36).slice(2);
+
+    const importSessions = (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const items = JSON.parse(evt.target.result);
+          const data = Array.isArray(items) ? items : [items];
+          for (const item of data) {
+            const newItem = { ...item, id: genNewId(), title: item.title || item.name || '导入存档' };
+            await apiFetch('/api/sessions', { method: 'POST', body: JSON.stringify(newItem) });
+          }
+          alert(`✅ 导入成功，共导入 ${data.length} 条存档`);
+          await loadSessions();
+        } catch (err) { alert('导入失败：格式错误'); }
+        e.target.value = '';
+      };
+      reader.readAsText(file);
+    };
+
+    const importWorlds = (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const items = JSON.parse(evt.target.result);
+          const data = Array.isArray(items) ? items : [items];
+          for (const item of data) {
+            const newItem = { ...item, id: genNewId() };
+            await apiFetch('/api/worlds', { method: 'POST', body: JSON.stringify(newItem) });
+          }
+          alert(`✅ 导入成功，共导入 ${data.length} 个世界设定`);
+          await loadAssets();
+        } catch (err) { alert('导入失败：格式错误'); }
+        e.target.value = '';
+      };
+      reader.readAsText(file);
+    };
+
+    const importChars = (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const items = JSON.parse(evt.target.result);
+          const data = Array.isArray(items) ? items : [items];
+          for (const item of data) {
+            const newItem = { ...item, id: genNewId() };
+            await apiFetch('/api/characters', { method: 'POST', body: JSON.stringify(newItem) });
+          }
+          alert(`✅ 导入成功，共导入 ${data.length} 个角色设定`);
+          await loadAssets();
+        } catch (err) { alert('导入失败：格式错误'); }
+        e.target.value = '';
+      };
+      reader.readAsText(file);
+    };
 
     async function addProfile() {
       const newId = String(Date.now());
