@@ -1212,7 +1212,6 @@ export default {
     const showCharDrawer   = ref(false);
     const showToolsMenu    = ref(false);
     const showEngineParams = ref(false); 
-    const showActionList   = ref(false); // 用于控制推荐行动列表的展开
 
 
     window.addEventListener('keydown', (e) => {
