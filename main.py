@@ -69,6 +69,7 @@ class SystemPromptSchema(BaseModel):
     id: str
     name: str
     content: str
+    user_id: Optional[str] = None # [补全] 用于区分新建/编辑
     is_public: Optional[int] = 0
     sort_index: Optional[int] = 0 # [NEW] 排序字段
 
@@ -89,6 +90,7 @@ class ProfileSchema(BaseModel):
 
 class WorldSchema(BaseModel):
     id: str
+    user_id: Optional[str] = None # [补全] 用于区分新建/编辑
     name: str
     intro: str
     desc: Optional[str] = ""
