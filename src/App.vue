@@ -1909,7 +1909,7 @@ export default {
       inputText, chatAreaEl, mainInputEl, welcomeInputEl,
       autoResize, sendFromWelcome, sendMessage,
       discoverSections, selectedCard, openDetail, newChatSession,
-      characters, engines, quickSetup, startAdventureFromDetail,
+      characters, rpgEngines, systemPrompts, quickSetup, startAdventureFromDetail,
       worlds, setupForm, canStartRPG, startRPG,
       editingWorld, editingChar, addNewWorld, addNewChar,
       editWorld, editChar, saveEdit, exitEdit,
