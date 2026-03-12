@@ -1254,7 +1254,8 @@ export default {
         // 转换为响应式字典
         Object.keys(sessionsData).forEach(key => delete sessionsData[key]);
         data.forEach(s => {
-          sessionsData[s.id] = { ...s, name: s.title || '未命名会话' };
+          // [适配] 将后端 type 映射为前端 mode，确保会话颜色和逻辑正确区分
+          sessionsData[s.id] = { ...s, mode: s.type, name: s.title || '未命名会话' };
         });
       } catch (e) { console.error('加载会话失败'); }
     }
