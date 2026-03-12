@@ -788,9 +788,6 @@
                     <input type="file" ref="importCharsInput" style="display:none" accept=".json" @change="importChars">
                   </div>
 
-                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between;border-color:rgba(229,62,62,.2)">
-                    <div><div style="font-size:14px;font-weight:700;color:var(--danger)">重置所有数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">清除全部本地数据，不可撤销</div></div>
-                    <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> 重置</button>
                   </div>
                 </div>
               </template>
