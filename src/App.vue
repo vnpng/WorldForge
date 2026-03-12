@@ -1205,14 +1205,7 @@ export default {
     const showToolsMenu    = ref(false);
     const showEngineParams = ref(false); 
     const showActionList   = ref(false); // 用于控制推荐行动列表的展开
-    const streamingEnabled = ref(true); // 默认开启流式输出
-    const advParams = reactive({
-      contextLimit: 10,
-      stmThreshold: 6,
-      rpgTemp: 0.8,
-      chatTemp: 0.6
-    });
-    const actionChips      = ref([]); // 用于存放 3 个行动建议
+
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && showCharDrawer.value) {
