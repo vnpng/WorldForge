@@ -1055,7 +1055,7 @@ export default {
     const currentUser = ref({ id: '', name: '未登录', role: 'user' });
     let nextId = Date.now(); // [新增] 定义全局自增 ID 起点
 
-    // 页面初始化：读取本地存储恢复登录状态
+    // 页面初始化：读取本地存储恢复登录状态与偏好设置
     onMounted(() => {
       const token = localStorage.getItem('wf_token');
       const userStr = localStorage.getItem('wf_user');
@@ -1069,7 +1069,22 @@ export default {
           localStorage.removeItem('wf_user');
         }
       }
+      
+      // [新增] 恢复功能开关与调节项偏好
+      const storedStreaming = localStorage.getItem('wf_streaming');
+      if (storedStreaming !== null) streamingEnabled.value = (storedStreaming === 'true');
+      const storedParams = localStorage.getItem('wf_adv_params');
+      if (storedParams) {
+        try {
+          const p = JSON.parse(storedParams);
+          Object.assign(advParams, p);
+        } catch(e) {}
+      }
     });
+
+    // [新增] 监听并保存偏好设置
+    watch(streamingEnabled, (val) => localStorage.setItem('wf_streaming', val));
+    watch(advParams, (val) => localStorage.setItem('wf_adv_params', JSON.stringify(val)), { deep: true });
 
     async function doLogin() {
       if (!loginUser.value.trim() || !loginPass.value.trim()) {
@@ -1753,7 +1768,7 @@ export default {
       const aiMsg = reactive({ 
         id: Date.now() + 1, 
         role: 'ai', 
-        content: '', 
+        content: streamingEnabled.value ? '' : '<i class="fas fa-spinner fa-spin"></i> AI 正在思考中...', 
         cot: '', 
         debug: '',
         usage: null 
@@ -1807,28 +1822,43 @@ export default {
                 const content = data.choices?.[0]?.delta?.content || "";
                 fullText += content;
                 
-                // 实时提取 <cot> 内容
-                const cotMatch = fullText.match(/<cot>([\s\S]*?)<\/cot>/);
-                if (cotMatch) {
-                  aiMsg.cot = cotMatch[1];
-                  aiMsg.content = marked.parse(fullText.replace(/<cot>[\s\S]*?<\/cot>/g, '').trim());
-                } else {
-                  aiMsg.content = marked.parse(fullText.trim());
-                }
+                // [逻辑闭环] 仅在开启流式输出时才实时更新 UI
+                if (streamingEnabled.value) {
+                  // 实时提取 <cot> 内容
+                  const cotMatch = fullText.match(/<cot>([\s\S]*?)<\/cot>/);
+                  if (cotMatch) {
+                    aiMsg.cot = cotMatch[1];
+                    aiMsg.content = marked.parse(fullText.replace(/<cot>[\s\S]*?<\/cot>/g, '').trim());
+                  } else {
+                    aiMsg.content = marked.parse(fullText.trim());
+                  }
 
-                // 实时提取 [推荐行动]
-                const actionMatch = fullText.match(/\[推荐行动\]([\s\S]*?)$/);
-                if (actionMatch && actionMatch[1]) {
-                   const rawActions = actionMatch[1].split('\n').filter(a => a.trim().length > 1);
-                   actionChips.value = rawActions.map(a => a.replace(/^\d+\.\s*/, '').trim()).slice(0, 3);
+                  // 实时提取 [推荐行动]
+                  const actionMatch = fullText.match(/\[推荐行动\]([\s\S]*?)$/);
+                  if (actionMatch && actionMatch[1]) {
+                     const rawActions = actionMatch[1].split('\n').filter(a => a.trim().length > 1);
+                     actionChips.value = rawActions.map(a => a.replace(/^\d+\.\s*/, '').trim()).slice(0, 3);
+                  }
+                  if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
                 }
-
-                if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
               } catch (e) { /* 忽略不完整的 JSON 分片 */ }
             }
           }
         }
         
+        // [逻辑闭环] 流式传输结束后的最终渲染 (如果是关闭流式状态，此时才真正写入内容)
+        const finalCotMatch = fullText.match(/<cot>([\s\S]*?)<\/cot>/);
+        if (finalCotMatch) aiMsg.cot = finalCotMatch[1];
+        aiMsg.content = marked.parse(fullText.replace(/<cot>[\s\S]*?<\/cot>/g, '').trim());
+
+        const finalActionMatch = fullText.match(/\[推荐行动\]([\s\S]*?)$/);
+        if (finalActionMatch && finalActionMatch[1]) {
+           const rawActions = finalActionMatch[1].split('\n').filter(a => a.trim().length > 1);
+           actionChips.value = rawActions.map(a => a.replace(/^\d+\.\s*/, '').trim()).slice(0, 3);
+        }
+        
+        if (chatAreaEl.value) nextTick(() => chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight);
+
         // 5. 保存会话存档
         await syncSession(currentSessionId.value);
 
