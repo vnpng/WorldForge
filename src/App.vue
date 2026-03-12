@@ -1507,7 +1507,11 @@ export default {
       if (!canStartRPG.value) return;
       const id = String(Date.now());
       sessionsData[id] = {
-        id, name: '新RPG开局', mode: 'rpg', messages: [
+        id, name: '新RPG开局', mode: 'rpg',
+        engine_id: setupForm.engineId,
+        world_id: setupForm.worldId,
+        char_id: setupForm.characterId,
+        messages: [
           { id: Date.now(), role: 'ai', content: '世界正在生成，命运的齿轮开始转动...', usage: { user_words:0, prompt_tokens:120, ai_words:18, completion_tokens:22 } }
         ],
         updatedAt: Date.now()
@@ -1841,9 +1845,9 @@ export default {
             message: text,
             mode: currentMode.value,
             profile_id: activeProfileId.value,
-            world_id: setupForm.worldId,
-            char_id: setupForm.characterId,
-            engine_id: setupForm.engineId,
+            world_id: activeSession.value?.world_id || null,
+            char_id: activeSession.value?.char_id || null,
+            engine_id: activeSession.value?.engine_id || null,
             context_limit: advParams.contextLimit,
             temperature: currentMode.value === 'rpg' ? advParams.rpgTemp : advParams.chatTemp
           })
