@@ -1882,7 +1882,6 @@ export default {
                 // 处理 OpenAI 格式的流式数据
                 const content = data.choices?.[0]?.delta?.content || "";
                 if (content && firstChunk) {
-                  aiMsg.content = ''; // 收到首个有效字符，清除“构思中”状态
                   firstChunk = false;
                 }
                 fullText += content;
