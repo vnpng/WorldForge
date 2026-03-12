@@ -1711,17 +1711,17 @@ export default {
       });
     }
 
-    function sendMessage() {
+    async function sendMessage() {
       let text = inputText.value.trim();
       if (!text || !activeSession.value) return;
 
-      // --- 数字识别逻辑 ---
+      // 1. 数字快捷选择逻辑
       if (currentMode.value === 'rpg' && actionChips.value.length > 0 && /^\d+$/.test(text)) {
         const selectedChips = text.split('').map(num => actionChips.value[parseInt(num) - 1]).filter(c => c);
         if (selectedChips.length > 0) text = selectedChips.join('，');
       }
 
-      // 清空面板状态
+      // 2. 清空 UI 状态
       actionChips.value = [];
       showActionList.value = false;
       showCharDrawer.value = false;
@@ -1731,38 +1731,92 @@ export default {
       msgs.push({ id: Date.now(), role: 'user', content: text });
       inputText.value = '';
 
-      nextTick(() => {
-        if (mainInputEl.value) { mainInputEl.value.style.height = 'auto'; mainInputEl.value.focus(); }
-        if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
-
-        // 模拟 AI 回复
-        setTimeout(() => {
-          const fullReply = "由于你刚才的行动，空气中的迷雾似乎变得更加粘稠，远处传来了低沉的咆哮声。你感觉到手中的武器在微微颤抖。";
-          const aiMsg = { id: Date.now(), role: 'ai', content: '', usage: { user_words: 10, prompt_tokens: 500, ai_words: 50, completion_tokens: 60 } };
-          msgs.push(aiMsg);
-
-          const generateNextSteps = () => {
-            if (currentMode.value === 'rpg') {
-              actionChips.value = ['🔍 寻找咆哮声来源', '🛡️ 举盾原地防守', '🏃 快速向反方向跑去'];
-            }
-          };
-
-          // --- 打字机/流式输出逻辑 ---
-          if (streamingEnabled.value) {
-            let i = 0;
-            const timer = setInterval(() => {
-              aiMsg.content += fullReply[i];
-              i++;
-              if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
-              if (i >= fullReply.length) { clearInterval(timer); generateNextSteps(); }
-            }, 30)
-          } else {
-            aiMsg.content = fullReply;
-            generateNextSteps();
-            nextTick(() => { if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight; });
-          }
-        }, 1000);
+      // 3. 准备 AI 占位消息
+      const aiMsg = reactive({ 
+        id: Date.now() + 1, 
+        role: 'ai', 
+        content: '', 
+        cot: '', 
+        debug: '',
+        usage: null 
       });
+      msgs.push(aiMsg);
+
+      // 滚到底部
+      nextTick(() => { 
+        if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
+        if (mainInputEl.value) mainInputEl.value.style.height = 'auto';
+      });
+
+      // 4. 发起真实流式请求
+      try {
+        const response = await apiFetch('/api/chat', {
+          method: 'POST',
+          body: JSON.stringify({
+            session_id: currentSessionId.value,
+            message: text,
+            mode: currentMode.value,
+            profile_id: activeProfileId.value,
+            world_id: setupForm.worldId,
+            char_id: setupForm.characterId,
+            engine_id: setupForm.engineId,
+            context_limit: advParams.contextLimit,
+            temperature: currentMode.value === 'rpg' ? advParams.rpgTemp : advParams.chatTemp
+          })
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                if (data.error) {
+                  aiMsg.content = `<span style="color:var(--danger)">[错误] ${data.detail || data.error}</span>`;
+                  return;
+                }
+                
+                // 处理 OpenAI 格式的流式数据
+                const content = data.choices?.[0]?.delta?.content || "";
+                fullText += content;
+                
+                // 实时提取 <cot> 内容
+                const cotMatch = fullText.match(/<cot>([\s\S]*?)<\/cot>/);
+                if (cotMatch) {
+                  aiMsg.cot = cotMatch[1];
+                  aiMsg.content = marked.parse(fullText.replace(/<cot>[\s\S]*?<\/cot>/g, '').trim());
+                } else {
+                  aiMsg.content = marked.parse(fullText.trim());
+                }
+
+                // 实时提取 [推荐行动]
+                const actionMatch = fullText.match(/\[推荐行动\]([\s\S]*?)$/);
+                if (actionMatch && actionMatch[1]) {
+                   const rawActions = actionMatch[1].split('\n').filter(a => a.trim().length > 1);
+                   actionChips.value = rawActions.map(a => a.replace(/^\d+\.\s*/, '').trim()).slice(0, 3);
+                }
+
+                if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
+              } catch (e) { /* 忽略不完整的 JSON 分片 */ }
+            }
+          }
+        }
+        
+        // 5. 保存会话存档
+        await syncSession(currentSessionId.value);
+
+      } catch (err) {
+        aiMsg.content = `<span style="color:var(--danger)">[网络异常] 无法连接到后厨，请检查后端程序是否运行。</span>`;
+      }
     }
 
     const welcomeHints = ['开始新的冒险', '帮我写一段代码', '继续上次剧情', '头脑风暴想法'];
