@@ -1045,6 +1045,16 @@ import { marked } from 'marked'
 export default {
   setup() {
 
+    // ── 全局状态变量 (预先定义，防止 ReferenceError) ──
+    const streamingEnabled = ref(true); 
+    const advParams = reactive({
+      contextLimit: 10,
+      stmThreshold: 6,
+      rpgTemp: 0.8,
+      chatTemp: 0.6
+    });
+    const actionChips      = ref([]); 
+
     // ── Auth ──
     const loggedIn  = ref(false);
     const isLoginMode = ref(true);
