@@ -2017,7 +2017,11 @@ export default {
     const charListRef = ref(null);
 
     const initSortable = (el, listRef, type) => {
-      if (!el || el._sortable) return;
+      if (!el) return;
+      if (el._sortable) {
+        el._sortable.destroy();
+        el._sortable = null;
+      }
       el._sortable = new Sortable(el, {
         animation: 150,
         onEnd: async (evt) => {
