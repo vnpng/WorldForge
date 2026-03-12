@@ -2019,7 +2019,6 @@ export default {
     const initSortable = (el, listRef, type) => {
       if (!el || el._sortable) return;
       el._sortable = new Sortable(el, {
-        handle: '.drag-handle',
         animation: 150,
         onEnd: async (evt) => {
           const { oldIndex, newIndex } = evt;
