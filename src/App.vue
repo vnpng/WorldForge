@@ -1300,7 +1300,10 @@ export default {
             title: s.name,
             messages: s.messages,
             updatedAt: Date.now(),
-            is_pinned: s.is_pinned || 0 // [修复] 补全置顶状态同步
+            is_pinned: s.is_pinned || 0, // [修复] 补全置顶状态同步
+            engine_id: s.engine_id || null,
+            world_id: s.world_id || null,
+            char_id: s.char_id || null
           })
         });
       } catch (e) { console.error('同步会话失败'); }
@@ -1793,8 +1796,8 @@ export default {
       sendMessage();
     }
 
-    async function sendMessage(overrideText = null, silent = false) {
-      let text = overrideText || inputText.value.trim();
+    async function sendMessage(rawText = null, silent = false) {
+      const text = (typeof rawText === 'string' && rawText.trim()) ? rawText.trim() : inputText.value.trim();
       if (!text || !activeSession.value) return;
 
       // 1. 数字快捷选择逻辑
