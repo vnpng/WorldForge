@@ -1355,7 +1355,10 @@ export default {
     const worlds = ref([]);
     const characters = ref([]);
 
-    const rpgEngines = computed(() => systemPrompts.value.filter(p => p.type === 'rpg'));
+    const rpgEngines = computed(() => {
+      const filtered = systemPrompts.value.filter(p => p.type === 'rpg');
+      return filtered.length > 0 ? filtered : systemPrompts.value; // 如果没有 RPG 类型的，显示全部作为兜底
+    });
 
     // 统一资产拉取函数 (已修复变量重名问题)
     async function loadAssets() {
