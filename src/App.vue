@@ -190,20 +190,6 @@
             <div class="status-sep">·</div>
             <div class="status-api"><div class="status-dot"></div>{{activeProfile.name}} · {{activeProfile.model}}</div>
             <div class="status-right">
-              <template v-if="currentMode==='rpg'">
-                <template v-if="currentUser.role === 'superadmin'">
-                  <span class="toggle-label">调试 Prompt</span>
-                  <label class="toggle">
-                    <input type="checkbox" :checked="showDebug" @change="showDebug=!showDebug"/>
-                    <div class="toggle-track"></div><div class="toggle-thumb"></div>
-                  </label>
-                </template>
-                <span class="toggle-label" style="margin-left:4px">CoT</span>
-                <label class="toggle">
-                  <input type="checkbox" :checked="showCoT" @change="showCoT=!showCoT"/>
-                  <div class="toggle-track"></div><div class="toggle-thumb"></div>
-                </label>
-              </template>
             </div>
           </template>
         </template>
@@ -934,11 +920,19 @@
                         <div class="toggle-track"></div><div class="toggle-thumb"></div>
                       </label>
                     </div>
-                    <div class="menu-item" style="opacity: 0.5;">
-                      <div class="menu-item-label">占位符 1</div>
+                    <div class="menu-item" v-if="currentUser.role === 'superadmin' || currentUser.role === 'admin'">
+                      <div class="menu-item-label">调试 Prompt</div>
+                      <label class="toggle" style="transform: scale(0.8);">
+                        <input type="checkbox" v-model="showDebug"/>
+                        <div class="toggle-track"></div><div class="toggle-thumb"></div>
+                      </label>
                     </div>
-                    <div class="menu-item" style="opacity: 0.5;">
-                      <div class="menu-item-label">占位符 2</div>
+                    <div class="menu-item">
+                      <div class="menu-item-label">CoT (推理过程)</div>
+                      <label class="toggle" style="transform: scale(0.8);">
+                        <input type="checkbox" v-model="showCoT"/>
+                        <div class="toggle-track"></div><div class="toggle-thumb"></div>
+                      </label>
                     </div>
                   </div>
                 </transition>
@@ -1094,6 +1088,13 @@ export default {
       // [新增] 恢复功能开关与调节项偏好
       const storedStreaming = localStorage.getItem('wf_streaming');
       if (storedStreaming !== null) streamingEnabled.value = (storedStreaming === 'true');
+      
+      const storedDebug = localStorage.getItem('wf_show_debug');
+      if (storedDebug !== null) showDebug.value = (storedDebug === 'true');
+      
+      const storedCoT = localStorage.getItem('wf_show_cot');
+      if (storedCoT !== null) showCoT.value = (storedCoT === 'true');
+
       const storedParams = localStorage.getItem('wf_adv_params');
       if (storedParams) {
         try {
@@ -1105,6 +1106,8 @@ export default {
 
     // [新增] 监听并保存偏好设置
     watch(streamingEnabled, (val) => localStorage.setItem('wf_streaming', val));
+    watch(showDebug, (val) => localStorage.setItem('wf_show_debug', val));
+    watch(showCoT, (val) => localStorage.setItem('wf_show_cot', val));
     watch(advParams, (val) => localStorage.setItem('wf_adv_params', JSON.stringify(val)), { deep: true });
 
     async function doLogin() {
@@ -1209,7 +1212,7 @@ export default {
     const confirmTarget    = ref(null);
     const confirmCb        = ref(null);
     const settingsTab      = ref('basic');
-    const showCoT          = ref(true);
+    const showCoT          = ref(false);
     const showDebug        = ref(false);
     const openDropdown     = ref(null);
     const showCharDrawer   = ref(false);
