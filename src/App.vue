@@ -583,8 +583,8 @@
               <div class="select-panel">
                 <div class="panel-header"><span><i class="fas fa-server" style="color:#2e9ec4"></i> 选择引擎</span></div>
                 <div class="panel-list">
-                  <div v-for="e in engines" :key="e.id" class="list-item" :class="{selected: setupForm.engineId===e.id}" @click="setupForm.engineId=e.id">
-                    <div class="item-name">{{e.name}}</div><div class="item-desc">{{e.model}}</div>
+                  <div v-for="e in rpgEngines" :key="e.id" class="list-item" :class="{selected: setupForm.engineId===e.id}" @click="setupForm.engineId=e.id">
+                    <div class="item-name">{{e.name}}</div><div class="item-desc">{{e.desc}}</div>
                   </div>
                 </div>
               </div>
@@ -1354,6 +1354,8 @@ export default {
     // ── 真实资产库 (打通后端) ──
     const worlds = ref([]);
     const characters = ref([]);
+
+    const rpgEngines = computed(() => systemPrompts.value.filter(p => p.type === 'rpg'));
 
     // 统一资产拉取函数 (已修复变量重名问题)
     async function loadAssets() {
