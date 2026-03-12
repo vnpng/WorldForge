@@ -778,8 +778,30 @@
             <div class="input-tools">
               <div class="tools-left">
               </div>
-              <div class="tools-right">
-                <div class="tool-btn-text">Pro <i class="fas fa-chevron-down" style="font-size:10px"></i></div>
+              <div class="tools-right" style="position: relative;">
+                <div class="tool-btn-text" @click.stop="showToolsMenu=!showToolsMenu">
+                  {{ activeProfile?.name || 'API' }} <i class="fas fa-chevron-down" style="font-size:10px"></i>
+                </div>
+
+                <transition name="menu-pop">
+                  <div class="tools-menu" v-if="showToolsMenu" @click.stop style="bottom: 100%; right: 0; margin-bottom: 8px;">
+                    <div 
+                      v-for="p in profiles" :key="p.id" 
+                      class="menu-item" 
+                      :class="{active: activeProfileId === p.id}"
+                      @click="activeProfileId = p.id; showToolsMenu = false"
+                    >
+                      <div class="menu-item-label" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <span>{{ p.name }}</span>
+                        <i v-if="activeProfileId === p.id" class="fas fa-check" style="font-size: 10px; color: var(--purple-lt);"></i>
+                      </div>
+                    </div>
+                    <div v-if="profiles.length === 0" class="menu-item" style="opacity: 0.5;">
+                      <div class="menu-item-label">暂无可用节点</div>
+                    </div>
+                  </div>
+                </transition>
+
                 <div class="tool-btn"><i class="fas fa-microphone"></i></div>
                 <button class="send-btn-gemini" @click="sendFromWelcome" :disabled="!inputText.trim()"><i class="fas fa-arrow-up"></i></button>
               </div>
