@@ -2054,6 +2054,27 @@ export default {
       }
     }, { immediate: true });
 
+    watch(editingWorld, async (newVal) => {
+      if (newVal === null) {
+        await nextTick();
+        if (worldListRef.value) initSortable(worldListRef.value, worlds, 'world');
+      }
+    });
+
+    watch(editingChar, async (newVal) => {
+      if (newVal === null) {
+        await nextTick();
+        if (charListRef.value) initSortable(charListRef.value, characters, 'char');
+      }
+    });
+
+    watch(editingEngine, async (newVal) => {
+      if (newVal === null) {
+        await nextTick();
+        if (engineListRef.value) initSortable(engineListRef.value, systemPrompts, 'engine');
+      }
+    });
+
     // ── Character Mock ──
     const charStats = ref([
       { name:'HP',  val:72, color:'#e53e3e' },
