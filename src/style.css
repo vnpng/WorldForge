@@ -472,6 +472,27 @@ body.light .chat .msg-avatar.ai { background: rgba(92,168,0,.15); color: #4a9000
   padding: 16px 20px; font-size: 16px; line-height: 1.75;
   color: var(--white); max-width: 100%;
 }
+
+/* AI 回复中的表格样式 */
+.bubble table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+  font-size: 13px;
+}
+.bubble table th,
+.bubble table td {
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 6px 10px;
+  text-align: left;
+}
+.bubble table th {
+  background: rgba(255,255,255,0.08);
+  font-weight: 600;
+}
+.bubble table tr:hover {
+  background: rgba(255,255,255,0.04);
+}
 .rpg  .bubble.ai   { background: transparent; border: none; padding: 8px 0; margin-left: 36px; }
 .rpg  .bubble.user { background: var(--bubble-rpg-user); border-radius: 16px 4px 16px 16px; color: #fff; }
 .chat .bubble.ai   { background: transparent; border: none; padding: 8px 0; margin-left: 36px; }
