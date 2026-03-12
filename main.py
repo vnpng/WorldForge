@@ -68,6 +68,7 @@ class SessionSchema(BaseModel):
 class SystemPromptSchema(BaseModel):
     id: str
     name: str
+    intro: Optional[str] = "" # [NEW] 引擎简介
     content: str
     user_id: Optional[str] = None # [补全] 用于区分新建/编辑
     is_public: Optional[int] = 0

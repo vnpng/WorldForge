@@ -45,6 +45,10 @@ def upgrade_tables(cursor):
         print("正在为 SystemPrompts 表追加 sort_index 字段...")
         cursor.execute("ALTER TABLE SystemPrompts ADD COLUMN sort_index INTEGER DEFAULT 0")
 
+    if 'intro' not in columns:
+        print("正在为 SystemPrompts 表追加 intro 字段...")
+        cursor.execute("ALTER TABLE SystemPrompts ADD COLUMN intro TEXT")
+
     # 3. 升级 Profiles 表：增加 user_id
     cursor.execute("PRAGMA table_info(Profiles)")
     columns = [row[1] for row in cursor.fetchall()]
@@ -123,6 +127,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS SystemPrompts (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
+        intro TEXT,
         content TEXT,
         sort_index INTEGER DEFAULT 0
     )

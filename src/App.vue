@@ -272,7 +272,7 @@
                     <span class="tag tag-chat" v-else style="font-size:11px;padding:1px 7px">Chat</span>
                     <span class="tag" v-if="p.isPublic" style="background:rgba(255,255,255,0.1);color:var(--white-soft);font-size:10px;padding:1px 6px;">公开</span>
                   </div>
-                  <div class="preset-desc">{{p.desc || '暂无内容'}}</div>
+                  <div class="preset-desc">{{p.intro || '暂无简介'}}</div>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center">
                   <label class="toggle" style="transform:scale(.9)">
@@ -1812,7 +1812,7 @@ export default {
       originalEditData.value = JSON.stringify(e);
     };
     const addNewEngine = () => {
-      const ne = { id: String(Date.now()), name: '新引擎预设', type: 'rpg', active: false, desc: '', isPublic: false };
+      const ne = { id: String(Date.now()), name: '新引擎预设', type: 'rpg', active: false, intro: '', desc: '', isPublic: false };
       systemPrompts.value.push(ne);
       editEngine(ne);
     };
