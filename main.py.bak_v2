@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Optional, Any
 import os
@@ -9,21 +9,7 @@ import json
 import time
 import jwt 
 import bcrypt 
-import httpx # [NEW] 用于流式代理
 from database import init_db, get_db_connection
-
-class ChatRequest(BaseModel):
-    session_id: str
-    message: str
-    mode: str  # 'rpg' 或 'chat'
-    profile_id: str
-    # RPG 专供字段
-    world_id: Optional[str] = None
-    char_id: Optional[str] = None
-    engine_id: Optional[str] = None
-    # 调优参数
-    context_limit: int = 10
-    temperature: float = 0.8
 
 # 初始化数据库结构
 init_db()
@@ -473,93 +459,6 @@ async def delete_character(char_id: str, user: dict = Depends(get_current_user))
     conn.commit()
     conn.close()
     return {"status": "success"}
-
-# --- AI Proxy 核心引擎 ---
-async def ai_stream_generator(client: httpx.AsyncClient, url: str, headers: dict, payload: dict):
-    """通用 SSE 流式转发生成器"""
-    try:
-        async with client.stream("POST", f"{url}/chat/completions", json=payload, headers=headers, timeout=60.0) as response:
-            if response.status_code != 200:
-                error_detail = await response.aread()
-                yield f"data: {json.dumps({'error': 'AI服务异常', 'detail': error_detail.decode()})}\n\n"
-                return
-
-            async for line in response.aiter_lines():
-                if line.startswith("data: "):
-                    yield line + "\n\n"
-    except Exception as e:
-        yield f"data: {json.dumps({'error': str(e)})}\n\n"
-
-@app.post("/api/chat")
-async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # 1. 获取选中的 API 节点配置
-    profile = cursor.execute("SELECT * FROM Profiles WHERE id = ? AND user_id = ?", (req.profile_id, user["id"])).fetchone()
-    if not profile:
-        conn.close()
-        raise HTTPException(status_code=404, detail="未找到选中的 API 配置")
-
-    # 2. 拼装 System Prompt
-    system_content = "你是一个全能的 AI 助手。"
-    if req.mode == 'rpg':
-        # 获取世界设定
-        world = cursor.execute("SELECT * FROM Worlds WHERE id = ? AND user_id = ?", (req.world_id, user["id"])).fetchone() if req.world_id else None
-        # 获取角色设定
-        char = cursor.execute("SELECT * FROM Characters WHERE id = ? AND user_id = ?", (req.char_id, user["id"])).fetchone() if req.char_id else None
-        # 获取引擎预设
-        engine = cursor.execute("SELECT * FROM SystemPrompts WHERE id = ?", (req.engine_id,)).fetchone() if req.engine_id else None
-        
-        system_content = f"""
-# [核心世界观设定]
-{world['desc'] if world else '一个神秘的未知世界。'}
-核心冲突：{world['conflict'] if world else '未知'}
-
-# [你扮演的角色信息]
-姓名：{char['name'] if char else '探险者'}
-身份：{char['identity'] if char else '平民'}
-外貌与性格：{char['appearance'] if char else ''}，{char['personality'] if char else ''}
-
-# [叙事风格指南]
-{engine['content'] if engine else '请使用沉浸式的第一人称或第三人称进行文字冒险推演。'}
-
-# [强制指令]
-1. 必须使用 <cot> 标签进行剧情逻辑推演。
-2. 在回复末尾，请以 [推荐行动] 格式给出 3 个后续行动建议，每个建议占一行。
-"""
-
-    # 3. 准备历史消息 (Context)
-    session = cursor.execute("SELECT messages FROM Sessions WHERE id = ? AND user_id = ?", (req.session_id, user["id"])).fetchone()
-    history = json.loads(session['messages']) if session and session['messages'] else []
-    
-    # 截取历史记录
-    context_msgs = history[-(req.context_limit):] if req.context_limit > 0 else []
-    
-    # 4. 构建发送给 AI 的完整 Payload
-    messages = [{"role": "system", "content": system_content}]
-    for m in context_msgs:
-        role = "assistant" if m['role'] == 'ai' else "user"
-        # 简单清理 content 中的 HTML
-        messages.append({"role": role, "content": m['content']})
-    messages.append({"role": "user", "content": req.message})
-
-    conn.close()
-
-    # 5. 发起流式请求
-    client = httpx.AsyncClient()
-    headers = {"Authorization": f"Bearer {profile['apiKey']}"}
-    payload = {
-        "model": profile['model'],
-        "messages": messages,
-        "temperature": req.temperature,
-        "stream": True
-    }
-
-    return StreamingResponse(
-        ai_stream_generator(client, profile['baseUrl'], headers, payload),
-        media_type="text/event-stream"
-    )
 
 @app.get("/")
 async def read_index():
