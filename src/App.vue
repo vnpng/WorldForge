@@ -834,14 +834,6 @@
               class="msg-group" :class="msg.role"
               v-show="!msg.hidden"
             >
-              <!-- AI header -->
-              <div class="msg-header" v-if="msg.role==='ai'">
-                <div class="msg-avatar ai">
-                  <i :class="currentMode==='rpg'?'fas fa-dragon':'fas fa-robot'"></i>
-                </div>
-                <span class="msg-role">{{currentMode==='rpg'?'引擎':'AI'}}</span>
-              </div>
-
               <!-- Bubble -->
               <div class="bubble" :class="msg.role">
                 <template v-if="msg.role==='ai' && currentMode==='rpg'">
