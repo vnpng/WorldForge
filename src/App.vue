@@ -777,7 +777,6 @@
             <textarea class="main-input" placeholder="问问 WorldForge..." v-model="inputText" @keydown.enter.exact.prevent="sendFromWelcome" @input="autoResize($event)" rows="1"></textarea>
             <div class="input-tools">
               <div class="tools-left">
-                <div class="tool-btn"><i class="fas fa-sliders-h"></i></div>
               </div>
               <div class="tools-right">
                 <div class="tool-btn-text">Pro <i class="fas fa-chevron-down" style="font-size:10px"></i></div>
