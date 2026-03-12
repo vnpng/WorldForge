@@ -317,6 +317,7 @@
                 <div style="display:flex; gap:12px;">
                   <button class="btn btn-ghost btn-sm" @click="exitEdit('engine')">退出编辑</button>
                   <button class="btn btn-primary btn-sm" @click="saveEdit('engine')" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
+                  <button class="btn btn-primary btn-sm" @click="saveEdit('engine', true)" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : 'background:#10b981'"><i class="fas fa-check-circle"></i> 保存并返回</button>
                 </div>
               </div>
             </div>
@@ -420,6 +421,7 @@
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-sm" @click="exitEdit('world')">退出编辑</button>
                 <button class="btn btn-primary btn-sm" @click="saveEdit('world')" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
+                <button class="btn btn-primary btn-sm" @click="saveEdit('world', true)" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : 'background:#10b981'"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
           </template>
@@ -527,6 +529,7 @@
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-sm" @click="exitEdit('char')">退出编辑</button>
                 <button class="btn btn-primary btn-sm" @click="saveEdit('char')" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
+                <button class="btn btn-primary btn-sm" @click="saveEdit('char', true)" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : 'background:#10b981'"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
           </template>
@@ -1511,7 +1514,7 @@ export default {
       originalEditData.value = JSON.stringify(c);
     };
 
-    const saveEdit = async (type) => {
+    const saveEdit = async (type, andReturn = false) => {
       const data = type === 'world' ? editingWorld.value : (type === 'char' ? editingChar.value : editingEngine.value);
       const endpoint = type === 'world' ? '/api/worlds' : (type === 'char' ? '/api/characters' : '/api/prompts');
       
@@ -1529,6 +1532,12 @@ export default {
         originalEditData.value = JSON.stringify(data);
         alert('✅ 保存并同步至云端成功！');
         await loadAssets(); // 保存后重新拉取
+        
+        if (andReturn) {
+          if (type === 'world') editingWorld.value = null;
+          else if (type === 'char') editingChar.value = null;
+          else if (type === 'engine') editingEngine.value = null;
+        }
       } catch (e) {
         alert('保存失败，请检查网络。');
       }
