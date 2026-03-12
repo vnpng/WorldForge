@@ -521,7 +521,8 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
         
         system_content = f"""
 # [核心世界观设定]
-{world['desc'] if world else '一个神秘的未知世界。'}
+{world['intro'] if world else '一个神秘的未知世界。'}
+{world['desc'] if world and world['desc'] else ''}
 核心冲突：{world['conflict'] if world else '未知'}
 
 # [你扮演的角色信息]

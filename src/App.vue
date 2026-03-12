@@ -788,7 +788,6 @@
                     <input type="file" ref="importCharsInput" style="display:none" accept=".json" @change="importChars">
                   </div>
 
-                  </div>
                 </div>
               </template>
             </div>
