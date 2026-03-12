@@ -558,7 +558,8 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
         "model": profile['model'],
         "messages": messages,
         "temperature": req.temperature,
-        "stream": True
+        "stream": True,
+        "stream_options": {"include_usage": True}
     }
 
     return StreamingResponse(

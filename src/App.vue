@@ -1843,7 +1843,12 @@ export default {
         content: '<i class="fas fa-brain fa-pulse"></i> AI 正在构思中...', 
         cot: '', 
         debug: '',
-        usage: null 
+        usage: {
+          user_words: text.length,
+          ai_words: 0,
+          prompt_tokens: '-',
+          completion_tokens: '-'
+        }
       });
       msgs.push(aiMsg);
 
@@ -1896,6 +1901,12 @@ export default {
                 if (content && firstChunk) {
                   firstChunk = false;
                 }
+
+                // 提取使用量数据包
+                if (data.usage) {
+                  aiMsg.usage.prompt_tokens = data.usage.prompt_tokens || '-';
+                  aiMsg.usage.completion_tokens = data.usage.completion_tokens || '-';
+                }
                 fullText += content;
                 
                 // [逻辑闭环] 仅在开启流式输出时才实时更新 UI
@@ -1938,6 +1949,10 @@ export default {
            const rawActions = finalActionMatch[1].split('\n').filter(a => a.trim().length > 1);
            actionChips.value = rawActions.map(a => a.replace(/^\d+\.\s*/, '').trim()).slice(0, 3);
         }
+
+        // 统计最终 AI 字数（去除 cot 和 html 标签）
+        const aiVisibleText = fullText.replace(/<cot>[\s\S]*?<\/cot>/g, '').replace(/<[^>]*>/g, '').trim();
+        aiMsg.usage.ai_words = aiVisibleText.length;
         
         if (chatAreaEl.value) nextTick(() => chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight);
 
