@@ -2554,7 +2554,7 @@ export default {
 }
 .bubble code {
   font-family: monospace;
-  font-size: 13px;
+  font-size: var(--text-sm);
 }
 .bubble p code {
   background: rgba(255,255,255,0.08);
