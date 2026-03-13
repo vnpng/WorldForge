@@ -292,11 +292,11 @@ async def save_prompt(prompt: SystemPromptSchema, user: dict = Depends(get_curre
     else:
         target_user_id = user["id"]
     
-    # [适配] 增加 sort_index 写入
+    # [适配] 增加 intro 和 sort_index 写入
     cursor.execute('''
-    INSERT OR REPLACE INTO SystemPrompts (id, name, content, user_id, is_public, sort_index)
-    VALUES (?, ?, ?, ?, ?, ?)
-    ''', (prompt.id, prompt.name, prompt.content, target_user_id, prompt.is_public, prompt.sort_index))
+    INSERT OR REPLACE INTO SystemPrompts (id, name, intro, content, user_id, is_public, sort_index)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (prompt.id, prompt.name, prompt.intro, prompt.content, target_user_id, prompt.is_public, prompt.sort_index))
     conn.commit()
     conn.close()
     return {"status": "success"}

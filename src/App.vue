@@ -54,13 +54,13 @@
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-plus" style="font-size: var(--text-sm);"></i>
           </div>
-          <div class="session-name">发起新对话</div>
+          <div class="session-name"><strong>发起聊天对话</strong></div>
         </div>
         <div class="session-item" :class="{active: currentView === 'rpg-start'}" @click="currentView='rpg-start'; currentSessionId = null">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-dice-d20" style="font-size: var(--text-sm);"></i>
           </div>
-          <div class="session-name">发起新开局</div>
+          <div class="session-name"><strong>发起RPG开局</strong></div>
         </div>
         <div class="sb-divider"></div>
         <div class="session-item" :class="{active: currentView === 'discover' || currentView === 'card-detail'}" @click="currentView = 'discover'; currentSessionId = null">
@@ -263,7 +263,8 @@
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 32px;">
               <div>
                 <div class="discover-title">引擎管理</div>
-                <div class="discover-sub" style="margin-top:4px;">管理 System Prompt 预设，控制 AI 的角色行为。</div>
+                <div class="discover-sub" style="margin-top:4px;"><strong style="color: #ffffff;">· 官方引擎库 · 为不同世界观量身定制的叙事核心 ·</strong></div>
+                <div class="discover-sub" style="margin-top:4px;">“ 引擎 决定了AI以何种方式演绎你的世界——剧情推演、叙事风格、战斗规则、事件逻辑，都由它掌控。”</div>
               </div>
               <button class="btn btn-primary btn-md" @click="addNewEngine()"><i class="fas fa-plus"></i> 新建预设</button>
             </div>
@@ -2038,19 +2039,23 @@ export default {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (evt) => {
+      reader.onload = async (evt) => {
         try {
           const parsed = JSON.parse(evt.target.result);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            profiles.value = parsed;
-            activeProfileId.value = parsed[0].id;
-            editingProfileId.value = parsed[0].id;
-            alert('✅ 导入成功！');
+            for (const item of parsed) {
+              await apiFetch('/api/profiles', {
+                method: 'POST',
+                body: JSON.stringify(item)
+              });
+            }
+            await loadProfiles();
+            alert(`✅ 成功导入 ${parsed.length} 个节点！`);
           } else {
             alert('格式错误：需要包含节点数组的 JSON 文件。');
           }
         } catch (err) {
-          alert('解析 JSON 失败！');
+          alert('导入失败：' + err.message);
         }
         e.target.value = '';
       };
