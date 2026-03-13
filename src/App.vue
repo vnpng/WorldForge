@@ -1161,11 +1161,13 @@
         <div class="form-field full">
           <div class="form-label">API Key</div>
           <div style="display:flex; gap:8px;">
-            <input type="text" style="display:none" aria-hidden="true"/>
-            <input type="password" style="display:none" aria-hidden="true"/>
             <input class="form-input" v-model="newProfileForm.apiKey"
               :type="showNewApiKey ? 'text' : 'password'"
-              autocomplete="new-password" placeholder="sk-..." style="flex:1"/>
+              autocomplete="off"
+              name="wf-api-key-new"
+              readonly
+              @focus="(e) => e.target.removeAttribute('readonly')"
+              placeholder="sk-..." style="flex:1"/>
             <button class="btn btn-ghost btn-sm" @click="showNewApiKey=!showNewApiKey" style="flex:none; width:40px; justify-content:center;">
               <i :class="showNewApiKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
             </button>
@@ -1173,7 +1175,7 @@
         </div>
         <div class="form-field full">
           <div class="form-label">Model Name</div>
-          <input class="form-input" v-model="newProfileForm.model" autocomplete="off" placeholder="gpt-4o"/>
+          <input class="form-input" v-model="newProfileForm.model" autocomplete="off" placeholder="例如：gpt-4o"/>
         </div>
       </div>
 
@@ -1231,11 +1233,13 @@
         <div class="form-field full">
           <div class="form-label">API Key</div>
           <div style="display:flex; gap:8px;">
-            <input type="text" style="display:none" aria-hidden="true"/>
-            <input type="password" style="display:none" aria-hidden="true"/>
             <input class="form-input" v-model="tempEditForm.apiKey"
               :type="showEditApiKey ? 'text' : 'password'"
-              autocomplete="new-password" placeholder="sk-..." style="flex:1"/>
+              autocomplete="off"
+              name="wf-api-key-edit"
+              readonly
+              @focus="(e) => e.target.removeAttribute('readonly')"
+              placeholder="sk-..." style="flex:1"/>
             <button class="btn btn-ghost btn-sm" @click="showEditApiKey=!showEditApiKey" style="flex:none; width:40px; justify-content:center;">
               <i :class="showEditApiKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
             </button>
@@ -1852,7 +1856,7 @@ export default {
     const showNewProfileModal = ref(false);
     const showNewApiKey = ref(false);
     const showEditApiKey = ref(false);
-    const newProfileForm = ref({ name: '', baseUrl: '', apiKey: '', model: 'gpt-4o' });
+    const newProfileForm = ref({ name: '', baseUrl: '', apiKey: '', model: '' });
     const tempEditForm = ref({ id: '', name: '', baseUrl: '', apiKey: '', model: '' });
     const profiles = ref([]);
     
@@ -2070,7 +2074,8 @@ export default {
 
     const closeNewProfileModal = () => {
       showNewProfileModal.value = false;
-      newProfileForm.value = { name: '', baseUrl: '', apiKey: '', model: 'gpt-4o' };
+      quickAddText.value = '';
+      newProfileForm.value = { name: '', baseUrl: '', apiKey: '', model: '' };
       showNewApiKey.value = false;
     };
 
