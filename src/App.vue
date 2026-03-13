@@ -2061,34 +2061,36 @@ export default {
         await loadProfiles(); // 刷新列表
         activeProfileId.value = payload.id; // 自动选中新节点
         showNewProfileModal.value = false;
-        newProfileForm.value = { name: '', baseUrl: '', apiKey: '', model: 'gpt-4o' }; // 重置表单
+        newProfileForm.value = Object.assign({}, { name: '', baseUrl: '', apiKey: '', model: 'gpt-4o' });
       }
     };
 
-    const quickAddProfiles = () => {
+    const quickAddProfiles = async () => {
       const text = quickAddText.value.trim();
       if (!text) return;
       const lines = text.split('\n');
       let added = 0;
-      lines.forEach(line => {
+      for (const line of lines) {
         const parts = line.split(',');
         if (parts.length >= 4) {
-          const newId = Date.now() + added;
-          profiles.value.push({
-            id: newId,
+          const payload = {
             name: parts[0].trim(),
-            url: parts[1].trim(),
-            key: parts[2].trim(),
+            baseUrl: parts[1].trim(),
+            apiKey: parts[2].trim(),
             model: parts[3].trim()
+          };
+          const res = await apiFetch('/api/profiles', {
+            method: 'POST',
+            body: JSON.stringify(payload)
           });
-          added++;
+          if (res.ok) added++;
         }
-      });
+      }
       if (added > 0) {
+        await loadProfiles();
         quickAddText.value = '';
         showNewProfileModal.value = false;
         alert(`✅ 成功批量添加 ${added} 个节点！`);
-        editingProfileId.value = profiles.value[profiles.value.length - 1].id;
       } else {
         alert('⚠️ 未识别到有效格式。请确保每行包含4个用英文逗号分隔的字段。');
       }
