@@ -107,7 +107,7 @@
               @click="selectSession(s.id)"
               style="position:relative"
             >
-              <div class="session-dot"><div class="dot-inner" :style="s.mode==='rpg'?'background:#7D39EB':'background:var(--green)'"></div></div>
+              <div class="session-dot"><div class="dot-inner" :style="s.mode==='rpg'?'background:var(--purple)':'background:var(--green)'"></div></div>
               <div class="session-name">
                 <i v-if="s.is_pinned" class="fas fa-thumbtack" style="font-size:var(--text-xs); color:var(--purple-lt); margin-right:4px;"></i>
                 {{s.name}}
@@ -323,7 +323,7 @@
                 <div style="display:flex; gap:12px;">
                   <button class="btn btn-ghost btn-sm" @click="exitEdit('engine')">退出编辑</button>
                   <button class="btn btn-primary btn-sm" @click="saveEdit('engine')" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
-                  <button class="btn btn-primary btn-sm" @click="saveEdit('engine', true)" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : 'background:#10b981'"><i class="fas fa-check-circle"></i> 保存并返回</button>
+                  <button class="btn btn-primary btn-sm" @click="saveEdit('engine', true)" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
                 </div>
               </div>
             </div>
@@ -427,7 +427,7 @@
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-sm" @click="exitEdit('world')">退出编辑</button>
                 <button class="btn btn-primary btn-sm" @click="saveEdit('world')" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
-                <button class="btn btn-primary btn-sm" @click="saveEdit('world', true)" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : 'background:#10b981'"><i class="fas fa-check-circle"></i> 保存并返回</button>
+                <button class="btn btn-primary btn-sm" @click="saveEdit('world', true)" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
           </template>
@@ -535,7 +535,7 @@
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-sm" @click="exitEdit('char')">退出编辑</button>
                 <button class="btn btn-primary btn-sm" @click="saveEdit('char')" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
-                <button class="btn btn-primary btn-sm" @click="saveEdit('char', true)" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : 'background:#10b981'"><i class="fas fa-check-circle"></i> 保存并返回</button>
+                <button class="btn btn-primary btn-sm" @click="saveEdit('char', true)" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
           </template>
@@ -584,7 +584,7 @@
             
             <div class="panel-grid">
               <div class="select-panel">
-                <div class="panel-header"><span><i class="fas fa-server" style="color:#2e9ec4"></i> 选择引擎</span></div>
+                <div class="panel-header"><span><i class="fas fa-server" style="color:var(--purple-lt)"></i> 选择引擎</span></div>
                 <div class="panel-list">
                   <div v-for="e in rpgEngines" :key="e.id" class="list-item" :class="{selected: setupForm.engineId===e.id}" @click="setupForm.engineId=e.id">
                     <div class="item-name">{{e.name}}</div><div class="item-desc">{{e.desc}}</div>
@@ -1024,7 +1024,7 @@
                     <div style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
                       <div class="param-card">
                         <div class="param-header">
-                          <div class="param-info"><i class="fas fa-history" style="color:#3b82f6"></i> 携带历史记忆长度 (Context Limit)</div>
+                          <div class="param-info"><i class="fas fa-history" style="color:var(--purple-lt)"></i> 携带历史记忆长度 (Context Limit)</div>
                           <div class="param-value">{{advParams.contextLimit}}</div>
                         </div>
                         <input type="range" class="custom-slider" v-model="advParams.contextLimit" min="1" max="50">
@@ -1037,7 +1037,7 @@
 
                       <div class="param-card">
                         <div class="param-header">
-                          <div class="param-info"><i class="fas fa-brain" style="color:#ec4899"></i> 短期记忆 (STM) 归纳阈值</div>
+                          <div class="param-info"><i class="fas fa-brain" style="color:var(--danger)"></i> 短期记忆 (STM) 归纳阈值</div>
                           <div class="param-value">{{advParams.stmThreshold}}</div>
                         </div>
                         <input type="range" class="custom-slider" v-model="advParams.stmThreshold" min="1" max="20">
@@ -1049,7 +1049,7 @@
 
                       <div class="param-card">
                         <div class="param-header">
-                          <div class="param-info"><i class="fas fa-fire" style="color:#f97316"></i> RPG 创造力 (Temperature)</div>
+                          <div class="param-info"><i class="fas fa-fire" style="color:var(--warn)"></i> RPG 创造力 (Temperature)</div>
                           <div class="param-value">{{advParams.rpgTemp}}</div>
                         </div>
                         <input type="range" class="custom-slider" v-model="advParams.rpgTemp" min="0" max="2" step="0.1">
@@ -1061,7 +1061,7 @@
 
                       <div class="param-card">
                         <div class="param-header">
-                          <div class="param-info"><i class="fas fa-comment-dots" style="color:#10b981"></i> 日常聊天严谨度 (Temperature)</div>
+                          <div class="param-info"><i class="fas fa-comment-dots" style="color:var(--green)"></i> 日常聊天严谨度 (Temperature)</div>
                           <div class="param-value">{{advParams.chatTemp}}</div>
                         </div>
                         <input type="range" class="custom-slider" v-model="advParams.chatTemp" min="0" max="1" step="0.1">
@@ -1132,7 +1132,7 @@
 
   <!-- 新建节点弹窗 -->
   <div v-if="showNewProfileModal"
-    style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:flex; align-items:center; justify-content:center;"
+    style="position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9999; display:flex; align-items:center; justify-content:center;"
     @click.self="closeNewProfileModal()">
     <div style="background:var(--ink-soft); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
 
@@ -1191,7 +1191,7 @@
         <textarea class="form-textarea" v-model="quickAddText"
           style="flex:1; min-height:80px; font-family:var(--font-mono); font-size:var(--text-xs);"
           placeholder="一行一条，可粘贴多行&#10;格式：Name,https://...,sk-...,gpt-4"></textarea>
-        <button class="btn btn-primary" style="background:#3b82f6; width:60px; justify-content:center; align-self:flex-end;" @click="quickAddProfiles">
+        <button class="btn btn-primary" style="background:var(--purple); width:60px; justify-content:center; align-self:flex-end;" @click="quickAddProfiles">
           添加
         </button>
       </div>
@@ -1201,7 +1201,7 @@
 
   <!-- 编辑节点弹窗 -->
   <div v-if="editingProfileId"
-    style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:flex; align-items:center; justify-content:center;"
+    style="position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9999; display:flex; align-items:center; justify-content:center;"
     @click.self="editingProfileId=null">
     <div style="background:var(--ink-soft); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
 
@@ -2480,11 +2480,11 @@ export default {
 
     // ── Character Mock ──
     const charStats = ref([
-      { name:'HP',  val:72, color:'#e53e3e' },
-      { name:'MP',  val:85, color:'#7D39EB' },
-      { name:'STR', val:68, color:'#d4890a' },
-      { name:'DEX', val:91, color:'#BFF729' },
-      { name:'INT', val:44, color:'#2e9ec4' },
+      { name:'HP',  val:72, color:'var(--danger)' },
+      { name:'MP',  val:85, color:'var(--purple)' },
+      { name:'STR', val:68, color:'var(--warn)' },
+      { name:'DEX', val:91, color:'var(--green)' },
+      { name:'INT', val:44, color:'var(--purple-lt)' },
     ]);
     const inventory = ref([
       { id:1, emoji:'🗺️', name:'残缺大陆地图', count:1 },
