@@ -730,51 +730,13 @@
                         </div>
                       </div>
                       <div style="display:flex; gap:6px;">
-                        <button class="btn btn-ghost btn-sm" @click.stop="editingProfileId = p.id" title="编辑">
+                        <button class="btn btn-ghost btn-sm" @click.stop="startEditing(p)" title="编辑">
                           <i class="fas fa-pen"></i>
                         </button>
                         <button class="btn btn-ghost btn-sm" style="color:var(--danger)" @click.stop="deleteProfile(p.id)" title="删除">
                           <i class="fas fa-trash"></i>
                         </button>
                       </div>
-                    </div>
-                  </div>
-
-                  <!-- 编辑表单（点击编辑按钮后展开） -->
-                  <div v-if="editingProfileId" style="background:var(--ink-muted); border-radius:10px; padding:16px; margin-bottom:20px;">
-                    <div style="font-size:13px; font-weight:700; margin-bottom:14px; color:var(--accent);">编辑节点</div>
-                    <div style="display:flex; flex-direction:column; gap:12px;">
-                      <div class="form-field full">
-                        <div class="form-label">名称</div>
-                        <input class="form-input" v-model="editingProfile.name" autocomplete="off"/>
-                      </div>
-                      <div class="form-field full">
-                        <div class="form-label">Base URL</div>
-                        <input class="form-input" v-model="editingProfile.baseUrl" autocomplete="off" placeholder="https://api.openai.com/v1"/>
-                      </div>
-                      <div class="form-field full">
-                        <div class="form-label">API Key</div>
-                        <div style="display:flex; gap:8px;">
-                          <input class="form-input" v-model="editingProfile.apiKey"
-                            :type="showApiKey ? 'text' : 'password'"
-                            autocomplete="new-password" placeholder="sk-..." style="flex:1"/>
-                          <button class="btn btn-ghost btn-sm" @click="showApiKey=!showApiKey" style="flex:none; width:40px; justify-content:center;">
-                            <i :class="showApiKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                          </button>
-                        </div>
-                      </div>
-                      <div class="form-field full">
-                        <div class="form-label">Model Name</div>
-                        <input class="form-input" v-model="editingProfile.model" autocomplete="off"/>
-                      </div>
-                    </div>
-                    <div style="display:flex; gap:8px; margin-top:16px;">
-                      <button class="btn btn-primary btn-sm" style="flex:1; justify-content:center;" @click="saveApiConfig(); editingProfileId=null;">
-                        保存
-                      </button>
-                      <button class="btn btn-ghost btn-sm" style="flex:1; justify-content:center; background:var(--ink);" @click="editingProfileId=null">
-                        取消
-                      </button>
                     </div>
                   </div>
 
@@ -1170,7 +1132,7 @@
   <div v-if="showNewProfileModal"
     style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:flex; align-items:center; justify-content:center;"
     @click.self="showNewProfileModal=false">
-    <div style="background:var(--ink-deep); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
+    <div style="background:var(--ink-deep); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
 
       <!-- 弹窗标题 -->
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
@@ -1207,10 +1169,15 @@
         </div>
       </div>
 
-      <!-- 保存按钮 -->
-      <button class="btn btn-primary" style="width:100%; justify-content:center; margin-bottom:20px;" @click="saveNewProfile">
-        保存节点
-      </button>
+      <!-- 操作按钮 -->
+      <div style="display:flex; gap:10px; margin-bottom:20px;">
+        <button class="btn btn-primary" style="flex:1; justify-content:center;" @click="saveNewProfile">
+          保存节点
+        </button>
+        <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink);" @click="showNewProfileModal=false">
+          取消
+        </button>
+      </div>
 
       <!-- 分隔线 -->
       <div style="border-top:1px solid var(--border); margin-bottom:16px;"></div>
@@ -1223,6 +1190,60 @@
           placeholder="一行一条，可粘贴多行&#10;格式：Name,https://...,sk-...,gpt-4"></textarea>
         <button class="btn btn-primary" style="background:#3b82f6; width:60px; justify-content:center; align-self:flex-end;" @click="quickAddProfiles">
           添加
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 编辑节点弹窗 -->
+  <div v-if="editingProfileId"
+    style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:flex; align-items:center; justify-content:center;"
+    @click.self="editingProfileId=null">
+    <div style="background:var(--ink-deep); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
+
+      <!-- 弹窗标题 -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+        <div style="font-size:16px; font-weight:700;">编辑节点</div>
+        <button class="btn btn-ghost btn-sm" @click="editingProfileId=null">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- 表单 -->
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+        <div class="form-field full">
+          <div class="form-label">名称</div>
+          <input class="form-input" v-model="tempEditForm.name" autocomplete="off"/>
+        </div>
+        <div class="form-field full">
+          <div class="form-label">Base URL</div>
+          <input class="form-input" v-model="tempEditForm.baseUrl" autocomplete="off" placeholder="https://api.openai.com/v1"/>
+        </div>
+        <div class="form-field full">
+          <div class="form-label">API Key</div>
+          <div style="display:flex; gap:8px;">
+            <input class="form-input" v-model="tempEditForm.apiKey"
+              :type="showEditApiKey ? 'text' : 'password'"
+              autocomplete="new-password" placeholder="sk-..." style="flex:1"/>
+            <button class="btn btn-ghost btn-sm" @click="showEditApiKey=!showEditApiKey" style="flex:none; width:40px; justify-content:center;">
+              <i :class="showEditApiKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-field full">
+          <div class="form-label">Model Name</div>
+          <input class="form-input" v-model="tempEditForm.model" autocomplete="off"/>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-primary" style="flex:1; justify-content:center;" @click="saveApiConfig">
+          保存修改
+        </button>
+        <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink);" @click="editingProfileId=null">
+          取消
         </button>
       </div>
 
@@ -1820,7 +1841,9 @@ export default {
     const showQuickPaste = ref(false);
     const showNewProfileModal = ref(false);
     const showNewApiKey = ref(false);
+    const showEditApiKey = ref(false);
     const newProfileForm = ref({ name: '', baseUrl: '', apiKey: '', model: 'gpt-4o' });
+    const tempEditForm = ref({ id: '', name: '', baseUrl: '', apiKey: '', model: '' });
     const profiles = ref([]);
     
     // 自动追踪最后选中的节点
@@ -1833,10 +1856,17 @@ export default {
       return found || (profiles.value.length > 0 ? profiles.value[0] : { name: '未配置', model: 'N/A' });
     });
 
+    // 已经改为弹窗，此 computed 可保留作为兼容，但主要逻辑将转移到 tempEditForm
     const editingProfile = computed(() => {
       if (!editingProfileId.value) return null;
       return profiles.value.find(p => p.id === editingProfileId.value) || null;
     });
+
+    const startEditing = (p) => {
+      editingProfileId.value = p.id;
+      tempEditForm.value = { ...p };
+      showEditApiKey.value = false;
+    };
 
     async function loadProfiles() {
       try {
@@ -1961,24 +1991,19 @@ export default {
       } catch (e) { alert('删除失败'); }
     }
 
-    // 监听实时保存：只要编辑框内容变了，自动同步到后端
-    watch(editingProfile, async (newVal, oldVal) => {
-      if (newVal && oldVal && newVal.id === oldVal.id) {
-        try {
-          await apiFetch('/api/profiles', { method: 'POST', body: JSON.stringify(newVal) });
-        } catch (e) { console.error('自动保存节点失败'); }
-      }
-    }, { deep: true });
-
-    const saveApiConfig = (e) => {
-      const btn = e.currentTarget;
-      const originalHtml = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-check"></i> 已保存';
-      
-      setTimeout(() => {
-        btn.innerHTML = originalHtml;
+    // 移除 watch(editingProfile)，因为现在改为显式保存模式
+    
+    const saveApiConfig = async () => {
+      try {
+        await apiFetch('/api/profiles', { 
+          method: 'POST', 
+          body: JSON.stringify(tempEditForm.value) 
+        });
+        await loadProfiles();
         editingProfileId.value = null;
-      }, 1500);
+      } catch (e) { 
+        alert('保存失败，请检查网络。');
+      }
     };
 
     const exportApiData = () => {
@@ -2461,7 +2486,7 @@ export default {
       selectSession, deleteSession,
       togglePin, renameSession, exportSession,
       profiles, activeProfileId, activeProfile, editingProfileId, editingProfile,
-      showNewProfileModal, showNewApiKey, newProfileForm, saveNewProfile,
+      showNewProfileModal, showNewApiKey, showEditApiKey, newProfileForm, tempEditForm, saveNewProfile, startEditing,
       importInput, quickAddText, addProfile, deleteProfile, saveApiConfig, exportApiData, triggerImport, importApiData, quickAddProfiles, apiFields,
       systemPrompts, rpgForm, rpgLocks,
       inputText, chatAreaEl, mainInputEl, welcomeInputEl,
