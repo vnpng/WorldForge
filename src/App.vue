@@ -713,20 +713,26 @@
                     </div>
                     <div
                       v-for="p in profiles" :key="p.id"
-                      style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:8px; background:var(--ink-muted); cursor:pointer;"
+                      style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:10px; cursor:pointer; transition: all 0.2s;"
+                      :style="{
+                        background: activeProfileId === p.id ? 'rgba(125, 57, 235, 0.12)' : 'var(--ink-muted)',
+                        border: activeProfileId === p.id ? '1.5px solid var(--purple-lt)' : '1.5px solid transparent',
+                        boxShadow: activeProfileId === p.id ? '0 0 15px rgba(125, 57, 235, 0.15)' : 'none'
+                      }"
                       @click="activeProfileId = p.id"
                     >
-                      <div style="display:flex; align-items:center; gap:10px;">
-                        <!-- 激活圆点 -->
+                      <div style="display:flex; align-items:center; gap:12px;">
+                        <!-- 激活指示器 -->
                         <div :style="{
-                          width: '8px', height: '8px', borderRadius: '50%',
-                          background: activeProfileId === p.id ? 'var(--accent)' : 'transparent',
-                          border: activeProfileId === p.id ? 'none' : '1.5px solid var(--grey)',
+                          width: '10px', height: '10px', borderRadius: '50%',
+                          background: activeProfileId === p.id ? 'var(--purple-lt)' : 'transparent',
+                          border: activeProfileId === p.id ? 'none' : '2px solid var(--grey)',
+                          boxShadow: activeProfileId === p.id ? '0 0 8px var(--purple-lt)' : 'none',
                           flex: 'none'
                         }"></div>
                         <div>
-                          <div style="font-size:14px; font-weight:600;">{{ p.name }}</div>
-                          <div style="font-size:12px; color:var(--grey);">{{ p.model }}</div>
+                          <div style="font-size:14px; font-weight:700;" :style="{ color: activeProfileId === p.id ? 'var(--white)' : 'var(--white-soft)' }">{{ p.name }}</div>
+                          <div style="font-size:11px;" :style="{ color: activeProfileId === p.id ? 'var(--purple-lt)' : 'var(--grey)' }">{{ p.model }}</div>
                         </div>
                       </div>
                       <div style="display:flex; gap:6px;">
