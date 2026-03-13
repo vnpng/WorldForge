@@ -16,10 +16,22 @@ from database import init_db, get_db_connection
 def strip_html(text: str) -> str:
     if not text:
         return ""
-    # 移除 HTML 标签
+    # 1. 提取 <summary> 标签内的文字，加换行保留标题
+    text = re.sub(r'<summary>(.*?)</summary>', r'\n\1\n', text, flags=re.DOTALL)
+    # 2. <br> 转换行
+    text = re.sub(r'<br\s*/?>', '\n', text, flags=re.IGNORECASE)
+    # 3. <p> 和 <div> 结尾标签转换行
+    text = re.sub(r'</p>|</div>|</tr>', '\n', text, flags=re.IGNORECASE)
+    # 4. 表格单元格 <td> <th> 之间加分隔符
+    text = re.sub(r'<td[^>]*>|<th[^>]*>', ' | ', text, flags=re.IGNORECASE)
+    # 5. 列表项 <li> 转换行加短横线
+    text = re.sub(r'<li[^>]*>', '\n- ', text, flags=re.IGNORECASE)
+    # 6. 删除所有剩余HTML标签
     text = re.sub(r'<[^>]+>', '', text)
-    # 还原常见的转义字符
-    text = text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&').replace('&nbsp;', ' ')
+    # 7. 处理HTML转义字符
+    text = text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&').replace('&nbsp;', ' ').replace('&quot;', '"')
+    # 8. 清理多余空行（超过2个连续换行压缩为2个）
+    text = re.sub(r'\n{3,}', '\n\n', text)
     return text.strip()
 
 class ChatRequest(BaseModel):
