@@ -2078,28 +2078,29 @@ export default {
       for (const rawLine of rawLines) {
         const line = rawLine.trim();
         if (!line) continue;
-        // 只按前三个逗号分割，避免URL或Key中含逗号导致切割错误
-        const idx = [0, 1, 2].reduce((acc, _) => {
-          const next = line.indexOf(',', acc[acc.length - 1] + 1);
-          return next === -1 ? acc : [...acc, next];
-        }, [-1]);
-        if (idx.length < 3) continue;
-        const parts = [
-          line.slice(0, idx[0]),
-          line.slice(idx[0] + 1, idx[1]),
-          line.slice(idx[1] + 1, idx[2]),
-          line.slice(idx[2] + 1)
-        ].map(s => s.trim());
-        if (!parts[0] || !parts[1] || !parts[2] || !parts[3]) continue;
+        const commas = [];
+        let searchFrom = 0;
+        while (commas.length < 3) {
+          const pos = line.indexOf(',', searchFrom);
+          if (pos === -1) break;
+          commas.push(pos);
+          searchFrom = pos + 1;
+        }
+        if (commas.length < 3) continue;
+        const name    = line.slice(0, commas[0]).trim();
+        const baseUrl = line.slice(commas[0] + 1, commas[1]).trim();
+        const apiKey  = line.slice(commas[1] + 1, commas[2]).trim();
+        const model   = line.slice(commas[2] + 1).trim();
+        if (!name || !baseUrl || !apiKey || !model) continue;
         formatOk++;
         const res = await apiFetch('/api/profiles', {
           method: 'POST',
           body: JSON.stringify({
             id: String(Date.now()) + String(Math.random()).slice(2, 6),
-            name: parts[0],
-            baseUrl: parts[1],
-            apiKey: parts[2],
-            model: parts[3]
+            name: name,
+            baseUrl: baseUrl,
+            apiKey: apiKey,
+            model: model
           })
         });
         if (res.ok) added++;
