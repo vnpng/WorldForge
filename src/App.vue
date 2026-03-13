@@ -26,7 +26,7 @@
         {{ isLoginMode ? '进入世界' : '确认注册' }}
       </button>
 
-      <div style="text-align: center; margin-top: 16px; font-size: 13px;">
+      <div style="text-align: center; margin-top: 16px; font-size: var(--text-sm);">
         <a href="#" @click.prevent="isLoginMode = !isLoginMode" style="color: var(--white-soft); text-decoration: underline; text-underline-offset: 4px; transition: color 0.2s;">
           {{ isLoginMode ? '还没有账号？前往注册' : '已有账号？返回登录' }}
         </a>
@@ -52,40 +52,40 @@
       <div class="sb-nav" style="padding: 0;">
         <div class="session-item" :class="{active: currentView === 'chat' && currentSessionId === null}" @click="newChatSession()">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-plus" style="font-size: 14px;"></i>
+            <i class="fas fa-plus" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name">发起新对话</div>
         </div>
         <div class="session-item" :class="{active: currentView === 'rpg-start'}" @click="currentView='rpg-start'; currentSessionId = null">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-dice-d20" style="font-size: 14px;"></i>
+            <i class="fas fa-dice-d20" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name">发起新开局</div>
         </div>
         <div class="sb-divider"></div>
         <div class="session-item" :class="{active: currentView === 'discover' || currentView === 'card-detail'}" @click="currentView = 'discover'; currentSessionId = null">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-compass" style="font-size: 14px;"></i>
+            <i class="fas fa-compass" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name">发现</div>
         </div>
         <div class="session-item" :class="{active: currentView === 'creators'}" @click="currentView = 'creators'; currentSessionId = null">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
-            <i class="fas fa-paint-brush" style="font-size: 14px;"></i>
+            <i class="fas fa-paint-brush" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name">创作者</div>
         </div>
         <div class="sb-divider"></div>
         <div class="session-item" :class="{active: currentView === 'engine-mgr'}" @click="currentView = 'engine-mgr'; currentSessionId = null">
-          <div class="session-dot"><i class="fas fa-layer-group" style="font-size: 14px;"></i></div>
+          <div class="session-dot"><i class="fas fa-layer-group" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">引擎管理</div>
         </div>
         <div class="session-item" :class="{active: currentView === 'world-mgr'}" @click="currentView = 'world-mgr'; editingWorld = null; currentSessionId = null">
-          <div class="session-dot"><i class="fas fa-globe" style="font-size: 14px;"></i></div>
+          <div class="session-dot"><i class="fas fa-globe" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">世界管理</div>
         </div>
         <div class="session-item" :class="{active: currentView === 'char-mgr'}" @click="currentView = 'char-mgr'; editingChar = null; currentSessionId = null">
-          <div class="session-dot"><i class="fas fa-user-ninja" style="font-size: 14px;"></i></div>
+          <div class="session-dot"><i class="fas fa-user-ninja" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">角色管理</div>
         </div>
       </div>
@@ -109,7 +109,7 @@
             >
               <div class="session-dot"><div class="dot-inner" :style="s.mode==='rpg'?'background:#7D39EB':'background:var(--green)'"></div></div>
               <div class="session-name">
-                <i v-if="s.is_pinned" class="fas fa-thumbtack" style="font-size:10px; color:var(--purple-lt); margin-right:4px;"></i>
+                <i v-if="s.is_pinned" class="fas fa-thumbtack" style="font-size:var(--text-xs); color:var(--purple-lt); margin-right:4px;"></i>
                 {{s.name}}
               </div>
               <div class="session-menu-btn" @click.stop="toggleDropdown(s.id)">
@@ -118,16 +118,16 @@
               <transition name="menu-pop">
                 <div class="dropdown" v-if="openDropdown===s.id" @click.stop>
                   <div class="dropdown-item" @click="togglePin(s.id)">
-                    <i class="fas fa-thumbtack" style="font-size:13px;color:var(--grey)"></i> 
+                    <i class="fas fa-thumbtack" style="font-size:var(--text-sm);color:var(--grey)"></i> 
                     {{ s.is_pinned ? '取消置顶' : '置顶会话' }}
                   </div>
-                  <div class="dropdown-item" @click="renameSession(s.id)"><i class="fas fa-pen" style="font-size:13px;color:var(--grey)"></i> 重命名</div>
-                  <div class="dropdown-item" @click="exportSession(s.id)"><i class="fas fa-file-export" style="font-size:13px;color:var(--grey)"></i> 导出对话 (JSON)</div>
-                  <div class="dropdown-item danger" @click="deleteSession(s.id)"><i class="fas fa-trash" style="font-size:13px"></i> 删除</div>
+                  <div class="dropdown-item" @click="renameSession(s.id)"><i class="fas fa-pen" style="font-size:var(--text-sm);color:var(--grey)"></i> 重命名</div>
+                  <div class="dropdown-item" @click="exportSession(s.id)"><i class="fas fa-file-export" style="font-size:var(--text-sm);color:var(--grey)"></i> 导出对话 (JSON)</div>
+                  <div class="dropdown-item danger" @click="deleteSession(s.id)"><i class="fas fa-trash" style="font-size:var(--text-sm)"></i> 删除</div>
                 </div>
               </transition>
             </div>
-            <div v-if="sessions.length===0" style="font-size:12px;color:var(--grey);padding:8px 4px;text-align:center">
+            <div v-if="sessions.length===0" style="font-size:var(--text-xs);color:var(--grey);padding:8px 4px;text-align:center">
               暂无会话
             </div>
           </div>
@@ -182,7 +182,7 @@
           </template>
           <template v-else>
             <div class="mode-tag" :class="currentMode">
-              <i :class="currentMode==='rpg'?'fas fa-dice-d20':'fas fa-comment-alt'" style="font-size:10px"></i>
+              <i :class="currentMode==='rpg'?'fas fa-dice-d20':'fas fa-comment-alt'" style="font-size:var(--text-xs)"></i>
               {{currentMode==='rpg'?'RPG':'Chat'}}
             </div>
             <div class="status-sep">·</div>
@@ -218,7 +218,7 @@
                       <div class="npc-desc">{{w.desc}}</div>
                       <div class="npc-footer">
                         <div class="npc-author"><i class="fas fa-user-circle"></i> @{{w.author}}</div>
-                        <div style="font-size:11px;color:var(--grey)"><i class="fas fa-eye" style="font-size:9px"></i> {{w.plays}}</div>
+                        <div style="font-size:var(--text-xs);color:var(--grey)"><i class="fas fa-eye" style="font-size:var(--text-xs)"></i> {{w.plays}}</div>
                       </div>
                     </div>
                   </div>
@@ -226,11 +226,11 @@
                   <div v-else class="world-card" @click="w.isDead ? null : openDetail(w)" :style="w.isDead ? 'cursor: not-allowed; opacity: 0.6;' : 'cursor: pointer;'">
                     <div class="wc-image"><i :class="w.icon"></i><div class="wc-tag">{{w.tag}}</div></div>
                     <div class="wc-body">
-                      <div class="wc-title" style="font-size:18px">{{w.name}}</div>
+                      <div class="wc-title" style="font-size:var(--text-lg)">{{w.name}}</div>
                       <div class="wc-desc" style="-webkit-line-clamp:2">{{w.desc}}</div>
                       <div class="wc-footer">
                         <div class="wc-author">@{{w.author}}</div>
-                        <div style="font-size:11px;color:var(--grey)"><i class="fas fa-play" style="font-size:9px"></i> {{w.plays}}</div>
+                        <div style="font-size:var(--text-xs);color:var(--grey)"><i class="fas fa-play" style="font-size:var(--text-xs)"></i> {{w.plays}}</div>
                       </div>
                     </div>
                   </div>
@@ -245,7 +245,7 @@
 
       <div class="view-container" v-if="currentView==='creators'">
         <div class="view-inner" style="height:100%; display:flex; align-items:center; justify-content:center;">
-          <div style="color:var(--grey);font-size:18px;text-align:center;">
+          <div style="color:var(--grey);font-size:var(--text-lg);text-align:center;">
             <i class="fas fa-paint-brush" style="font-size:48px;opacity:0.2;margin-bottom:12px"></i>
             <div>开发中，敬请期待。</div>
           </div>
@@ -268,9 +268,9 @@
                 <div style="flex:1">
                   <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
                     <div class="preset-name">{{p.name}}</div>
-                    <span class="tag tag-rpg" v-if="p.type==='rpg'" style="font-size:11px;padding:1px 7px">RPG</span>
-                    <span class="tag tag-chat" v-else style="font-size:11px;padding:1px 7px">Chat</span>
-                    <span class="tag" v-if="p.isPublic" style="background:rgba(255,255,255,0.1);color:var(--white-soft);font-size:10px;padding:1px 6px;">公开</span>
+                    <span class="tag tag-rpg" v-if="p.type==='rpg'" style="font-size:var(--text-xs);padding:1px 7px">RPG</span>
+                    <span class="tag tag-chat" v-else style="font-size:var(--text-xs);padding:1px 7px">Chat</span>
+                    <span class="tag" v-if="p.isPublic" style="background:rgba(255,255,255,0.1);color:var(--white-soft);font-size:var(--text-xs);padding:1px 6px;">公开</span>
                   </div>
                   <div class="preset-desc">{{p.intro || '暂无简介'}}</div>
                 </div>
@@ -279,8 +279,8 @@
                     <input type="checkbox" :checked="p.active" @change="p.active=!p.active"/>
                     <div class="toggle-track"></div><div class="toggle-thumb"></div>
                   </label>
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click="editEngine(p)"><i class="fas fa-pen"></i></div>
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click="confirmDelete(p, 'engine')"><i class="fas fa-trash"></i></div>
+                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="editEngine(p)"><i class="fas fa-pen"></i></div>
+                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="confirmDelete(p, 'engine')"><i class="fas fa-trash"></i></div>
                 </div>
               </div>
             </div>
@@ -298,7 +298,7 @@
                 <div class="form-field full">
                   <div class="form-label">
                     <div class="form-label-left">引擎名称</div>
-                    <span v-if="!editingEngine.name" style="color:var(--danger);font-size:12px;">* 必填</span>
+                    <span v-if="!editingEngine.name" style="color:var(--danger);font-size:var(--text-xs);">* 必填</span>
                   </div>
                   <input class="form-input" v-model="editingEngine.name" placeholder="输入引擎预设名称..."/>
                 </div>
@@ -309,13 +309,13 @@
                   <input class="form-input" v-model="editingEngine.intro" placeholder="一句话描述这个引擎的作用..."/>
                 </div>
                 <div class="form-field full">
-                  <div class="form-label"><div class="form-label-left"><i class="fas fa-terminal" style="color:var(--purple-lt);font-size:11px"></i> 引擎内容 (System Prompt)</div></div>
+                  <div class="form-label"><div class="form-label-left"><i class="fas fa-terminal" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 引擎内容 (System Prompt)</div></div>
                   <textarea class="form-textarea" v-model="editingEngine.desc" placeholder="输入详细的系统级提示词约束..." style="height: 600px;"></textarea>
                 </div>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <div>
-                  <label v-if="currentUser.role === 'superadmin'" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:var(--white-soft);">
+                  <label v-if="currentUser.role === 'superadmin'" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:var(--text-sm); color:var(--white-soft);">
                     <input type="checkbox" v-model="editingEngine.isPublic" />
                     设为系统公开
                   </label>
@@ -352,8 +352,8 @@
                   <div class="preset-desc">{{w.intro || '暂无简介'}}</div>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center">
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click="editWorld(w)"><i class="fas fa-pen"></i></div>
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click="confirmDelete(w, 'world')"><i class="fas fa-trash"></i></div>
+                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="editWorld(w)"><i class="fas fa-pen"></i></div>
+                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="confirmDelete(w, 'world')"><i class="fas fa-trash"></i></div>
                 </div>
               </div>
             </div>
@@ -371,53 +371,53 @@
                 <div class="form-field full">
                   <div class="form-label">
                     <div class="form-label-left">世界名称</div>
-                    <span v-if="!editingWorld.name" style="color:var(--danger);font-size:12px;">* 此项必填</span>
+                    <span v-if="!editingWorld.name" style="color:var(--danger);font-size:var(--text-xs);">* 此项必填</span>
                   </div>
                   <input class="form-input" v-model="editingWorld.name" placeholder="输入世界名称..."/>
                 </div>
                 <div class="form-field full">
                   <div class="form-label">
                     <div class="form-label-left">世界简介</div>
-                    <span v-if="!editingWorld.intro" style="color:var(--danger);font-size:12px;">* 此项必填</span>
+                    <span v-if="!editingWorld.intro" style="color:var(--danger);font-size:var(--text-xs);">* 此项必填</span>
                   </div>
                   <textarea class="form-textarea" v-model="editingWorld.intro" placeholder="一句话概括这个世界..."></textarea>
                 </div>
                 <div class="form-field full">
-                  <div class="form-label"><div class="form-label-left"><i class="fas fa-globe" style="color:var(--purple-lt);font-size:11px"></i> 世界背景描述</div></div>
+                  <div class="form-label"><div class="form-label-left"><i class="fas fa-globe" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 世界背景描述</div></div>
                   <textarea class="form-textarea" v-model="editingWorld.desc" placeholder="详细的背景故事、世界起源等..."></textarea>
                 </div>
                 <div class="form-field full">
-                  <div class="form-label"><div class="form-label-left"><i class="fas fa-bolt" style="color:var(--purple-lt);font-size:11px"></i> 核心冲突</div></div>
+                  <div class="form-label"><div class="form-label-left"><i class="fas fa-bolt" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 核心冲突</div></div>
                   <textarea class="form-textarea" v-model="editingWorld.conflict" placeholder="当前世界面临的最大危机或矛盾核心..."></textarea>
                 </div>
 
                 <details class="form-field full" style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px; padding: 16px;" :open="!!(editingWorld.society || editingWorld.history || editingWorld.geography || editingWorld.magic_system || editingWorld.rules || editingWorld.extra_rules)">
-                  <summary style="cursor: pointer; font-size: 14px; font-weight: 700; color: var(--purple-lt); outline: none; list-style: none; display: flex; align-items: center; gap: 8px; user-select: none;">
-                    <i class="fas fa-sliders-h" style="font-size: 12px;"></i> 展开更多详细设定
+                  <summary style="cursor: pointer; font-size: var(--text-sm); font-weight: 700; color: var(--purple-lt); outline: none; list-style: none; display: flex; align-items: center; gap: 8px; user-select: none;">
+                    <i class="fas fa-sliders-h" style="font-size: var(--text-xs);"></i> 展开更多详细设定
                   </summary>
                   <div class="form-grid" style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 16px;">
                     <div class="form-field full">
-                      <div class="form-label"><div class="form-label-left"><i class="fas fa-users" style="color:var(--purple-lt);font-size:11px"></i> 社会构成</div></div>
+                      <div class="form-label"><div class="form-label-left"><i class="fas fa-users" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 社会构成</div></div>
                       <textarea class="form-textarea" v-model="editingWorld.society" placeholder="政治体制、阶级、主要阵营..."></textarea>
                     </div>
                     <div class="form-field full">
-                      <div class="form-label"><div class="form-label-left"><i class="fas fa-book" style="color:var(--purple-lt);font-size:11px"></i> 大事记 / 历史</div></div>
+                      <div class="form-label"><div class="form-label-left"><i class="fas fa-book" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 大事记 / 历史</div></div>
                       <textarea class="form-textarea" v-model="editingWorld.history" placeholder="改变世界走向的重大历史事件..."></textarea>
                     </div>
                     <div class="form-field full">
-                      <div class="form-label"><div class="form-label-left"><i class="fas fa-mountain" style="color:var(--purple-lt);font-size:11px"></i> 地理环境</div></div>
+                      <div class="form-label"><div class="form-label-left"><i class="fas fa-mountain" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 地理环境</div></div>
                       <textarea class="form-textarea" v-model="editingWorld.geography" placeholder="大陆分布、气候、特殊地貌..."></textarea>
                     </div>
                     <div class="form-field full">
-                      <div class="form-label"><div class="form-label-left"><i class="fas fa-magic" style="color:var(--purple-lt);font-size:11px"></i> 力量 / 魔法 / 科技体系</div></div>
+                      <div class="form-label"><div class="form-label-left"><i class="fas fa-magic" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 力量 / 魔法 / 科技体系</div></div>
                       <textarea class="form-textarea" v-model="editingWorld.magic_system" placeholder="超自然力量的来源与运转机制，或科技发展水平..."></textarea>
                     </div>
                     <div class="form-field full">
-                      <div class="form-label"><div class="form-label-left"><i class="fas fa-gavel" style="color:var(--purple-lt);font-size:11px"></i> 核心规则</div></div>
+                      <div class="form-label"><div class="form-label-left"><i class="fas fa-gavel" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 核心规则</div></div>
                       <textarea class="form-textarea" v-model="editingWorld.rules" placeholder="跑团中的死亡机制、核心约束等..."></textarea>
                     </div>
                     <div class="form-field full">
-                      <div class="form-label"><div class="form-label-left"><i class="fas fa-plus-circle" style="color:var(--purple-lt);font-size:11px"></i> 附加规则 / 特殊设定</div></div>
+                      <div class="form-label"><div class="form-label-left"><i class="fas fa-plus-circle" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 附加规则 / 特殊设定</div></div>
                       <textarea class="form-textarea" v-model="editingWorld.extra_rules" placeholder="其他的特殊设定、补充规则..."></textarea>
                     </div>
                   </div>
@@ -455,8 +455,8 @@
                   <div class="preset-desc">{{c.identity || '暂无身份'}}</div>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center">
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click="editChar(c)"><i class="fas fa-pen"></i></div>
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click="confirmDelete(c, 'char')"><i class="fas fa-trash"></i></div>
+                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="editChar(c)"><i class="fas fa-pen"></i></div>
+                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="confirmDelete(c, 'char')"><i class="fas fa-trash"></i></div>
                 </div>
               </div>
             </div>
@@ -476,21 +476,21 @@
                   <div class="form-field">
                     <div class="form-label">
                       <div class="form-label-left">姓名</div>
-                      <span v-if="!editingChar.name" style="color:var(--danger);font-size:12px;">* 必填</span>
+                      <span v-if="!editingChar.name" style="color:var(--danger);font-size:var(--text-xs);">* 必填</span>
                     </div>
                     <input class="form-input" v-model="editingChar.name" placeholder="如：银翼·克劳德"/>
                   </div>
                   <div class="form-field">
                     <div class="form-label">
                       <div class="form-label-left">性别</div>
-                      <span v-if="!editingChar.gender" style="color:var(--danger);font-size:12px;">* 必填</span>
+                      <span v-if="!editingChar.gender" style="color:var(--danger);font-size:var(--text-xs);">* 必填</span>
                     </div>
                     <input class="form-input" v-model="editingChar.gender" placeholder="男 / 女 / 其他"/>
                   </div>
                   <div class="form-field">
                     <div class="form-label">
                       <div class="form-label-left">年龄</div>
-                      <span v-if="!editingChar.age" style="color:var(--danger);font-size:12px;">* 必填</span>
+                      <span v-if="!editingChar.age" style="color:var(--danger);font-size:var(--text-xs);">* 必填</span>
                     </div>
                     <input class="form-input" v-model="editingChar.age" placeholder="如：28"/>
                   </div>
@@ -503,31 +503,31 @@
                   </div>
                   <div class="form-field">
                     <div class="form-label">
-                      <div class="form-label-left"><i class="fas fa-user-ninja" style="color:var(--purple-lt);font-size:11px"></i> 身份/职业</div>
-                      <span v-if="!editingChar.identity" style="color:var(--danger);font-size:12px;">* 必填</span>
+                      <div class="form-label-left"><i class="fas fa-user-ninja" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 身份/职业</div>
+                      <span v-if="!editingChar.identity" style="color:var(--danger);font-size:var(--text-xs);">* 必填</span>
                     </div>
                     <input class="form-input" v-model="editingChar.identity" placeholder="如：流亡骑士"/>
                   </div>
                 </div>
 
                 <div class="form-field full">
-                  <div class="form-label"><div class="form-label-left"><i class="fas fa-eye" style="color:var(--purple-lt);font-size:11px"></i> 外貌描述</div></div>
+                  <div class="form-label"><div class="form-label-left"><i class="fas fa-eye" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 外貌描述</div></div>
                   <textarea class="form-textarea" v-model="editingChar.appearance" placeholder="发色、瞳色、穿着打扮、显著特征..."></textarea>
                 </div>
                 <div class="form-field full">
-                  <div class="form-label"><div class="form-label-left"><i class="fas fa-heart" style="color:var(--purple-lt);font-size:11px"></i> 性格特点</div></div>
+                  <div class="form-label"><div class="form-label-left"><i class="fas fa-heart" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 性格特点</div></div>
                   <textarea class="form-textarea" v-model="editingChar.personality" placeholder="外冷内热、狡猾爱财、或是极具正义感..."></textarea>
                 </div>
                 <div class="form-field full">
-                  <div class="form-label"><div class="form-label-left"><i class="fas fa-shopping-bag" style="color:var(--purple-lt);font-size:11px"></i> 初始携带物品</div></div>
+                  <div class="form-label"><div class="form-label-left"><i class="fas fa-shopping-bag" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 初始携带物品</div></div>
                   <textarea class="form-textarea" v-model="editingChar.item" placeholder="断剑、等离子手枪、或是神秘的卷轴..."></textarea>
                 </div>
                 <div class="form-field full">
-                  <div class="form-label"><div class="form-label-left"><i class="fas fa-comment-dots" style="color:var(--purple-lt);font-size:11px"></i> 叙事/说话风格</div></div>
+                  <div class="form-label"><div class="form-label-left"><i class="fas fa-comment-dots" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 叙事/说话风格</div></div>
                   <textarea class="form-textarea" v-model="editingChar.style" placeholder="沉默寡言，字字珠玑；或语速极快，喜欢用比喻..."></textarea>
                 </div>
                 <div class="form-field full">
-                  <div class="form-label"><div class="form-label-left"><i class="fas fa-plus-circle" style="color:var(--purple-lt);font-size:11px"></i> 自定义补充</div></div>
+                  <div class="form-label"><div class="form-label-left"><i class="fas fa-plus-circle" style="color:var(--purple-lt);font-size:var(--text-xs)"></i> 自定义补充</div></div>
                   <textarea class="form-textarea" v-model="editingChar.custom" placeholder="其他特殊的设定、身世秘密或隐藏能力..."></textarea>
                 </div>
 
@@ -646,7 +646,7 @@
                   <div class="form-field">
                     <div class="form-label">
                       <div class="form-label-left">用户昵称</div>
-                      <span v-if="currentUser.role === 'superadmin'" style="color:var(--purple-lt);font-size:12px;"><i class="fas fa-crown"></i> 超管</span>
+                      <span v-if="currentUser.role === 'superadmin'" style="color:var(--purple-lt);font-size:var(--text-xs);"><i class="fas fa-crown"></i> 超管</span>
                     </div>
                     <input class="form-input" :value="currentUser.name" readonly style="opacity: 0.7; cursor: not-allowed;"/>
                   </div>
@@ -708,7 +708,7 @@
 
                   <!-- 节点列表 -->
                   <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;">
-                    <div v-if="profiles.length === 0" style="color:var(--grey); font-size:13px; padding:12px 0;">
+                    <div v-if="profiles.length === 0" style="color:var(--grey); font-size:var(--text-sm); padding:12px 0;">
                       暂无节点，点击"新建节点"添加
                     </div>
                     <div
@@ -731,13 +731,13 @@
                           flex: 'none'
                         }"></div>
                         <div>
-                          <div style="font-size:14px; font-weight:700;" :style="{ color: activeProfileId === p.id ? 'var(--white)' : 'var(--white-soft)' }">{{ p.name }}</div>
-                          <div style="font-size:11px;" :style="{ color: activeProfileId === p.id ? 'var(--purple-lt)' : 'var(--grey)' }">{{ p.model }}</div>
+                          <div style="font-size:var(--text-sm); font-weight:700;" :style="{ color: activeProfileId === p.id ? 'var(--white)' : 'var(--white-soft)' }">{{ p.name }}</div>
+                          <div style="font-size:var(--text-xs);" :style="{ color: activeProfileId === p.id ? 'var(--purple-lt)' : 'var(--grey)' }">{{ p.model }}</div>
                         </div>
                       </div>
                       <div style="display:flex; gap:6px; align-items:center">
-                        <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click.stop="startEditing(p)" title="编辑"><i class="fas fa-pen"></i></div>
-                        <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click.stop="deleteProfile(p.id)" title="删除"><i class="fas fa-trash"></i></div>
+                        <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click.stop="startEditing(p)" title="编辑"><i class="fas fa-pen"></i></div>
+                        <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click.stop="deleteProfile(p.id)" title="删除"><i class="fas fa-trash"></i></div>
                       </div>
                     </div>
                   </div>
@@ -762,33 +762,33 @@
                 <div style="display:flex;flex-direction:column;gap:10px">
                   <!-- Sessions -->
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:14px;font-weight:700">导出所有对话/存档数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">将所有会话记录导出为 JSON 文件</div></div>
+                    <div><div style="font-size:var(--text-sm);font-weight:700">导出所有对话/存档数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">将所有会话记录导出为 JSON 文件</div></div>
                     <button class="btn btn-ghost btn-sm" @click="exportSessions"><i class="fas fa-file-export"></i> 导出</button>
                   </div>
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:14px;font-weight:700">导入对话/存档数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">从 JSON 文件恢复会话记录，每条作为新存档导入</div></div>
+                    <div><div style="font-size:var(--text-sm);font-weight:700">导入对话/存档数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">从 JSON 文件恢复会话记录，每条作为新存档导入</div></div>
                     <button class="btn btn-ghost btn-sm" @click="$refs.importSessionsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
                     <input type="file" ref="importSessionsInput" style="display:none" accept=".json" @change="importSessions">
                   </div>
 
                   <!-- Worlds -->
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:14px;font-weight:700">导出所有世界数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">将所有世界设定导出为 JSON 文件</div></div>
+                    <div><div style="font-size:var(--text-sm);font-weight:700">导出所有世界数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">将所有世界设定导出为 JSON 文件</div></div>
                     <button class="btn btn-ghost btn-sm" @click="exportWorlds"><i class="fas fa-file-export"></i> 导出</button>
                   </div>
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:14px;font-weight:700">导入单个/多个世界数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">从 JSON 文件导入世界设定，每条作为新记录导入</div></div>
+                    <div><div style="font-size:var(--text-sm);font-weight:700">导入单个/多个世界数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">从 JSON 文件导入世界设定，每条作为新记录导入</div></div>
                     <button class="btn btn-ghost btn-sm" @click="$refs.importWorldsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
                     <input type="file" ref="importWorldsInput" style="display:none" accept=".json" @change="importWorlds">
                   </div>
 
                   <!-- Characters -->
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:14px;font-weight:700">导出所有角色数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">将所有角色设定导出为 JSON 文件</div></div>
+                    <div><div style="font-size:var(--text-sm);font-weight:700">导出所有角色数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">将所有角色设定导出为 JSON 文件</div></div>
                     <button class="btn btn-ghost btn-sm" @click="exportChars"><i class="fas fa-file-export"></i> 导出</button>
                   </div>
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:14px;font-weight:700">导入单个/多个角色数据</div><div style="font-size:12px;color:var(--grey);margin-top:2px">从 JSON 文件导入角色设定，每条作为新记录导入</div></div>
+                    <div><div style="font-size:var(--text-sm);font-weight:700">导入单个/多个角色数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">从 JSON 文件导入角色设定，每条作为新记录导入</div></div>
                     <button class="btn btn-ghost btn-sm" @click="$refs.importCharsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
                     <input type="file" ref="importCharsInput" style="display:none" accept=".json" @change="importChars">
                   </div>
@@ -815,7 +815,7 @@
               </div>
               <div class="tools-right" style="position: relative;">
                 <div class="tool-btn-text" @click.stop="showProfileMenu=!showProfileMenu; showToolsMenu=false; showCharDrawer=false; showEngineParams=false">
-                  {{ activeProfile?.name || 'API' }} <i class="fas fa-chevron-down" style="font-size:10px"></i>
+                  {{ activeProfile?.name || 'API' }} <i class="fas fa-chevron-down" style="font-size:var(--text-xs)"></i>
                 </div>
 
                 <transition name="menu-pop">
@@ -828,7 +828,7 @@
                     >
                       <div class="menu-item-label" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                         <span>{{ p.name }}</span>
-                        <i v-if="activeProfileId === p.id" class="fas fa-check" style="font-size: 10px; color: var(--purple-lt);"></i>
+                        <i v-if="activeProfileId === p.id" class="fas fa-check" style="font-size: var(--text-xs); color: var(--purple-lt);"></i>
                       </div>
                     </div>
                     <div v-if="profiles.length === 0" class="menu-item" style="opacity: 0.5;">
@@ -866,9 +866,9 @@
               <div class="bubble" :class="msg.role">
                 <template v-if="msg.role==='ai' && currentMode==='rpg'">
                   <details class="debug-box" v-if="msg.role === 'ai'">
-                    <summary><i class="fas fa-bug" style="font-size:10px"></i> 调试 Prompt</summary>
+                    <summary><i class="fas fa-bug" style="font-size:var(--text-xs)"></i> 调试 Prompt</summary>
                     <div class="debug-content">
-                      <div v-if="msg.usage" class="inner-stats" style="padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,165,0,0.15); display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px;">
+                      <div v-if="msg.usage" class="inner-stats" style="padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,165,0,0.15); display: flex; flex-wrap: wrap; gap: 10px; font-size: var(--text-xs);">
                         <span><i class="fas fa-arrow-up"></i> 你的字数: {{msg.usage.user_words}}</span>
                         <span><i class="fas fa-database"></i> 上下文消耗: {{msg.usage.prompt_tokens}}</span>
                         <span><i class="fas fa-arrow-down"></i> 回复字数: {{msg.usage.ai_words}}</span>
@@ -878,7 +878,7 @@
                     </div>
                   </details>
                   <details class="cot-box" v-if="msg.cot">
-                    <summary><i class="fas fa-brain" style="font-size:10px"></i> 推理过程</summary>
+                    <summary><i class="fas fa-brain" style="font-size:var(--text-xs)"></i> 推理过程</summary>
                     <div class="cot-content">{{msg.cot}}</div>
                   </details>
                 </template>
@@ -888,28 +888,28 @@
               <!-- Action buttons -->
               <div class="msg-actions">
                 <template v-if="msg.role==='user'">
-                  <div class="action-btn" @click="editUserMsg(msg)"><i class="fas fa-pen" style="font-size:10px"></i> 编辑</div>
+                  <div class="action-btn" @click="editUserMsg(msg)"><i class="fas fa-pen" style="font-size:var(--text-xs)"></i> 编辑</div>
                                     <div class="action-btn" @click="copyMsg(msg)" style="min-width:52px;justify-content:center">
                     <template v-if="copiedMsgId === msg.id">
-                      <i class="fas fa-check" style="font-size:10px;color:var(--green)"></i> 已复制
+                      <i class="fas fa-check" style="font-size:var(--text-xs);color:var(--green)"></i> 已复制
                     </template>
                     <template v-else>
-                      <i class="fas fa-copy" style="font-size:10px"></i> 复制
+                      <i class="fas fa-copy" style="font-size:var(--text-xs)"></i> 复制
                     </template>
                   </div>
-                  <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
+                  <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:var(--text-xs)"></i> 删除</div>
                 </template>
                 <template v-else>
-                  <div class="action-btn regen" @click="regenMsg(msg)"><i class="fas fa-sync-alt" style="font-size:10px"></i> 重新生成</div>
+                  <div class="action-btn regen" @click="regenMsg(msg)"><i class="fas fa-sync-alt" style="font-size:var(--text-xs)"></i> 重新生成</div>
                                     <div class="action-btn" @click="copyMsg(msg)" style="min-width:52px;justify-content:center">
                     <template v-if="copiedMsgId === msg.id">
-                      <i class="fas fa-check" style="font-size:10px;color:var(--green)"></i> 已复制
+                      <i class="fas fa-check" style="font-size:var(--text-xs);color:var(--green)"></i> 已复制
                     </template>
                     <template v-else>
-                      <i class="fas fa-copy" style="font-size:10px"></i> 复制
+                      <i class="fas fa-copy" style="font-size:var(--text-xs)"></i> 复制
                     </template>
                   </div>
-                  <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:10px"></i> 删除</div>
+                  <div class="action-btn danger" @click="deleteMsg(msg)"><i class="fas fa-trash" style="font-size:var(--text-xs)"></i> 删除</div>
                 </template>
               </div>
             </div>
@@ -1017,7 +1017,7 @@
                 <div class="modal-overlay" v-if="showEngineParams" @click.stop="showEngineParams=false" style="z-index: 300;">
                   <div class="params-modal" @click.stop>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-                      <div class="s-title" style="margin-bottom:0; font-size:22px;"><i class="fas fa-dice-d20" style="color:var(--purple-lt)"></i> 引擎高级参数</div>
+                      <div class="s-title" style="margin-bottom:0; font-size:var(--text-lg);"><i class="fas fa-dice-d20" style="color:var(--purple-lt)"></i> 引擎高级参数</div>
                       <div class="icon-btn" @click="showEngineParams=false"><i class="fas fa-times"></i></div>
                     </div>
                     
@@ -1078,7 +1078,7 @@
               </div>
               <div class="tools-right" style="position: relative;">
                 <div class="tool-btn-text" @click.stop="showProfileMenu=!showProfileMenu; showToolsMenu=false; showCharDrawer=false; showEngineParams=false">
-                  {{ activeProfile?.name || 'API' }} <i class="fas fa-chevron-down" style="font-size:10px"></i>
+                  {{ activeProfile?.name || 'API' }} <i class="fas fa-chevron-down" style="font-size:var(--text-xs)"></i>
                 </div>
 
                 <transition name="menu-pop">
@@ -1091,7 +1091,7 @@
                     >
                       <div class="menu-item-label" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                         <span>{{ p.name }}</span>
-                        <i v-if="activeProfileId === p.id" class="fas fa-check" style="font-size: 10px; color: var(--purple-lt);"></i>
+                        <i v-if="activeProfileId === p.id" class="fas fa-check" style="font-size: var(--text-xs); color: var(--purple-lt);"></i>
                       </div>
                     </div>
                     <div v-if="profiles.length === 0" class="menu-item" style="opacity: 0.5;">
@@ -1116,7 +1116,7 @@
   <div class="modal-overlay" v-if="showConfirm" @click.self="showConfirm=false">
     <div class="confirm-modal">
       <div class="confirm-header">
-        <div style="font-size:15px;font-weight:700">确认删除</div>
+        <div style="font-size:var(--text-md);font-weight:700">确认删除</div>
         <div class="icon-btn" @click="showConfirm=false" style="width:28px;height:28px"><i class="fas fa-times"></i></div>
       </div>
       <div class="confirm-body">
@@ -1138,7 +1138,7 @@
 
       <!-- 弹窗标题 -->
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-        <div style="font-size:16px; font-weight:700;">新建节点</div>
+        <div style="font-size:var(--text-md); font-weight:700;">新建节点</div>
         <button class="btn btn-ghost btn-sm" @click="closeNewProfileModal()">
           <i class="fas fa-times"></i>
         </button>
@@ -1186,10 +1186,10 @@
       <div style="border-top:1px solid var(--border); margin-bottom:16px;"></div>
 
       <!-- 一键粘贴配置 -->
-      <div style="font-size:12px; color:var(--grey); font-weight:700; margin-bottom:8px;">一键粘贴配置（名称,URL,Key,模型）</div>
+      <div style="font-size:var(--text-xs); color:var(--grey); font-weight:700; margin-bottom:8px;">一键粘贴配置（名称,URL,Key,模型）</div>
       <div style="display:flex; gap:8px;">
         <textarea class="form-textarea" v-model="quickAddText"
-          style="flex:1; min-height:80px; font-family:var(--font-mono); font-size:12px;"
+          style="flex:1; min-height:80px; font-family:var(--font-mono); font-size:var(--text-xs);"
           placeholder="一行一条，可粘贴多行&#10;格式：Name,https://...,sk-...,gpt-4"></textarea>
         <button class="btn btn-primary" style="background:#3b82f6; width:60px; justify-content:center; align-self:flex-end;" @click="quickAddProfiles">
           添加
@@ -1207,7 +1207,7 @@
 
       <!-- 弹窗标题 -->
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-        <div style="font-size:16px; font-weight:700;">编辑节点</div>
+        <div style="font-size:var(--text-md); font-weight:700;">编辑节点</div>
         <button class="btn btn-ghost btn-sm" @click="editingProfileId=null">
           <i class="fas fa-times"></i>
         </button>
