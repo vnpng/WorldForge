@@ -672,8 +672,9 @@ body.light .send-btn-gemini { background: var(--ink); color: #fff; }
 }
 .btn:hover { opacity: .85; }
 .btn:active { transform: scale(.97); }
-.btn-sm  { padding: 7px 16px; font-size: var(--text-sm); }
-.btn-md  { padding: 10px 20px; font-size: var(--text-md); }
+.btn-sm  { padding: 0 14px; height: 32px; font-size: var(--text-sm); }
+.btn-md  { padding: 0 20px; height: 40px; font-size: var(--text-md); }
+.btn-lg  { padding: 0 28px; height: 48px; font-size: var(--text-md); }
 .btn-primary { background: var(--purple); color: #fff; }
 .btn-ghost   { background: rgba(255,255,255,.06); color: var(--white-soft); }
 .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,.2); color: var(--white); }
