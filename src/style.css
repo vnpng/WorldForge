@@ -332,11 +332,11 @@ body.light .toggle input:checked ~ .toggle-track { background: var(--purple); }
 /* Icon button */
 .icon-btn {
   width: 40px !important; height: 40px !important; border-radius: 50% !important;
-  background: rgba(255,255,255,.06); border: none;
+  background: transparent; border: none;
   display: flex; align-items: center; justify-content: center;
   color: var(--white-soft); cursor: pointer; font-size: var(--text-sm); transition: all 0.2s;
 }
-.icon-btn:hover { background: var(--ink-muted) !important; color: var(--white) !important; }
+.icon-btn:hover { background: rgba(255,255,255,.06) !important; color: var(--white) !important; }
 body.light .icon-btn { color: #3a3d5c; }
 body.light .icon-btn:hover { background: rgba(0,0,0,0.06) !important; }
 
