@@ -1730,12 +1730,12 @@ export default {
     };
 
     const addNewWorld = () => {
-      const nw = { id: String(Date.now()), name: '新世界', intro: '', desc: '', society: '', history: '', geography: '', magic_system: '', rules: '', extra_rules: '', conflict: '' };
+      const nw = { id: String(Date.now()), name: '', intro: '', desc: '', society: '', history: '', geography: '', magic_system: '', rules: '', extra_rules: '', conflict: '' };
       worlds.value.push(nw);
       editWorld(nw);
     };
     const addNewChar = () => {
-      const nc = { id: String(Date.now()), name: '新角色', gender: '', age: '', race: '', identity: '', appearance: '', personality: '', item: '', style: '', custom: '' };
+      const nc = { id: String(Date.now()), name: '', gender: '', age: '', race: '', identity: '', appearance: '', personality: '', item: '', style: '', custom: '' };
       characters.value.push(nc);
       editChar(nc);
     };
@@ -2127,7 +2127,7 @@ export default {
       originalEditData.value = JSON.stringify(e);
     };
     const addNewEngine = () => {
-      const ne = { id: String(Date.now()), name: '新引擎预设', type: 'rpg', active: false, intro: '', desc: '', isPublic: false };
+      const ne = { id: String(Date.now()), name: '', type: 'rpg', active: false, intro: '', desc: '', isPublic: false };
       systemPrompts.value.push(ne);
       editEngine(ne);
     };
