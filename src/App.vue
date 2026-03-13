@@ -188,7 +188,7 @@
             <div class="status-sep">·</div>
             <div class="status-session">{{activeSession?.name || '未命名'}}</div>
             <div class="status-sep">·</div>
-            <div class="status-api"><div class="status-dot"></div>{{activeProfile.name}} · {{activeProfile.model}}</div>
+            <div class="status-api">{{activeProfile.name}}</div>
             <div class="status-right">
             </div>
           </template>
