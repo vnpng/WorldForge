@@ -1763,27 +1763,27 @@ export default {
 
     async function loadProfiles() {
       try {
-        const res = await apiFetch(\'/api/profiles\');
+        const res = await apiFetch('/api/profiles');
         profiles.value = await res.json();
         // 如果没有选中的，或者选中的已被删，默认选第一个
         if (!activeProfileId.value && profiles.value.length > 0) {
           activeProfileId.value = profiles.value[0].id;
         }
-      } catch (e) { console.error(\'加载节点失败\'); }
+      } catch (e) { console.error('加载节点失败'); }
     }
     
     const importInput = ref(null);
     const importSessionsInput = ref(null);
     const importWorldsInput = ref(null);
     const importCharsInput = ref(null);
-    const quickAddText = ref(\'\');
+    const quickAddText = ref('');
 
     // --- Data Management Logic ---
     const downloadJson = (data, filename) => {
       const dataStr = JSON.stringify(data, null, 2);
       const blob = new Blob([dataStr], { type: "application/json" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement(\'a\');
+      const a = document.createElement('a');
       a.href = url; a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
@@ -1791,10 +1791,10 @@ export default {
 
     const exportSessions = async () => {
       try {
-        const res = await apiFetch(\'/api/sessions\');
+        const res = await apiFetch('/api/sessions');
         const data = await res.json();
         downloadJson(data, `wf_sessions_${Date.now()}.json`);
-      } catch (e) { alert(\'导出失败\'); }
+      } catch (e) { alert('导出失败'); }
     };
 
     const exportWorlds = () => downloadJson(worlds.value, `wf_worlds_${Date.now()}.json`);
@@ -1810,13 +1810,13 @@ export default {
           const items = JSON.parse(evt.target.result);
           const data = Array.isArray(items) ? items : [items];
           for (const item of data) {
-            const newItem = { ...item, id: genNewId(), title: item.title || item.name || \'导入存档\' };
-            await apiFetch(\'/api/sessions\', { method: \'POST\', body: JSON.stringify(newItem) });
+            const newItem = { ...item, id: genNewId(), title: item.title || item.name || '导入存档' };
+            await apiFetch('/api/sessions', { method: 'POST', body: JSON.stringify(newItem) });
           }
           alert(`✅ 导入成功，共导入 ${data.length} 条存档`);
           await loadSessions();
-        } catch (err) { alert(\'导入失败：格式错误\'); }
-        e.target.value = \'\';
+        } catch (err) { alert('导入失败：格式错误'); }
+        e.target.value = '';
       };
       reader.readAsText(file);
     };
@@ -1830,12 +1830,12 @@ export default {
           const data = Array.isArray(items) ? items : [items];
           for (const item of data) {
             const newItem = { ...item, id: genNewId() };
-            await apiFetch(\'/api/worlds\', { method: \'POST\', body: JSON.stringify(newItem) });
+            await apiFetch('/api/worlds', { method: 'POST', body: JSON.stringify(newItem) });
           }
           alert(`✅ 导入成功，共导入 ${data.length} 个世界设定`);
           await loadAssets();
-        } catch (err) { alert(\'导入失败：格式错误\'); }
-        e.target.value = \'\';
+        } catch (err) { alert('导入失败：格式错误'); }
+        e.target.value = '';
       };
       reader.readAsText(file);
     };
@@ -1849,31 +1849,31 @@ export default {
           const data = Array.isArray(items) ? items : [items];
           for (const item of data) {
             const newItem = { ...item, id: genNewId() };
-            await apiFetch(\'/api/characters\', { method: \'POST\', body: JSON.stringify(newItem) });
+            await apiFetch('/api/characters', { method: 'POST', body: JSON.stringify(newItem) });
           }
           alert(`✅ 导入成功，共导入 ${data.length} 个角色设定`);
           await loadAssets();
-        } catch (err) { alert(\'导入失败：格式错误\'); }
-        e.target.value = \'\';
+        } catch (err) { alert('导入失败：格式错误'); }
+        e.target.value = '';
       };
       reader.readAsText(file);
     };
 
     async function addProfile() {
       const newId = String(Date.now());
-      const newP = { id: newId, name: \'新建节点\', baseUrl: \'\', apiKey: \'\', model: \'gpt-4o\' };
+      const newP = { id: newId, name: '新建节点', baseUrl: '', apiKey: '', model: 'gpt-4o' };
       try {
-        await apiFetch(\'/api/profiles\', { method: \'POST\', body: JSON.stringify(newP) });
+        await apiFetch('/api/profiles', { method: 'POST', body: JSON.stringify(newP) });
         await loadProfiles();
         editingProfileId.value = newId;
         showApiKey.value = false;
-      } catch (e) { alert(\'新建失败\'); }
+      } catch (e) { alert('新建失败'); }
     }
 
     async function deleteProfile(id) {
-      if (!confirm(\'确定删除此 API 节点吗？\')) return;
+      if (!confirm('确定删除此 API 节点吗？')) return;
       try {
-        await apiFetch(`/api/profiles/${id}`, { method: \'DELETE\' });
+        await apiFetch(`/api/profiles/${id}`, { method: 'DELETE' });
         await loadProfiles();
         if (activeProfileId.value === id) {
           activeProfileId.value = profiles.value.length > 0 ? profiles.value[0].id : null;
@@ -1881,22 +1881,22 @@ export default {
         if (editingProfileId.value === id) {
           editingProfileId.value = null;
         }
-      } catch (e) { alert(\'删除失败\'); }
+      } catch (e) { alert('删除失败'); }
     }
 
     // 监听实时保存：只要编辑框内容变了，自动同步到后端
     watch(editingProfile, async (newVal, oldVal) => {
       if (newVal && oldVal && newVal.id === oldVal.id) {
         try {
-          await apiFetch(\'/api/profiles\', { method: \'POST\', body: JSON.stringify(newVal) });
-        } catch (e) { console.error(\'自动保存节点失败\'); }
+          await apiFetch('/api/profiles', { method: 'POST', body: JSON.stringify(newVal) });
+        } catch (e) { console.error('自动保存节点失败'); }
       }
     }, { deep: true });
 
     const saveApiConfig = (e) => {
       const btn = e.currentTarget;
       const originalHtml = btn.innerHTML;
-      btn.innerHTML = \'<i class="fas fa-check"></i> 已保存\';
+      btn.innerHTML = '<i class="fas fa-check"></i> 已保存';
       
       setTimeout(() => {
         btn.innerHTML = originalHtml;
