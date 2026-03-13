@@ -735,13 +735,9 @@
                           <div style="font-size:11px;" :style="{ color: activeProfileId === p.id ? 'var(--purple-lt)' : 'var(--grey)' }">{{ p.model }}</div>
                         </div>
                       </div>
-                      <div style="display:flex; gap:6px;">
-                        <button class="btn btn-ghost btn-sm" @click.stop="startEditing(p)" title="编辑">
-                          <i class="fas fa-pen"></i>
-                        </button>
-                        <button class="btn btn-ghost btn-sm" style="color:var(--danger)" @click.stop="deleteProfile(p.id)" title="删除">
-                          <i class="fas fa-trash"></i>
-                        </button>
+                      <div style="display:flex; gap:6px; align-items:center">
+                        <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click.stop="startEditing(p)" title="编辑"><i class="fas fa-pen"></i></div>
+                        <div class="icon-btn" style="width:28px;height:28px;font-size:11px" @click.stop="deleteProfile(p.id)" title="删除"><i class="fas fa-trash"></i></div>
                       </div>
                     </div>
                   </div>
