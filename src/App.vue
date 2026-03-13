@@ -323,7 +323,7 @@
                 <div style="display:flex; gap:12px;">
                   <button class="btn btn-ghost btn-md" @click="exitEdit('engine')">退出编辑</button>
                   <button class="btn btn-primary btn-md" @click="saveEdit('engine')" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
-                  <button class="btn btn-primary btn-md" @click="saveEdit('engine', true)" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
+                  <button class="btn btn-primary btn-md" @click="saveEdit('engine', true)" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-check-circle"></i> 保存并返回</button>
                 </div>
               </div>
             </div>
@@ -427,7 +427,7 @@
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-md" @click="exitEdit('world')">退出编辑</button>
                 <button class="btn btn-primary btn-md" @click="saveEdit('world')" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
-                <button class="btn btn-primary btn-md" @click="saveEdit('world', true)" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
+                <button class="btn btn-primary btn-md" @click="saveEdit('world', true)" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
           </template>
@@ -535,7 +535,7 @@
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-md" @click="exitEdit('char')">退出编辑</button>
                 <button class="btn btn-primary btn-md" @click="saveEdit('char')" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
-                <button class="btn btn-primary btn-md" @click="saveEdit('char', true)" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
+                <button class="btn btn-primary btn-md" @click="saveEdit('char', true)" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
           </template>
@@ -1731,12 +1731,10 @@ export default {
 
     const addNewWorld = () => {
       const nw = { id: String(Date.now()), name: '', intro: '', desc: '', society: '', history: '', geography: '', magic_system: '', rules: '', extra_rules: '', conflict: '' };
-      worlds.value.push(nw);
       editWorld(nw);
     };
     const addNewChar = () => {
       const nc = { id: String(Date.now()), name: '', gender: '', age: '', race: '', identity: '', appearance: '', personality: '', item: '', style: '', custom: '' };
-      characters.value.push(nc);
       editChar(nc);
     };
 
@@ -2128,7 +2126,6 @@ export default {
     };
     const addNewEngine = () => {
       const ne = { id: String(Date.now()), name: '', type: 'rpg', active: false, intro: '', desc: '', isPublic: false };
-      systemPrompts.value.push(ne);
       editEngine(ne);
     };
 
