@@ -323,7 +323,7 @@
                 <div style="display:flex; gap:12px;">
                   <button class="btn btn-ghost btn-sm" @click="exitEdit('engine')">退出编辑</button>
                   <button class="btn btn-primary btn-sm" @click="saveEdit('engine')" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
-                  <button class="btn btn-primary btn-sm" @click="saveEdit('engine', true)" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
+                  <button class="btn btn-primary btn-md" @click="saveEdit('engine', true)" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
                 </div>
               </div>
             </div>
