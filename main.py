@@ -7,10 +7,20 @@ from typing import List, Optional, Any
 import os
 import json
 import time
+import re
 import jwt 
 import bcrypt 
 import httpx # [NEW] 用于流式代理
 from database import init_db, get_db_connection
+
+def strip_html(text: str) -> str:
+    if not text:
+        return ""
+    # 移除 HTML 标签
+    text = re.sub(r'<[^>]+>', '', text)
+    # 还原常见的转义字符
+    text = text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&').replace('&nbsp;', ' ')
+    return text.strip()
 
 class ChatRequest(BaseModel):
     session_id: str
@@ -550,8 +560,8 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
     for m in context_msgs:
         role = "assistant" if m['role'] == 'ai' else "user"
         # 简单清理 content 中的 HTML
-        messages.append({"role": role, "content": m['content']})
-    messages.append({"role": "user", "content": req.message})
+        messages.append({"role": role, "content": strip_html(m['content'])})
+    messages.append({"role": "user", "content": strip_html(req.message)})
 
     conn.close()
 
