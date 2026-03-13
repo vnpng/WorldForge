@@ -1139,9 +1139,9 @@
       <!-- 弹窗标题 -->
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
         <div style="font-size:var(--text-md); font-weight:700;">新建节点</div>
-        <button class="btn btn-ghost btn-sm" @click="closeNewProfileModal()">
+        <div class="icon-btn" @click="closeNewProfileModal()">
           <i class="fas fa-times"></i>
-        </button>
+        </div>
       </div>
 
       <!-- 表单 -->
@@ -1208,9 +1208,9 @@
       <!-- 弹窗标题 -->
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
         <div style="font-size:var(--text-md); font-weight:700;">编辑节点</div>
-        <button class="btn btn-ghost btn-sm" @click="editingProfileId=null">
+        <div class="icon-btn" @click="editingProfileId=null">
           <i class="fas fa-times"></i>
-        </button>
+        </div>
       </div>
 
       <!-- 表单 -->

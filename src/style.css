@@ -332,7 +332,7 @@ body.light .toggle input:checked ~ .toggle-track { background: var(--purple); }
 /* Icon button */
 .icon-btn {
   width: 40px !important; height: 40px !important; border-radius: 50% !important;
-  background: transparent; border: none;
+  background: rgba(255,255,255,.06); border: none;
   display: flex; align-items: center; justify-content: center;
   color: var(--white-soft); cursor: pointer; font-size: var(--text-sm); transition: all 0.2s;
 }
@@ -668,7 +668,7 @@ body.light .send-btn-gemini { background: var(--ink); color: #fff; }
   display: inline-flex; align-items: center; gap: 6px;
   font-family: var(--font-body); font-weight: 700; border: none;
   cursor: pointer; transition: opacity .15s, transform .1s;
-  white-space: nowrap; border-radius: var(--r-sm);
+  white-space: nowrap; border-radius: var(--r-pill);
 }
 .btn:hover { opacity: .85; }
 .btn:active { transform: scale(.97); }
