@@ -1753,7 +1753,7 @@ export default {
 
     const activeProfile = computed(() => {
       const found = profiles.value.find(p => p.id === activeProfileId.value);
-      return found || (profiles.value.length > 0 ? profiles.value[0] : { name: \'未配置\', model: \'N/A\' });
+      return found || (profiles.value.length > 0 ? profiles.value[0] : { name: '未配置', model: 'N/A' });
     });
 
     const editingProfile = computed(() => {
