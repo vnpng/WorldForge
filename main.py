@@ -7,32 +7,10 @@ from typing import List, Optional, Any
 import os
 import json
 import time
-import re
 import jwt 
 import bcrypt 
 import httpx # [NEW] 用于流式代理
 from database import init_db, get_db_connection
-
-def strip_html(text: str) -> str:
-    if not text:
-        return ""
-    # 1. 提取 <summary> 标签内的文字，加换行保留标题
-    text = re.sub(r'<summary>(.*?)</summary>', r'\n\1\n', text, flags=re.DOTALL)
-    # 2. <br> 转换行
-    text = re.sub(r'<br\s*/?>', '\n', text, flags=re.IGNORECASE)
-    # 3. <p> 和 <div> 结尾标签转换行
-    text = re.sub(r'</p>|</div>|</tr>', '\n', text, flags=re.IGNORECASE)
-    # 4. 表格单元格 <td> <th> 之间加分隔符
-    text = re.sub(r'<td[^>]*>|<th[^>]*>', ' | ', text, flags=re.IGNORECASE)
-    # 5. 列表项 <li> 转换行加短横线
-    text = re.sub(r'<li[^>]*>', '\n- ', text, flags=re.IGNORECASE)
-    # 6. 删除所有剩余HTML标签
-    text = re.sub(r'<[^>]+>', '', text)
-    # 7. 处理HTML转义字符
-    text = text.replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&').replace('&nbsp;', ' ').replace('&quot;', '"')
-    # 8. 清理多余空行（超过2个连续换行压缩为2个）
-    text = re.sub(r'\n{3,}', '\n\n', text)
-    return text.strip()
 
 class ChatRequest(BaseModel):
     session_id: str
@@ -571,13 +549,9 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
     messages = [{"role": "system", "content": system_content}]
     for m in context_msgs:
         role = "assistant" if m['role'] == 'ai' else "user"
-        if role == "assistant":
-            # AI消息保留原始内容，不清洗，防止AI"学坏"丢失格式
-            messages.append({"role": role, "content": m['content']})
-        else:
-            # 用户消息清洗前端注入的HTML标签
-            messages.append({"role": role, "content": strip_html(m['content'])})
-    messages.append({"role": "user", "content": strip_html(req.message)})
+        # 简单清理 content 中的 HTML
+        messages.append({"role": role, "content": m['content']})
+    messages.append({"role": "user", "content": req.message})
 
     conn.close()
 
