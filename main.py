@@ -106,6 +106,7 @@ class WorldSchema(BaseModel):
 
 class CharacterSchema(BaseModel):
     id: str
+    user_id: Optional[str] = None # [补全] 修复标题显示逻辑
     name: str
     gender: str
     age: str
