@@ -1173,10 +1173,10 @@
 
       <!-- 操作按钮 -->
       <div style="display:flex; gap:10px; margin-bottom:20px;">
-        <button class="btn btn-primary" style="flex:1; justify-content:center;" @click="saveNewProfile">
+        <button class="btn btn-primary btn-md" style="flex:1; justify-content:center;" @click="saveNewProfile">
           保存节点
         </button>
-        <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink);" @click="closeNewProfileModal()">
+        <button class="btn btn-ghost btn-md" style="flex:1; justify-content:center;" @click="closeNewProfileModal()">
           取消
         </button>
       </div>
@@ -1190,7 +1190,7 @@
         <textarea class="form-textarea" v-model="quickAddText"
           style="flex:1; min-height:80px; font-family:var(--font-mono); font-size:var(--text-xs);"
           placeholder="一行一条，可粘贴多行&#10;格式：Name,https://...,sk-...,gpt-4"></textarea>
-        <button class="btn btn-primary" style="background:var(--purple); width:60px; justify-content:center; align-self:flex-end;" @click="quickAddProfiles">
+        <button class="btn btn-primary btn-md" style="width:60px; justify-content:center; align-self:flex-end;" @click="quickAddProfiles">
           添加
         </button>
       </div>
@@ -1242,10 +1242,10 @@
 
       <!-- 操作按钮 -->
       <div style="display:flex; gap:10px;">
-        <button class="btn btn-primary" style="flex:1; justify-content:center;" @click="saveApiConfig">
+        <button class="btn btn-primary btn-md" style="flex:1; justify-content:center;" @click="saveApiConfig">
           保存修改
         </button>
-        <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink);" @click="editingProfileId=null">
+        <button class="btn btn-ghost btn-md" style="flex:1; justify-content:center;" @click="editingProfileId=null">
           取消
         </button>
       </div>
