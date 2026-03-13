@@ -697,52 +697,82 @@
 
               <template v-if="settingsTab==='api'">
                 <div style="display:flex; flex-direction:column; min-height: 100%;">
+                  <!-- 上区：节点列表 -->
                   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
                     <div class="s-title" style="margin-bottom:0">API 节点管理</div>
-                  </div>
-                  
-                  <div class="config-section" style="padding:16px; margin-bottom:20px; display:flex; gap:10px; align-items:center; background:var(--ink-muted);">
-                    <div style="flex:1">
-                      <div style="font-size:12px; color:var(--grey); margin-bottom:6px; font-weight:700">配置切换（选中即切换）</div>
-                      <select class="form-select" v-model="activeProfileId" style="padding:8px 12px; height:40px;">
-                        <option v-for="p in profiles" :key="p.id" :value="p.id">
-                          {{ p.name }}
-                        </option>
-                      </select>
-                    </div>
-                    <div style="display:flex; gap:8px; margin-top:24px;">
-                      <button class="btn btn-primary" style="background:#10b981; width:40px; height:40px; justify-content:center" @click="addProfile" title="新建节点"><i class="fas fa-plus"></i></button>
-                      <button class="btn btn-danger" style="width:40px; height:40px; justify-content:center" @click="deleteProfile(activeProfileId)" title="删除当前节点"><i class="fas fa-trash"></i></button>
-                    </div>
+                    <button class="btn btn-primary btn-sm" @click="addProfile"><i class="fas fa-plus"></i> 新建节点</button>
                   </div>
 
-                  <div v-if="editingProfile" style="display:flex; flex-direction:column; gap:16px;">
-                    <div class="form-field full">
-                      <div class="form-label">名称</div>
-                      <input class="form-input" v-model="editingProfile.name"/>
+                  <div class="api-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+                    <div v-for="p in profiles" :key="p.id" class="preset-card" :class="{active: activeProfileId === p.id}" style="padding: 10px 14px; cursor: pointer;" @click="activeProfileId = p.id">
+                      <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                        <div v-if="activeProfileId === p.id" style="width: 8px; height: 8px; border-radius: 50%; background: var(--purple-lt); box-shadow: 0 0 8px var(--purple-lt);"></div>
+                        <div v-else style="width: 8px; height: 8px;"></div>
+                        <div>
+                          <div style="font-size: 14px; font-weight: 600; color: var(--white-soft);">{{ p.name }}</div>
+                          <div style="font-size: 11px; color: var(--grey);">{{ p.model }}</div>
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 6px;" @click.stop>
+                        <div class="icon-btn" style="width:28px; height:28px; font-size:11px;" @click="editingProfileId = p.id"><i class="fas fa-pen"></i></div>
+                        <div class="icon-btn" style="width:28px; height:28px; font-size:11px;" @click="deleteProfile(p.id)"><i class="fas fa-trash"></i></div>
+                      </div>
                     </div>
-                    <div class="form-field full">
-                      <div class="form-label">Base URL</div>
-                      <input class="form-input" v-model="editingProfile.baseUrl" placeholder="https://api.openai.com/v1"/>
-                    </div>
-                    <div class="form-field full">
-                      <div class="form-label">API Key</div>
-                      <input class="form-input" v-model="editingProfile.apiKey" type="password" placeholder="sk-..."/>
-                    </div>
-                    <div class="form-field full">
-                      <div class="form-label">Model Name</div>
-                      <input class="form-input" v-model="editingProfile.model"/>
-                    </div>
+                    <div v-if="profiles.length === 0" class="empty-state" style="padding: 20px;">暂无 API 节点，请点击右上角新建。</div>
+                  </div>
 
-                    <div class="form-field full" style="margin-top:8px">
-                      <div class="form-label" style="color:var(--grey); font-size:12px">一键粘贴配置 (名称,URL,Key,模型)</div>
+                  <!-- 中间：一键粘贴区 (可折叠) -->
+                  <div class="config-section" style="padding: 0; background: transparent; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 20px;">
+                    <div @click="showQuickPaste = !showQuickPaste" style="padding: 10px 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--grey);">
+                      <span><i class="fas fa-paste" style="margin-right: 6px;"></i> 一键粘贴配置</span>
+                      <i class="fas" :class="showQuickPaste ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </div>
+                    <div v-if="showQuickPaste" style="padding: 14px; border-top: 1px solid rgba(255,255,255,0.06); background: var(--ink-muted);">
+                      <div class="form-label" style="color:var(--grey); font-size:11px; margin-bottom: 8px;">格式：名称, URL, Key, 模型 (一行一条)</div>
                       <div style="display:flex; gap:10px;">
-                        <textarea class="form-textarea" v-model="quickAddText" style="flex:1; min-height:80px; font-family:var(--font-mono); font-size:12px;" placeholder="一行一条，可粘贴多行&#10;格式: Name,https://...,sk-...,gpt-4"></textarea>
-                        <button class="btn btn-primary" style="background:#3b82f6; width:60px; justify-content:center" @click="quickAddProfiles">添加</button>
+                        <textarea class="form-textarea" v-model="quickAddText" style="flex:1; min-height:80px; font-family:var(--font-mono); font-size:12px;" placeholder="Name,https://...,sk-...,gpt-4"></textarea>
+                        <button class="btn btn-primary" style="background:#3b82f6; width:60px; justify-content:center; font-size: 12px;" @click="quickAddProfiles">添加</button>
                       </div>
                     </div>
                   </div>
 
+                  <!-- 下区：编辑表单 -->
+                  <transition name="menu-pop">
+                    <div v-if="editingProfile" class="config-section" style="padding: 20px; border: 1px solid var(--purple-lt); background: rgba(125, 57, 235, 0.03); margin-bottom: 24px;">
+                      <div style="font-size: 16px; font-weight: 700; margin-bottom: 18px; color: var(--purple-lt);">
+                        <i class="fas fa-edit"></i> {{ editingProfile.name === '新建节点' ? '新建节点' : '编辑节点' }}
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="form-field full">
+                          <div class="form-label">节点名称</div>
+                          <input class="form-input" v-model="editingProfile.name" autocomplete="off" placeholder="例如：我的 Gemini 节点"/>
+                        </div>
+                        <div class="form-field full">
+                          <div class="form-label">Base URL</div>
+                          <input class="form-input" v-model="editingProfile.baseUrl" autocomplete="off" placeholder="https://api.openai.com/v1"/>
+                        </div>
+                        <div class="form-field full">
+                          <div class="form-label">API Key</div>
+                          <div style="position: relative; display: flex; align-items: center;">
+                            <input :type="showApiKey ? 'text' : 'password'" class="form-input" v-model="editingProfile.apiKey" autocomplete="new-password" placeholder="sk-..." style="padding-right: 40px;"/>
+                            <div class="icon-btn" style="position: absolute; right: 8px; width: 28px; height: 28px; background: transparent;" @click="showApiKey = !showApiKey">
+                              <i class="fas" :class="showApiKey ? 'fa-eye-slash' : 'fa-eye'"></i>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-field full">
+                          <div class="form-label">Model Name</div>
+                          <input class="form-input" v-model="editingProfile.model" autocomplete="off" placeholder="例如：gpt-4o"/>
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06);">
+                        <button class="btn btn-primary" style="flex: 1; justify-content: center;" @click="saveApiConfig($event)"><i class="fas fa-save"></i> 保存配置</button>
+                        <button class="btn btn-ghost" style="width: 80px; justify-content: center;" @click="editingProfileId = null">取消</button>
+                      </div>
+                    </div>
+                  </transition>
+
+                  <!-- 底部导出/导入 -->
                   <div style="display:flex; gap:10px; margin-top:auto; padding-top:24px;">
                     <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink-muted)" @click="exportApiData" title="导出 JSON"><i class="fas fa-file-export"></i> 导出全部</button>
                     <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink-muted)" @click="triggerImport" title="导入 JSON"><i class="fas fa-file-import"></i> 导入替换</button>
@@ -1710,45 +1740,50 @@ export default {
     }
 
     // ── Profiles (打通后端) ──
-    const activeProfileId = ref(localStorage.getItem('wf_active_profile') || null);
+    const activeProfileId = ref(localStorage.getItem(\'wf_active_profile\') || null);
     const editingProfileId = ref(null);
+    const showApiKey = ref(false);
+    const showQuickPaste = ref(false);
     const profiles = ref([]);
     
     // 自动追踪最后选中的节点
     watch(activeProfileId, (newVal) => {
-      if (newVal) localStorage.setItem('wf_active_profile', newVal);
+      if (newVal) localStorage.setItem(\'wf_active_profile\', newVal);
     });
 
     const activeProfile = computed(() => {
       const found = profiles.value.find(p => p.id === activeProfileId.value);
-      return found || (profiles.value.length > 0 ? profiles.value[0] : { name: '未配置', model: 'N/A' });
+      return found || (profiles.value.length > 0 ? profiles.value[0] : { name: \'未配置\', model: \'N/A\' });
     });
 
-    const editingProfile = computed(() => profiles.value.find(p => p.id === (editingProfileId.value || activeProfileId.value)) || null);
+    const editingProfile = computed(() => {
+      if (!editingProfileId.value) return null;
+      return profiles.value.find(p => p.id === editingProfileId.value) || null;
+    });
 
     async function loadProfiles() {
       try {
-        const res = await apiFetch('/api/profiles');
+        const res = await apiFetch(\'/api/profiles\');
         profiles.value = await res.json();
         // 如果没有选中的，或者选中的已被删，默认选第一个
         if (!activeProfileId.value && profiles.value.length > 0) {
           activeProfileId.value = profiles.value[0].id;
         }
-      } catch (e) { console.error('加载节点失败'); }
+      } catch (e) { console.error(\'加载节点失败\'); }
     }
     
     const importInput = ref(null);
     const importSessionsInput = ref(null);
     const importWorldsInput = ref(null);
     const importCharsInput = ref(null);
-    const quickAddText = ref('');
+    const quickAddText = ref(\'\');
 
     // --- Data Management Logic ---
     const downloadJson = (data, filename) => {
       const dataStr = JSON.stringify(data, null, 2);
       const blob = new Blob([dataStr], { type: "application/json" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement(\'a\');
       a.href = url; a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
@@ -1756,10 +1791,10 @@ export default {
 
     const exportSessions = async () => {
       try {
-        const res = await apiFetch('/api/sessions');
+        const res = await apiFetch(\'/api/sessions\');
         const data = await res.json();
         downloadJson(data, `wf_sessions_${Date.now()}.json`);
-      } catch (e) { alert('导出失败'); }
+      } catch (e) { alert(\'导出失败\'); }
     };
 
     const exportWorlds = () => downloadJson(worlds.value, `wf_worlds_${Date.now()}.json`);
@@ -1775,13 +1810,13 @@ export default {
           const items = JSON.parse(evt.target.result);
           const data = Array.isArray(items) ? items : [items];
           for (const item of data) {
-            const newItem = { ...item, id: genNewId(), title: item.title || item.name || '导入存档' };
-            await apiFetch('/api/sessions', { method: 'POST', body: JSON.stringify(newItem) });
+            const newItem = { ...item, id: genNewId(), title: item.title || item.name || \'导入存档\' };
+            await apiFetch(\'/api/sessions\', { method: \'POST\', body: JSON.stringify(newItem) });
           }
           alert(`✅ 导入成功，共导入 ${data.length} 条存档`);
           await loadSessions();
-        } catch (err) { alert('导入失败：格式错误'); }
-        e.target.value = '';
+        } catch (err) { alert(\'导入失败：格式错误\'); }
+        e.target.value = \'\';
       };
       reader.readAsText(file);
     };
@@ -1795,12 +1830,12 @@ export default {
           const data = Array.isArray(items) ? items : [items];
           for (const item of data) {
             const newItem = { ...item, id: genNewId() };
-            await apiFetch('/api/worlds', { method: 'POST', body: JSON.stringify(newItem) });
+            await apiFetch(\'/api/worlds\', { method: \'POST\', body: JSON.stringify(newItem) });
           }
           alert(`✅ 导入成功，共导入 ${data.length} 个世界设定`);
           await loadAssets();
-        } catch (err) { alert('导入失败：格式错误'); }
-        e.target.value = '';
+        } catch (err) { alert(\'导入失败：格式错误\'); }
+        e.target.value = \'\';
       };
       reader.readAsText(file);
     };
@@ -1814,48 +1849,59 @@ export default {
           const data = Array.isArray(items) ? items : [items];
           for (const item of data) {
             const newItem = { ...item, id: genNewId() };
-            await apiFetch('/api/characters', { method: 'POST', body: JSON.stringify(newItem) });
+            await apiFetch(\'/api/characters\', { method: \'POST\', body: JSON.stringify(newItem) });
           }
           alert(`✅ 导入成功，共导入 ${data.length} 个角色设定`);
           await loadAssets();
-        } catch (err) { alert('导入失败：格式错误'); }
-        e.target.value = '';
+        } catch (err) { alert(\'导入失败：格式错误\'); }
+        e.target.value = \'\';
       };
       reader.readAsText(file);
     };
 
     async function addProfile() {
       const newId = String(Date.now());
-      const newP = { id: newId, name: '新建节点', baseUrl: '', apiKey: '', model: 'gpt-4o' };
+      const newP = { id: newId, name: \'新建节点\', baseUrl: \'\', apiKey: \'\', model: \'gpt-4o\' };
       try {
-        await apiFetch('/api/profiles', { method: 'POST', body: JSON.stringify(newP) });
+        await apiFetch(\'/api/profiles\', { method: \'POST\', body: JSON.stringify(newP) });
         await loadProfiles();
-        activeProfileId.value = newId;
-      } catch (e) { alert('新建失败'); }
+        editingProfileId.value = newId;
+        showApiKey.value = false;
+      } catch (e) { alert(\'新建失败\'); }
     }
 
     async function deleteProfile(id) {
-      if (!confirm('确定删除此 API 节点吗？')) return;
+      if (!confirm(\'确定删除此 API 节点吗？\')) return;
       try {
-        await apiFetch(`/api/profiles/${id}`, { method: 'DELETE' });
+        await apiFetch(`/api/profiles/${id}`, { method: \'DELETE\' });
         await loadProfiles();
         if (activeProfileId.value === id) {
           activeProfileId.value = profiles.value.length > 0 ? profiles.value[0].id : null;
         }
-      } catch (e) { alert('删除失败'); }
+        if (editingProfileId.value === id) {
+          editingProfileId.value = null;
+        }
+      } catch (e) { alert(\'删除失败\'); }
     }
 
     // 监听实时保存：只要编辑框内容变了，自动同步到后端
     watch(editingProfile, async (newVal, oldVal) => {
       if (newVal && oldVal && newVal.id === oldVal.id) {
         try {
-          await apiFetch('/api/profiles', { method: 'POST', body: JSON.stringify(newVal) });
-        } catch (e) { console.error('自动保存节点失败'); }
+          await apiFetch(\'/api/profiles\', { method: \'POST\', body: JSON.stringify(newVal) });
+        } catch (e) { console.error(\'自动保存节点失败\'); }
       }
     }, { deep: true });
 
-    const saveApiConfig = () => {
-      alert('✅ 配置已保存');
+    const saveApiConfig = (e) => {
+      const btn = e.currentTarget;
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = \'<i class="fas fa-check"></i> 已保存\';
+      
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+        editingProfileId.value = null;
+      }, 1500);
     };
 
     const exportApiData = () => {
