@@ -1740,7 +1740,7 @@ export default {
     }
 
     // ── Profiles (打通后端) ──
-    const activeProfileId = ref(localStorage.getItem(\'wf_active_profile\') || null);
+    const activeProfileId = ref(localStorage.getItem('wf_active_profile') || null);
     const editingProfileId = ref(null);
     const showApiKey = ref(false);
     const showQuickPaste = ref(false);
@@ -1748,7 +1748,7 @@ export default {
     
     // 自动追踪最后选中的节点
     watch(activeProfileId, (newVal) => {
-      if (newVal) localStorage.setItem(\'wf_active_profile\', newVal);
+      if (newVal) localStorage.setItem('wf_active_profile', newVal);
     });
 
     const activeProfile = computed(() => {
