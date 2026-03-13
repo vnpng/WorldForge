@@ -108,9 +108,14 @@
               style="position:relative"
             >
               <div class="session-dot"><div class="dot-inner" :style="s.mode==='rpg'?'background:var(--purple)':'background:var(--green)'"></div></div>
-              <div class="session-name">
-                <i v-if="s.is_pinned" class="fas fa-thumbtack" style="font-size:var(--text-xs); color:var(--purple-lt); margin-right:4px;"></i>
-                {{s.name}}
+              <div style="flex: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 1px;">
+                <div class="session-name" style="font-size: var(--text-md) !important; flex: none !important; width: 100%;">
+                  <i v-if="s.is_pinned" class="fas fa-thumbtack" style="font-size:var(--text-xs); color:var(--purple-lt); margin-right:4px;"></i>
+                  {{s.name}}
+                </div>
+                <div style="font-size: var(--text-xs); color: var(--grey); opacity: 0.8; line-height: 1;">
+                  {{ formatDate(s.updatedAt) }}
+                </div>
               </div>
               <div class="session-menu-btn" @click.stop="toggleDropdown(s.id)">
                 <i class="fas fa-ellipsis-v"></i>
@@ -1327,6 +1332,16 @@ export default {
     watch(showDebug, (val) => localStorage.setItem('wf_show_debug', val));
     watch(showCoT, (val) => localStorage.setItem('wf_show_cot', val));
     watch(advParams, (val) => localStorage.setItem('wf_adv_params', JSON.stringify(val)), { deep: true });
+
+    const formatDate = (ts) => {
+      if (!ts) return '';
+      const d = new Date(ts);
+      const M = d.getMonth() + 1;
+      const D = d.getDate();
+      const h = d.getHours().toString().padStart(2, '0');
+      const m = d.getMinutes().toString().padStart(2, '0');
+      return `${M}/${D} ${h}:${m}`;
+    };
 
     async function doLogin() {
       if (!loginUser.value.trim() || !loginPass.value.trim()) {
