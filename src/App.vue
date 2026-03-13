@@ -427,7 +427,7 @@
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-sm" @click="exitEdit('world')">退出编辑</button>
                 <button class="btn btn-primary btn-sm" @click="saveEdit('world')" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
-                <button class="btn btn-primary btn-sm" @click="saveEdit('world', true)" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
+                <button class="btn btn-primary btn-md" @click="saveEdit('world', true)" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
           </template>
@@ -535,7 +535,7 @@
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-sm" @click="exitEdit('char')">退出编辑</button>
                 <button class="btn btn-primary btn-sm" @click="saveEdit('char')" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
-                <button class="btn btn-primary btn-sm" @click="saveEdit('char', true)" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
+                <button class="btn btn-primary btn-md" @click="saveEdit('char', true)" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
           </template>
