@@ -571,8 +571,12 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
     messages = [{"role": "system", "content": system_content}]
     for m in context_msgs:
         role = "assistant" if m['role'] == 'ai' else "user"
-        # 简单清理 content 中的 HTML
-        messages.append({"role": role, "content": strip_html(m['content'])})
+        if role == "assistant":
+            # AI消息保留原始内容，不清洗，防止AI"学坏"丢失格式
+            messages.append({"role": role, "content": m['content']})
+        else:
+            # 用户消息清洗前端注入的HTML标签
+            messages.append({"role": role, "content": strip_html(m['content'])})
     messages.append({"role": "user", "content": strip_html(req.message)})
 
     conn.close()
