@@ -2536,7 +2536,7 @@ export default {
       rowRefs, scrollRow, startDrag, stopDrag, onDrag,
       engineListRef, worldListRef, charListRef,
       showScrollBottom, scrollToBottom, onChatScroll,
-      isStreaming, stopStreaming, currentReader
+      isStreaming, stopStreaming, currentReader, formatDate
     };
   }
 }
