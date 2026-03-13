@@ -612,7 +612,7 @@
             </div>
 
             <div class="start-actions">
-              <button class="btn btn-primary btn-lg" :disabled="!canStartRPG" @click="startRPG()"><i class="fas fa-dice-d20"></i> 生成序章并进入</button>
+              <button class="btn btn-primary btn-md" :disabled="!canStartRPG" @click="startRPG()"><i class="fas fa-dice-d20"></i> 生成序章并进入</button>
             </div>
           </div>
         </div>
@@ -687,11 +687,10 @@
                 
                 <div class="divider"></div>
                 
-                <div class="setting-row" style="cursor: pointer; justify-content: center;" @click="doLogout">
-                  <div class="setting-row-info" style="text-align: center;">
-                    <div class="setting-row-label" style="color: var(--danger); font-weight: bold;"><i class="fas fa-sign-out-alt"></i> 退出登录</div>
-                    <div class="setting-row-desc">清除本地缓存并返回登录界面</div>
-                  </div>
+                <div style="display:flex; justify-content:center; padding-top:8px;">
+                  <button class="btn btn-danger btn-md" @click="doLogout">
+                    <i class="fas fa-sign-out-alt"></i> 退出登录
+                  </button>
                 </div>
               </template>
 
@@ -744,10 +743,10 @@
 
                   <!-- 底部导出/导入 -->
                   <div style="display:flex; gap:10px; margin-top:auto; padding-top:24px;">
-                    <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink-muted)" @click="exportApiData">
+                    <button class="btn btn-ghost btn-md" style="flex:1; justify-content:center;" @click="exportApiData">
                       <i class="fas fa-file-export"></i> 导出
                     </button>
-                    <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink-muted)" @click="triggerImport">
+                    <button class="btn btn-ghost btn-md" style="flex:1; justify-content:center;" @click="triggerImport">
                       <i class="fas fa-file-import"></i> 导入
                     </button>
                     <input type="file" ref="importInput" style="display:none" accept=".json" @change="importApiData">
@@ -763,33 +762,33 @@
                   <!-- Sessions -->
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
                     <div><div style="font-size:var(--text-sm);font-weight:700">导出所有对话/存档数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">将所有会话记录导出为 JSON 文件</div></div>
-                    <button class="btn btn-ghost btn-sm" @click="exportSessions"><i class="fas fa-file-export"></i> 导出</button>
+                    <button class="btn btn-ghost btn-md" @click="exportSessions"><i class="fas fa-file-export"></i> 导出</button>
                   </div>
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
                     <div><div style="font-size:var(--text-sm);font-weight:700">导入对话/存档数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">从 JSON 文件恢复会话记录，每条作为新存档导入</div></div>
-                    <button class="btn btn-ghost btn-sm" @click="$refs.importSessionsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
+                    <button class="btn btn-ghost btn-md" @click="$refs.importSessionsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
                     <input type="file" ref="importSessionsInput" style="display:none" accept=".json" @change="importSessions">
                   </div>
 
                   <!-- Worlds -->
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
                     <div><div style="font-size:var(--text-sm);font-weight:700">导出所有世界数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">将所有世界设定导出为 JSON 文件</div></div>
-                    <button class="btn btn-ghost btn-sm" @click="exportWorlds"><i class="fas fa-file-export"></i> 导出</button>
+                    <button class="btn btn-ghost btn-md" @click="exportWorlds"><i class="fas fa-file-export"></i> 导出</button>
                   </div>
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
                     <div><div style="font-size:var(--text-sm);font-weight:700">导入单个/多个世界数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">从 JSON 文件导入世界设定，每条作为新记录导入</div></div>
-                    <button class="btn btn-ghost btn-sm" @click="$refs.importWorldsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
+                    <button class="btn btn-ghost btn-md" @click="$refs.importWorldsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
                     <input type="file" ref="importWorldsInput" style="display:none" accept=".json" @change="importWorlds">
                   </div>
 
                   <!-- Characters -->
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
                     <div><div style="font-size:var(--text-sm);font-weight:700">导出所有角色数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">将所有角色设定导出为 JSON 文件</div></div>
-                    <button class="btn btn-ghost btn-sm" @click="exportChars"><i class="fas fa-file-export"></i> 导出</button>
+                    <button class="btn btn-ghost btn-md" @click="exportChars"><i class="fas fa-file-export"></i> 导出</button>
                   </div>
                   <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
                     <div><div style="font-size:var(--text-sm);font-weight:700">导入单个/多个角色数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">从 JSON 文件导入角色设定，每条作为新记录导入</div></div>
-                    <button class="btn btn-ghost btn-sm" @click="$refs.importCharsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
+                    <button class="btn btn-ghost btn-md" @click="$refs.importCharsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
                     <input type="file" ref="importCharsInput" style="display:none" accept=".json" @change="importChars">
                   </div>
 
