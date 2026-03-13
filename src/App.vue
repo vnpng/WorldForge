@@ -1162,15 +1162,12 @@
           <div class="form-label">API Key</div>
           <div style="display:flex; gap:8px;">
             <input class="form-input" v-model="newProfileForm.apiKey"
-              :type="showNewApiKey ? 'text' : 'password'"
+              type="text"
               autocomplete="off"
               name="wf-api-key-new"
               readonly
               @focus="(e) => e.target.removeAttribute('readonly')"
               placeholder="sk-..." style="flex:1"/>
-            <button class="btn btn-ghost btn-sm" @click="showNewApiKey=!showNewApiKey" style="flex:none; width:40px; justify-content:center;">
-              <i :class="showNewApiKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-            </button>
           </div>
         </div>
         <div class="form-field full">
@@ -1234,15 +1231,12 @@
           <div class="form-label">API Key</div>
           <div style="display:flex; gap:8px;">
             <input class="form-input" v-model="tempEditForm.apiKey"
-              :type="showEditApiKey ? 'text' : 'password'"
+              type="text"
               autocomplete="off"
               name="wf-api-key-edit"
               readonly
               @focus="(e) => e.target.removeAttribute('readonly')"
               placeholder="sk-..." style="flex:1"/>
-            <button class="btn btn-ghost btn-sm" @click="showEditApiKey=!showEditApiKey" style="flex:none; width:40px; justify-content:center;">
-              <i :class="showEditApiKey ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-            </button>
           </div>
         </div>
         <div class="form-field full">
@@ -1854,8 +1848,6 @@ export default {
     const showApiKey = ref(false);
     const showQuickPaste = ref(false);
     const showNewProfileModal = ref(false);
-    const showNewApiKey = ref(false);
-    const showEditApiKey = ref(false);
     const newProfileForm = ref({ name: '', baseUrl: '', apiKey: '', model: '' });
     const tempEditForm = ref({ id: '', name: '', baseUrl: '', apiKey: '', model: '' });
     const profiles = ref([]);
@@ -1879,7 +1871,6 @@ export default {
     const startEditing = (p) => {
       editingProfileId.value = p.id;
       tempEditForm.value = { ...p };
-      showEditApiKey.value = false;
     };
 
     async function loadProfiles() {
@@ -2076,7 +2067,6 @@ export default {
       showNewProfileModal.value = false;
       quickAddText.value = '';
       newProfileForm.value = { name: '', baseUrl: '', apiKey: '', model: '' };
-      showNewApiKey.value = false;
     };
 
     const quickAddProfiles = async () => {
@@ -2104,7 +2094,13 @@ export default {
         formatOk++;
         const res = await apiFetch('/api/profiles', {
           method: 'POST',
-          body: JSON.stringify({ name: parts[0], baseUrl: parts[1], apiKey: parts[2], model: parts[3] })
+          body: JSON.stringify({
+            id: String(Date.now()) + String(Math.random()).slice(2, 6),
+            name: parts[0],
+            baseUrl: parts[1],
+            apiKey: parts[2],
+            model: parts[3]
+          })
         });
         if (res.ok) added++;
       }
@@ -2516,7 +2512,7 @@ export default {
       selectSession, deleteSession,
       togglePin, renameSession, exportSession,
       profiles, activeProfileId, activeProfile, editingProfileId, editingProfile,
-      showNewProfileModal, closeNewProfileModal, showNewApiKey, showEditApiKey, newProfileForm, tempEditForm, saveNewProfile, startEditing,
+      showNewProfileModal, closeNewProfileModal, newProfileForm, tempEditForm, saveNewProfile, startEditing,
       importInput, quickAddText, addProfile, deleteProfile, saveApiConfig, exportApiData, triggerImport, importApiData, quickAddProfiles, apiFields,
       systemPrompts, rpgForm, rpgLocks,
       inputText, chatAreaEl, mainInputEl, welcomeInputEl,
