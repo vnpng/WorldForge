@@ -1132,7 +1132,7 @@
   <div v-if="showNewProfileModal"
     style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:flex; align-items:center; justify-content:center;"
     @click.self="showNewProfileModal=false">
-    <div style="background:var(--ink-deep); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
+    <div style="background:var(--ink-soft); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
 
       <!-- 弹窗标题 -->
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
@@ -1200,7 +1200,7 @@
   <div v-if="editingProfileId"
     style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:flex; align-items:center; justify-content:center;"
     @click.self="editingProfileId=null">
-    <div style="background:var(--ink-deep); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
+    <div style="background:var(--ink-soft); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
 
       <!-- 弹窗标题 -->
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
