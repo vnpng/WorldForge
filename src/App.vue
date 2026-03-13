@@ -260,7 +260,7 @@
                 <div class="discover-title">引擎管理</div>
                 <div class="discover-sub" style="margin-top:4px;">管理 System Prompt 预设，控制 AI 的角色行为。</div>
               </div>
-              <button class="btn btn-primary btn-sm" @click="addNewEngine()"><i class="fas fa-plus"></i> 新建预设</button>
+              <button class="btn btn-primary btn-md" @click="addNewEngine()"><i class="fas fa-plus"></i> 新建预设</button>
             </div>
             <div ref="engineListRef" style="min-height: 50px;">
               <div v-for="p in systemPrompts" :key="p.id" class="preset-card" :class="{active:p.active}">
@@ -321,8 +321,8 @@
                   </label>
                 </div>
                 <div style="display:flex; gap:12px;">
-                  <button class="btn btn-ghost btn-sm" @click="exitEdit('engine')">退出编辑</button>
-                  <button class="btn btn-primary btn-sm" @click="saveEdit('engine')" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
+                  <button class="btn btn-ghost btn-md" @click="exitEdit('engine')">退出编辑</button>
+                  <button class="btn btn-primary btn-md" @click="saveEdit('engine')" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
                   <button class="btn btn-primary btn-md" @click="saveEdit('engine', true)" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
                 </div>
               </div>
@@ -339,7 +339,7 @@
                 <div class="discover-title">世界管理</div>
                 <div class="discover-sub" style="margin-top:4px;">定义故事世界的背景框架，AI 将在此框架内推演叙事。</div>
               </div>
-              <button class="btn btn-primary btn-sm" @click="addNewWorld()"><i class="fas fa-plus"></i> 新建世界</button>
+              <button class="btn btn-primary btn-md" @click="addNewWorld()"><i class="fas fa-plus"></i> 新建世界</button>
             </div>
             <div v-if="worlds.length===0" class="empty-state">暂无世界设定</div>
             <div ref="worldListRef" style="min-height: 50px;">
@@ -425,8 +425,8 @@
 
               </div>
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
-                <button class="btn btn-ghost btn-sm" @click="exitEdit('world')">退出编辑</button>
-                <button class="btn btn-primary btn-sm" @click="saveEdit('world')" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
+                <button class="btn btn-ghost btn-md" @click="exitEdit('world')">退出编辑</button>
+                <button class="btn btn-primary btn-md" @click="saveEdit('world')" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
                 <button class="btn btn-primary btn-md" @click="saveEdit('world', true)" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
@@ -442,7 +442,7 @@
                 <div class="discover-title">角色管理</div>
                 <div class="discover-sub" style="margin-top:4px;">设定你扮演的角色信息。</div>
               </div>
-              <button class="btn btn-primary btn-sm" @click="addNewChar()"><i class="fas fa-plus"></i> 新建角色</button>
+              <button class="btn btn-primary btn-md" @click="addNewChar()"><i class="fas fa-plus"></i> 新建角色</button>
             </div>
             <div v-if="characters.length===0" class="empty-state">暂无角色设定</div>
             <div ref="charListRef" style="min-height: 50px;">
@@ -533,8 +533,8 @@
 
               </div>
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
-                <button class="btn btn-ghost btn-sm" @click="exitEdit('char')">退出编辑</button>
-                <button class="btn btn-primary btn-sm" @click="saveEdit('char')" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
+                <button class="btn btn-ghost btn-md" @click="exitEdit('char')">退出编辑</button>
+                <button class="btn btn-primary btn-md" @click="saveEdit('char')" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
                 <button class="btn btn-primary btn-md" @click="saveEdit('char', true)" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : 'background:var(--green)'"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
@@ -567,8 +567,8 @@
               </select>
             </div>
             <div class="detail-actions">
-              <button class="btn btn-ghost btn-lg"><i class="fas fa-bookmark"></i> 加入库中</button>
-              <button class="btn btn-primary btn-lg" @click="startAdventureFromDetail()"><i class="fas fa-play"></i> 开启冒险</button>
+              <button class="btn btn-ghost btn-md"><i class="fas fa-bookmark"></i> 加入库中</button>
+              <button class="btn btn-primary btn-md" @click="startAdventureFromDetail()"><i class="fas fa-play"></i> 开启冒险</button>
             </div>
           </div>
         </div>
@@ -700,7 +700,7 @@
                   <!-- 标题栏 -->
                   <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
                     <div class="s-title" style="margin-bottom:0">API 节点管理</div>
-                    <button class="btn btn-primary btn-sm" @click="showNewProfileModal=true">
+                    <button class="btn btn-primary btn-md" @click="showNewProfileModal=true">
                       <i class="fas fa-plus"></i> 新建节点
                     </button>
                   </div>
@@ -1123,8 +1123,8 @@
         <div class="confirm-text">确定要删除 <strong>「{{confirmTarget?.name}}」</strong> 吗？<br>此操作不可撤销。</div>
       </div>
       <div class="confirm-footer">
-        <button class="btn btn-ghost btn-sm" @click="showConfirm=false">取消</button>
-        <button class="btn btn-danger btn-sm" @click="confirmDeleteExec"><i class="fas fa-trash"></i> 确认删除</button>
+        <button class="btn btn-ghost btn-md" @click="showConfirm=false">取消</button>
+        <button class="btn btn-danger btn-md" @click="confirmDeleteExec"><i class="fas fa-trash"></i> 确认删除</button>
       </div>
     </div>
   </div>
