@@ -1137,13 +1137,13 @@
   <!-- 新建节点弹窗 -->
   <div v-if="showNewProfileModal"
     style="position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:flex; align-items:center; justify-content:center;"
-    @click.self="showNewProfileModal=false">
+    @click.self="closeNewProfileModal()">
     <div style="background:var(--ink-soft); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
 
       <!-- 弹窗标题 -->
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
         <div style="font-size:16px; font-weight:700;">新建节点</div>
-        <button class="btn btn-ghost btn-sm" @click="showNewProfileModal=false">
+        <button class="btn btn-ghost btn-sm" @click="closeNewProfileModal()">
           <i class="fas fa-times"></i>
         </button>
       </div>
@@ -1161,6 +1161,8 @@
         <div class="form-field full">
           <div class="form-label">API Key</div>
           <div style="display:flex; gap:8px;">
+            <input type="text" style="display:none" aria-hidden="true"/>
+            <input type="password" style="display:none" aria-hidden="true"/>
             <input class="form-input" v-model="newProfileForm.apiKey"
               :type="showNewApiKey ? 'text' : 'password'"
               autocomplete="new-password" placeholder="sk-..." style="flex:1"/>
@@ -1180,7 +1182,7 @@
         <button class="btn btn-primary" style="flex:1; justify-content:center;" @click="saveNewProfile">
           保存节点
         </button>
-        <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink);" @click="showNewProfileModal=false">
+        <button class="btn btn-ghost" style="flex:1; justify-content:center; background:var(--ink);" @click="closeNewProfileModal()">
           取消
         </button>
       </div>
@@ -1229,6 +1231,8 @@
         <div class="form-field full">
           <div class="form-label">API Key</div>
           <div style="display:flex; gap:8px;">
+            <input type="text" style="display:none" aria-hidden="true"/>
+            <input type="password" style="display:none" aria-hidden="true"/>
             <input class="form-input" v-model="tempEditForm.apiKey"
               :type="showEditApiKey ? 'text' : 'password'"
               autocomplete="new-password" placeholder="sk-..." style="flex:1"/>
@@ -2060,40 +2064,53 @@ export default {
       if (res.ok) {
         await loadProfiles(); // 刷新列表
         activeProfileId.value = payload.id; // 自动选中新节点
-        showNewProfileModal.value = false;
-        newProfileForm.value = Object.assign({}, { name: '', baseUrl: '', apiKey: '', model: 'gpt-4o' });
+        closeNewProfileModal();
       }
+    };
+
+    const closeNewProfileModal = () => {
+      showNewProfileModal.value = false;
+      newProfileForm.value = { name: '', baseUrl: '', apiKey: '', model: 'gpt-4o' };
+      showNewApiKey.value = false;
     };
 
     const quickAddProfiles = async () => {
       const text = quickAddText.value.trim();
       if (!text) return;
-      const lines = text.split('\n');
+      const rawLines = text.split('\n');
+      let formatOk = 0;
       let added = 0;
-      for (const line of lines) {
-        const parts = line.split(',');
-        if (parts.length >= 4) {
-          const payload = {
-            name: parts[0].trim(),
-            baseUrl: parts[1].trim(),
-            apiKey: parts[2].trim(),
-            model: parts[3].trim()
-          };
-          const res = await apiFetch('/api/profiles', {
-            method: 'POST',
-            body: JSON.stringify(payload)
-          });
-          if (res.ok) added++;
-        }
+      for (const rawLine of rawLines) {
+        const line = rawLine.trim();
+        if (!line) continue;
+        // 只按前三个逗号分割，避免URL或Key中含逗号导致切割错误
+        const idx = [0, 1, 2].reduce((acc, _) => {
+          const next = line.indexOf(',', acc[acc.length - 1] + 1);
+          return next === -1 ? acc : [...acc, next];
+        }, [-1]);
+        if (idx.length < 3) continue;
+        const parts = [
+          line.slice(0, idx[0]),
+          line.slice(idx[0] + 1, idx[1]),
+          line.slice(idx[1] + 1, idx[2]),
+          line.slice(idx[2] + 1)
+        ].map(s => s.trim());
+        if (!parts[0] || !parts[1] || !parts[2] || !parts[3]) continue;
+        formatOk++;
+        const res = await apiFetch('/api/profiles', {
+          method: 'POST',
+          body: JSON.stringify({ name: parts[0], baseUrl: parts[1], apiKey: parts[2], model: parts[3] })
+        });
+        if (res.ok) added++;
       }
-      if (added > 0) {
-        await loadProfiles();
-        quickAddText.value = '';
-        showNewProfileModal.value = false;
-        alert(`✅ 成功批量添加 ${added} 个节点！`);
-      } else {
-        alert('⚠️ 未识别到有效格式。请确保每行包含4个用英文逗号分隔的字段。');
+      if (formatOk === 0) {
+        alert('⚠️ 未识别到有效格式。请确保每行包含4个用英文逗号分隔的字段：名称,URL,Key,模型');
+        return;
       }
+      await loadProfiles();
+      quickAddText.value = '';
+      showNewProfileModal.value = false;
+      alert(`✅ 成功添加 ${added} 个节点${added < formatOk ? `（${formatOk - added} 个失败）` : ''}！`);
     };
 
     const apiFields = computed(() => [
@@ -2494,7 +2511,7 @@ export default {
       selectSession, deleteSession,
       togglePin, renameSession, exportSession,
       profiles, activeProfileId, activeProfile, editingProfileId, editingProfile,
-      showNewProfileModal, showNewApiKey, showEditApiKey, newProfileForm, tempEditForm, saveNewProfile, startEditing,
+      showNewProfileModal, closeNewProfileModal, showNewApiKey, showEditApiKey, newProfileForm, tempEditForm, saveNewProfile, startEditing,
       importInput, quickAddText, addProfile, deleteProfile, saveApiConfig, exportApiData, triggerImport, importApiData, quickAddProfiles, apiFields,
       systemPrompts, rpgForm, rpgLocks,
       inputText, chatAreaEl, mainInputEl, welcomeInputEl,
