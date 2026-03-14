@@ -41,5 +41,3 @@
 例如 localStorage.getItem('wf_token') 不能写成 localStorage.getItem(\'wf_token\')。
 如果外层是双引号字符串，内层单引号直接写 ' 即可；如果需要嵌套引号，改用模板字符串 ` ` 解决。
 1
-2
-3
