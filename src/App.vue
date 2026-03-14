@@ -1618,12 +1618,12 @@ export default {
         title: '从官方模板开始', 
         items: [
           { id: 101, name: '深渊神殿', desc: '黑暗奇幻风格，探索被诅咒的远古神殿。死亡即重置。', author: '官方', plays: '12k', icon: 'fas fa-dungeon', tag: 'RPG' },
-          ...generateDeadCards(6, 102)
+          ...generateDeadCards(4, 102)
         ]
       },
-      { title: '热门世界观', items: generateDeadCards(7, 301) },
-      { title: '热门角色/NPC', items: generateNpcCards(7, 401) },
-      { title: '热门模组', items: generateDeadCards(7, 501) }
+      { title: '热门世界观', items: generateDeadCards(5, 301) },
+      { title: '热门角色/NPC', items: generateNpcCards(5, 401) },
+      { title: '热门模组', items: generateDeadCards(5, 501) }
     ]);
     const selectedCard = ref(null);
 
