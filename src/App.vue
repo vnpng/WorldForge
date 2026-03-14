@@ -1711,9 +1711,11 @@ export default {
         }));
 
         // 4. 恢复 API 节点选中状态与新建开局默认选中
-        const storedProfileId = activeProfileId.value;
+        const storedProfileId = activeProfileId.value || localStorage.getItem('wf_active_profile');
         const profileExists = storedProfileId && profiles.value.find(p => p.id === storedProfileId);
-        if (!profileExists && profiles.value.length > 0) {
+        if (profileExists) {
+          activeProfileId.value = storedProfileId;
+        } else if (profiles.value.length > 0) {
           activeProfileId.value = profiles.value[0].id;
         }
         // [新增] 自动选中第一个资产，防止 ID 不匹配导致无法开局
@@ -1931,12 +1933,15 @@ export default {
       try {
         const res = await apiFetch('/api/profiles');
         profiles.value = await res.json();
-        // 如果没有选中的，或者选中的已被删，默认选第一个
-        const storedProfileId = activeProfileId.value;
+        // 4. 恢复 API 节点选中状态与新建开局默认选中
+        const storedProfileId = activeProfileId.value || localStorage.getItem('wf_active_profile');
         const profileExists = storedProfileId && profiles.value.find(p => p.id === storedProfileId);
-        if (!profileExists && profiles.value.length > 0) {
+        if (profileExists) {
+          activeProfileId.value = storedProfileId;
+        } else if (profiles.value.length > 0) {
           activeProfileId.value = profiles.value[0].id;
         }
+
       } catch (e) { console.error('加载节点失败'); }
     }
     
