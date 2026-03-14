@@ -800,6 +800,43 @@
 
                 </div>
               </template>
+
+              <template v-if="settingsTab==='admin'">
+                <div class="s-title">超管面板</div>
+                <div class="s-sub">邀请码管理，仅超级管理员可见。</div>
+
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+                  <button class="btn btn-primary btn-md" @click="generateInvite">
+                    <i class="fas fa-plus"></i> 生成新邀请码
+                  </button>
+                  <div v-if="lastGeneratedCode" style="display:flex; align-items:center; gap:8px; background:rgba(125,57,235,0.12); border:1.5px solid var(--purple-lt); border-radius:8px; padding:6px 14px;">
+                    <span style="font-size:var(--text-sm); font-weight:700; letter-spacing:2px; color:var(--purple-lt);">{{ lastGeneratedCode }}</span>
+                    <div class="icon-btn" style="width:24px;height:24px;font-size:var(--text-xs);" @click="copyInviteCode(lastGeneratedCode)" title="复制">
+                      <i :class="copiedInviteCode === lastGeneratedCode ? 'fas fa-check' : 'fas fa-copy'" :style="copiedInviteCode === lastGeneratedCode ? 'color:var(--green)' : ''"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <div v-if="inviteList.length === 0" style="color:var(--grey); font-size:var(--text-sm); padding:12px 0;">
+                    暂无邀请码记录
+                  </div>
+                  <div
+                    v-for="item in inviteList" :key="item.code"
+                    style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:8px; background:var(--ink-muted);"
+                    :style="{ opacity: item.is_used ? 0.45 : 1 }"
+                  >
+                    <div style="display:flex; align-items:center; gap:12px;">
+                      <span style="font-size:var(--text-sm); font-weight:700; letter-spacing:2px; color:var(--white-soft);">{{ item.code }}</span>
+                      <span v-if="item.is_used" style="font-size:var(--text-xs); color:var(--grey); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:4px;">已使用</span>
+                      <span v-else style="font-size:var(--text-xs); color:var(--green); background:rgba(191,247,41,0.08); padding:2px 8px; border-radius:4px;">未使用</span>
+                    </div>
+                    <div v-if="!item.is_used" class="icon-btn" style="width:24px;height:24px;font-size:var(--text-xs);" @click="copyInviteCode(item.code)" title="复制">
+                      <i :class="copiedInviteCode === item.code ? 'fas fa-check' : 'fas fa-copy'" :style="copiedInviteCode === item.code ? 'color:var(--green)' : ''"></i>
+                    </div>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -1502,11 +1539,17 @@ export default {
       showConfirm.value = true;
     };
 
-    const settingsNav = [
-      { key:'basic',     icon:'fas fa-sliders-h',   label:'基础设置', desc:'应用名称和界面选项' },
-      { key:'api',       icon:'fas fa-server',       label:'API 设置', desc:'模型与密钥配置' },
-      { key:'data',      icon:'fas fa-database',     label:'数据管理', desc:'导入、导出、重置' },
-    ];
+    const settingsNav = computed(() => {
+      const items = [
+        { key:'basic',     icon:'fas fa-sliders-h',   label:'基础设置', desc:'应用名称和界面选项' },
+        { key:'api',       icon:'fas fa-server',       label:'API 设置', desc:'模型与密钥配置' },
+        { key:'data',      icon:'fas fa-database',     label:'数据管理', desc:'导入、导出、重置' },
+      ];
+      if (currentUser.value.role === 'superadmin') {
+        items.push({ key:'admin', icon:'fas fa-crown', label:'超管面板', desc:'邀请码管理' });
+      }
+      return items;
+    });
 
     // ── Sessions (打通后端) ──
     const sessionsData = reactive({});
@@ -2514,6 +2557,46 @@ export default {
       { id:11,emoji:'',   name:'', count:null },{ id:12,emoji:'', name:'', count:null },
     ]);
 
+    // ── 超管面板 ──
+    const inviteList = ref([]);
+    const lastGeneratedCode = ref('');
+    const copiedInviteCode = ref(false);
+
+    const loadInvites = async () => {
+      if (currentUser.value.role !== 'superadmin') return;
+      try {
+        const res = await apiFetch('/api/auth/invites');
+        inviteList.value = await res.json();
+      } catch (e) {
+        console.error('加载邀请码列表失败');
+      }
+    };
+
+    const generateInvite = async () => {
+      try {
+        const res = await apiFetch('/api/auth/invite', { method: 'POST' });
+        const data = await res.json();
+        lastGeneratedCode.value = data.code;
+        await loadInvites();
+      } catch (e) {
+        alert('生成失败，请检查网络。');
+      }
+    };
+
+    const copyInviteCode = async (code) => {
+      try {
+        await navigator.clipboard.writeText(code);
+        copiedInviteCode.value = code;
+        setTimeout(() => { copiedInviteCode.value = false; }, 1500);
+      } catch (e) {
+        console.error('复制失败');
+      }
+    };
+
+    watch(settingsTab, (newVal) => {
+      if (newVal === 'admin') loadInvites();
+    });
+
     return {
       loggedIn, isLoginMode, loginUser, loginPass, inviteCode, doLogin, doRegister, doLogout,
       currentView,
@@ -2541,7 +2624,8 @@ export default {
       rowRefs, scrollRow, startDrag, stopDrag, onDrag,
       engineListRef, worldListRef, charListRef,
       showScrollBottom, scrollToBottom, onChatScroll,
-      isStreaming, stopStreaming, currentReader, formatDate
+      isStreaming, stopStreaming, currentReader, formatDate,
+      inviteList, lastGeneratedCode, copiedInviteCode, generateInvite, copyInviteCode,
     };
   }
 }

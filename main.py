@@ -227,6 +227,17 @@ async def generate_invite(current_user: dict = Depends(get_current_user)):
     conn.close()
     return {"code": new_code}
 
+@app.get("/api/auth/invites")
+async def list_invites(current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "superadmin":
+        raise HTTPException(status_code=403, detail="权限不足")
+    conn = get_db_connection()
+    rows = conn.execute(
+        "SELECT code, is_used, created_at FROM InviteCodes ORDER BY created_at DESC"
+    ).fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
 # --- 业务 API 路由 ---
 
 @app.get("/api/sessions", response_model=List[SessionSchema])
