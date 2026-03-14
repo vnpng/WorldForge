@@ -1711,7 +1711,9 @@ export default {
         }));
 
         // 4. 恢复 API 节点选中状态与新建开局默认选中
-        if (!activeProfileId.value && profiles.value.length > 0) {
+        const storedProfileId = activeProfileId.value;
+        const profileExists = storedProfileId && profiles.value.find(p => p.id === storedProfileId);
+        if (!profileExists && profiles.value.length > 0) {
           activeProfileId.value = profiles.value[0].id;
         }
         // [新增] 自动选中第一个资产，防止 ID 不匹配导致无法开局
@@ -1930,7 +1932,9 @@ export default {
         const res = await apiFetch('/api/profiles');
         profiles.value = await res.json();
         // 如果没有选中的，或者选中的已被删，默认选第一个
-        if (!activeProfileId.value && profiles.value.length > 0) {
+        const storedProfileId = activeProfileId.value;
+        const profileExists = storedProfileId && profiles.value.find(p => p.id === storedProfileId);
+        if (!profileExists && profiles.value.length > 0) {
           activeProfileId.value = profiles.value[0].id;
         }
       } catch (e) { console.error('加载节点失败'); }
