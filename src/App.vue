@@ -286,7 +286,13 @@
                     <div class="toggle-track"></div><div class="toggle-thumb"></div>
                   </label>
                   <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="editEngine(p)"><i class="fas fa-pen"></i></div>
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="confirmDelete(p, 'engine')"><i class="fas fa-trash"></i></div>
+                  <div
+                    class="icon-btn"
+                    style="width:28px;height:28px;font-size:var(--text-xs)"
+                    :style="p.isPublic ? 'opacity:0.3;cursor:not-allowed;' : ''"
+                    @click="!p.isPublic && confirmDelete(p, 'engine')"
+                    :title="p.isPublic ? '请先取消系统公开后再删除' : '删除'"
+                  ><i class="fas fa-trash"></i></div>
                 </div>
               </div>
             </div>

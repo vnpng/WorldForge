@@ -340,12 +340,14 @@ async def reorder_prompts(items: List[ReorderPromptItem], user: dict = Depends(g
 async def delete_prompt(prompt_id: str, user: dict = Depends(get_current_user)):
     conn = get_db_connection()
     cursor = conn.cursor()
-    protected_ids = ['sp_default_rpg', 'sp_chat', 'sp_novel', 'sp_official_4', 'sp_official_5']
-    if prompt_id in protected_ids:
+    existing = cursor.execute("SELECT user_id, is_public FROM SystemPrompts WHERE id = ?", (prompt_id,)).fetchone()
+    if not existing:
         conn.close()
-        raise HTTPException(status_code=403, detail="禁止删除核心预设")
-    existing = cursor.execute("SELECT user_id FROM SystemPrompts WHERE id = ?", (prompt_id,)).fetchone()
-    if not existing or (existing["user_id"] != user["id"] and user["role"] != "superadmin"):
+        raise HTTPException(status_code=404, detail="引擎不存在")
+    if existing["is_public"] == 1:
+        conn.close()
+        raise HTTPException(status_code=403, detail="系统公开的引擎禁止删除，请先取消公开")
+    if existing["user_id"] != user["id"] and user["role"] != "superadmin":
         conn.close()
         raise HTTPException(status_code=403, detail="无权删除")
     cursor.execute("DELETE FROM SystemPrompts WHERE id = ?", (prompt_id,))
