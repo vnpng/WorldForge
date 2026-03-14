@@ -3,7 +3,7 @@
 你负责从底层数据库、后端 FastAPI 路由到前端 Vue 3 交互的全局设计与实施。
 但绝对禁止擅自进行大范围的代码重写、全局格式化或破坏原有架构。
 
-# 🛠 技术栈与架构底线
+# 🛠 技术栈与架构底线 
 - **前端架构**：Vite + Vue 3 Composition API + Tailwind CSS v4，单 `App.vue` 结构。
 - **后端架构**：Python 3 + FastAPI + SQLite (`worldforge.db`)，使用 PyJWT 进行鉴权。
 - **物理结构**：目前新前端和旧后端同处一个项目根目录，Vite 已配置 `/api` 代理转发。旧前端还未删除。
