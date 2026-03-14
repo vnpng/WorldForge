@@ -1439,7 +1439,8 @@ export default {
         localStorage.removeItem('wf_token');
         localStorage.removeItem('wf_user');
         loggedIn.value = false;
-        loginPass.value = ''; 
+        loginPass.value = '';
+        activeProfileId.value = null;
         currentUser.value = { id: '', name: '未登录', role: 'user' };
       }
     }
@@ -1711,7 +1712,8 @@ export default {
         }));
 
         // 4. 恢复 API 节点选中状态与新建开局默认选中
-        const storedProfileId = activeProfileId.value || localStorage.getItem('wf_active_profile');
+        const userProfileKey = 'wf_active_profile_' + currentUser.value.id;
+        const storedProfileId = activeProfileId.value || localStorage.getItem(userProfileKey);
         const profileExists = storedProfileId && profiles.value.find(p => p.id === storedProfileId);
         if (profileExists) {
           activeProfileId.value = storedProfileId;
@@ -1899,7 +1901,7 @@ export default {
     }
 
     // ── Profiles (打通后端) ──
-    const activeProfileId = ref(localStorage.getItem('wf_active_profile') || null);
+    const activeProfileId = ref(null);
     const editingProfileId = ref(null);
     const showApiKey = ref(false);
     const showQuickPaste = ref(false);
@@ -1910,7 +1912,9 @@ export default {
     
     // 自动追踪最后选中的节点
     watch(activeProfileId, (newVal) => {
-      if (newVal) localStorage.setItem('wf_active_profile', newVal);
+      if (newVal && currentUser.value.id) {
+        localStorage.setItem('wf_active_profile_' + currentUser.value.id, newVal);
+      }
     });
 
     const activeProfile = computed(() => {
@@ -1934,7 +1938,8 @@ export default {
         const res = await apiFetch('/api/profiles');
         profiles.value = await res.json();
         // 4. 恢复 API 节点选中状态与新建开局默认选中
-        const storedProfileId = activeProfileId.value || localStorage.getItem('wf_active_profile');
+        const userProfileKey = 'wf_active_profile_' + currentUser.value.id;
+        const storedProfileId = activeProfileId.value || localStorage.getItem(userProfileKey);
         const profileExists = storedProfileId && profiles.value.find(p => p.id === storedProfileId);
         if (profileExists) {
           activeProfileId.value = storedProfileId;
