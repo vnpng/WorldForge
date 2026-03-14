@@ -282,7 +282,7 @@
                 </div>
                 <div style="display:flex;gap:6px;align-items:center">
                   <label class="toggle" style="transform:scale(.9)">
-                    <input type="checkbox" :checked="p.active" @change="p.active=!p.active"/>
+                    <input type="checkbox" :checked="p.isPublic" @change="toggleEnginePublic(p)"/>
                     <div class="toggle-track"></div><div class="toggle-thumb"></div>
                   </label>
                   <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="editEngine(p)"><i class="fas fa-pen"></i></div>
@@ -321,10 +321,13 @@
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <div>
-                  <label v-if="currentUser.role === 'superadmin'" style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:var(--text-sm); color:var(--white-soft);">
-                    <input type="checkbox" v-model="editingEngine.isPublic" />
-                    设为系统公开
-                  </label>
+                  <div v-if="currentUser.role === 'superadmin'" style="display:flex; align-items:center; gap:10px;">
+                    <label class="toggle" style="transform:scale(.9)">
+                      <input type="checkbox" v-model="editingEngine.isPublic"/>
+                      <div class="toggle-track"></div><div class="toggle-thumb"></div>
+                    </label>
+                    <span style="font-size:var(--text-sm); color:var(--white-soft);">设为系统公开</span>
+                  </div>
                 </div>
                 <div style="display:flex; gap:12px;">
                   <button class="btn btn-ghost btn-md" @click="exitEdit('engine')">退出编辑</button>
@@ -2607,6 +2610,24 @@ export default {
       }
     };
 
+    const toggleEnginePublic = async (engine) => {
+      engine.isPublic = !engine.isPublic;
+      const payload = {
+        ...engine,
+        content: engine.desc || '',
+        is_public: engine.isPublic ? 1 : 0
+      };
+      try {
+        await apiFetch('/api/prompts', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        engine.isPublic = !engine.isPublic;
+        alert('保存失败，请检查网络。');
+      }
+    };
+
     watch(settingsTab, (newVal) => {
       if (newVal === 'admin') loadInvites();
     });
@@ -2640,6 +2661,7 @@ export default {
       showScrollBottom, scrollToBottom, onChatScroll,
       isStreaming, stopStreaming, currentReader, formatDate,
       inviteList, lastGeneratedCode, copiedInviteCode, generateInvite, copyInviteCode,
+      toggleEnginePublic,
     };
   }
 }

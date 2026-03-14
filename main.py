@@ -531,22 +531,59 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
         # 获取引擎预设
         engine = cursor.execute("SELECT * FROM SystemPrompts WHERE id = ?", (req.engine_id,)).fetchone() if req.engine_id else None
         
-        system_content = f"""
-# [核心世界观设定]
-{world['intro'] if world else '一个神秘的未知世界。'}
-{world['desc'] if world and world['desc'] else ''}
-核心冲突：{world['conflict'] if world else '未知'}
+        def _f(val, fallback=''):
+            return val if val else fallback
 
-# [你扮演的角色信息]
-姓名：{char['name'] if char else '探险者'}
-身份：{char['identity'] if char else '平民'}
-外貌与性格：{char['appearance'] if char else ''}，{char['personality'] if char else ''}
+        world_name     = _f(world['name'] if world else '', '未命名世界')
+        world_intro    = _f(world['intro'] if world else '')
+        world_desc     = _f(world['desc'] if world else '')
+        world_conflict = _f(world['conflict'] if world else '')
+        world_society  = _f(world['society'] if world else '')
+        world_history  = _f(world['history'] if world else '')
+        world_geo      = _f(world['geography'] if world else '')
+        world_magic    = _f(world['magic_system'] if world else '')
+        world_rules    = _f(world['rules'] if world else '')
+        world_extra    = _f(world['extra_rules'] if world else '')
 
-# [叙事风格指南]
-{engine['content'] if engine else '请使用沉浸式的第一人称或第三人称进行文字冒险推演。'}
+        char_name        = _f(char['name'] if char else '', '探险者')
+        char_gender      = _f(char['gender'] if char else '')
+        char_age         = _f(char['age'] if char else '')
+        char_race        = _f(char['race'] if char else '')
+        char_identity    = _f(char['identity'] if char else '', '平民')
+        char_appearance  = _f(char['appearance'] if char else '')
+        char_personality = _f(char['personality'] if char else '')
+        char_item        = _f(char['item'] if char else '')
+        char_style       = _f(char['style'] if char else '')
+        char_custom      = _f(char['custom'] if char else '')
 
-# [强制指令]
-1. 必须使用 <cot> 标签进行剧情逻辑推演。
+        engine_content = _f(engine['content'] if engine else '', '请使用沉浸式叙事风格进行文字冒险推演。')
+
+        system_content = f"""# [核心世界观设定]
+世界名称：{world_name}
+简介：{world_intro}
+背景描述：{world_desc}
+核心冲突：{world_conflict}
+社会构成：{world_society}
+历史大事记：{world_history}
+地理环境：{world_geo}
+力量/魔法/科技体系：{world_magic}
+核心规则：{world_rules}
+附加规则：{world_extra}
+
+# [角色信息]
+姓名：{char_name}
+性别：{char_gender}
+年龄：{char_age}
+种族：{char_race}
+身份/职业：{char_identity}
+外貌：{char_appearance}
+性格：{char_personality}
+初始物品：{char_item}
+说话风格：{char_style}
+自定义补充：{char_custom}
+
+# [引擎指令]
+{engine_content}
 """
 
     # 3. 准备历史消息 (Context)
