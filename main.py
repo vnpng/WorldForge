@@ -504,20 +504,21 @@ async def delete_character(char_id: str, user: dict = Depends(get_current_user))
     return {"status": "success"}
 
 # --- AI Proxy 核心引擎 ---
-async def ai_stream_generator(client: httpx.AsyncClient, url: str, headers: dict, payload: dict):
-    """通用 SSE 流式转发生成器"""
-    try:
-        async with client.stream("POST", f"{url}/chat/completions", json=payload, headers=headers, timeout=60.0) as response:
-            if response.status_code != 200:
-                error_detail = await response.aread()
-                yield f"data: {json.dumps({'error': 'AI服务异常', 'detail': error_detail.decode()})}\n\n"
-                return
+async def ai_stream_generator(url: str, headers: dict, payload: dict):
+    """通用 SSE 流式转发生成器（已修复连接泄漏）"""
+    async with httpx.AsyncClient() as client:
+        try:
+            async with client.stream("POST", f"{url}/chat/completions", json=payload, headers=headers, timeout=60.0) as response:
+                if response.status_code != 200:
+                    error_detail = await response.aread()
+                    yield f"data: {json.dumps({'error': 'AI服务异常', 'detail': error_detail.decode()})}\n\n"
+                    return
 
-            async for line in response.aiter_lines():
-                if line.startswith("data: "):
-                    yield line + "\n\n"
-    except Exception as e:
-        yield f"data: {json.dumps({'error': str(e)})}\n\n"
+                async for line in response.aiter_lines():
+                    if line.startswith("data: "):
+                        yield line + "\n\n"
+        except Exception as e:
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
 @app.post("/api/chat")
 async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
@@ -537,8 +538,14 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
         world = cursor.execute("SELECT * FROM Worlds WHERE id = ? AND user_id = ?", (req.world_id, user["id"])).fetchone() if req.world_id else None
         # 获取角色设定
         char = cursor.execute("SELECT * FROM Characters WHERE id = ? AND user_id = ?", (req.char_id, user["id"])).fetchone() if req.char_id else None
-        # 获取引擎预设
-        engine = cursor.execute("SELECT * FROM SystemPrompts WHERE id = ?", (req.engine_id,)).fetchone() if req.engine_id else None
+        
+        # 获取引擎预设 (已增加越权隔离与公开库校验)
+        engine = None
+        if req.engine_id:
+            engine = cursor.execute(
+                "SELECT * FROM SystemPrompts WHERE id = ? AND (user_id = ? OR is_public = 1)",
+                (req.engine_id, user["id"])
+            ).fetchone()
         
         def _f(val, fallback=''):
             return val if val else fallback
@@ -613,7 +620,6 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
     conn.close()
 
     # 5. 发起流式请求
-    client = httpx.AsyncClient()
     headers = {"Authorization": f"Bearer {profile['apiKey']}"}
     payload = {
         "model": profile['model'],
@@ -624,7 +630,7 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
     }
 
     return StreamingResponse(
-        ai_stream_generator(client, profile['baseUrl'], headers, payload),
+        ai_stream_generator(profile['baseUrl'], headers, payload),
         media_type="text/event-stream"
     )
 
