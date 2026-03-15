@@ -1337,7 +1337,7 @@ export default {
     const inviteCode = ref('');
     // 真实用户状态
     const currentUser = ref({ id: '', name: '未登录', role: 'user' });
-    const hasRole = (roles) => roles.includes(currentUser.value.role); // [RBAC] 全局权限判断函数
+    const hasRole = (roles) => roles.includes(currentUser.value.role); // [RBAC] 补全全局权限判断函数
     let nextId = Date.now(); // [新增] 定义全局自增 ID 起点
 
     // 页面初始化：读取本地存储恢复登录状态与偏好设置
