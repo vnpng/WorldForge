@@ -46,7 +46,7 @@
         </a>
       </div>
 
-      <div class="login-footer">v14.0.0-dev.33 · Demo模式</div>
+      <div class="login-footer">测试版本</div>
     </div>
   </div>
 
@@ -74,7 +74,7 @@
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-dice-d20" style="font-size: var(--text-sm);"></i>
           </div>
-          <div class="session-name"><strong>发起RPG开局</strong></div>
+          <div class="session-name"><strong>发起 RPG 冒险</strong></div>
         </div>
         <div class="sb-divider"></div>
         <div class="session-item" :class="{active: currentView === 'discover' || currentView === 'card-detail'}" @click="currentView = 'discover'; currentSessionId = null">
@@ -172,7 +172,7 @@
       <!-- Status bar -->
       <div class="status-bar">
         <template v-if="currentView==='discover'">
-          <div class="top-title"><i class="fas fa-compass" style="color:var(--grey)"></i> 发现世界</div>
+          <div class="top-title"><i class="fas fa-compass" style="color:var(--grey)"></i> 发现探索</div>
         </template>
         <template v-else-if="currentView==='creators'">
           <div class="top-title"><i class="fas fa-paint-brush" style="color:var(--grey)"></i> 创作者中心</div>
@@ -218,7 +218,7 @@
       <div class="view-container" v-if="currentView==='discover'">
         <div class="view-inner">
           <div class="discover-header">
-            <div class="discover-title">发现世界</div>
+            <div class="discover-title">欢迎，冒险者！</div>
             <div class="discover-sub">探索社区创造的奇妙世界与角色。</div>
           </div>
           
@@ -647,7 +647,7 @@
             </div>
 
             <div class="start-actions">
-              <button class="btn btn-primary btn-md" :disabled="!canStartRPG" @click="startRPG()"><i class="fas fa-dice-d20"></i> 生成序章并进入</button>
+              <button class="btn btn-primary btn-md" :disabled="!canStartRPG" @click="startRPG()"><i class="fas fa-dice-d20"></i> 生成序章并开始冒险</button>
             </div>
           </div>
         </div>
@@ -842,12 +842,12 @@
       <template v-if="currentView==='chat'">
         <div class="welcome-view" v-if="isWelcome">
           <div class="welcome-greeting">
-            <h1>请坐，朋友</h1>
-            <h2>有什么我能帮上忙的？</h2>
+            <h1>请坐 我的朋友 😃</h1>
+            <h2>有什么我能帮上忙的？👇</h2>
           </div>
           
           <div class="input-inner">
-            <textarea class="main-input" placeholder="问问 WorldForge..." v-model="inputText" @keydown.enter.exact.prevent="sendFromWelcome" @input="autoResize($event)" rows="1"></textarea>
+            <textarea class="main-input" placeholder="想聊点什么？  Enter 发送消息，Shift + Enter 换行" v-model="inputText" @keydown.enter.exact.prevent="sendFromWelcome" @input="autoResize($event)" rows="1"></textarea>
             <div class="input-tools">
               <div class="tools-left">
               </div>
@@ -1011,7 +1011,7 @@
               <i class="fas fa-arrow-down"></i>
             </button>
 
-            <textarea class="main-input" :placeholder="currentMode==='rpg'?'描述你的行动…':'问问 WorldForge...'" v-model="inputText" ref="mainInputEl" @keydown.enter.exact.prevent="sendMessage" @input="autoResize($event)" rows="1"></textarea>
+            <textarea class="main-input" :placeholder="currentMode==='rpg'?'描述你的行动...  Enter 发送 ,  Shift + Enter 换行':'输入内容...  Enter 发送 ,  Shift + Enter 换行'" v-model="inputText" ref="mainInputEl" @keydown.enter.exact.prevent="sendMessage" @input="autoResize($event)" rows="1"></textarea>
             <div class="input-tools">
               <div class="tools-left" style="position: relative;">
                 <div class="tool-btn-text" @click.stop="showToolsMenu=!showToolsMenu; showProfileMenu=false; showCharDrawer=false; showActionList=false; showEngineParams=false" :style="{color: showToolsMenu ? 'var(--purple-lt)' : ''}">
@@ -1020,6 +1020,13 @@
 
                 <transition name="menu-pop">
                   <div class="tools-menu" v-if="showToolsMenu" @click.stop>
+                    <div class="menu-item" v-if="hasRole(['superadmin', 'admin'])">
+                      <div class="menu-item-label">开发者调试</div>
+                      <label class="toggle" style="transform: scale(0.8);">
+                        <input type="checkbox" v-model="showDebug"/>
+                        <div class="toggle-track"></div><div class="toggle-thumb"></div>
+                      </label>
+                    </div>
                     <div class="menu-item">
                       <div class="menu-item-label">流式输出</div>
                       <label class="toggle" style="transform: scale(0.8);">
@@ -1027,15 +1034,8 @@
                         <div class="toggle-track"></div><div class="toggle-thumb"></div>
                       </label>
                     </div>
-                    <div class="menu-item" v-if="hasRole(['superadmin', 'admin'])">
-                      <div class="menu-item-label">调试 Prompt</div>
-                      <label class="toggle" style="transform: scale(0.8);">
-                        <input type="checkbox" v-model="showDebug"/>
-                        <div class="toggle-track"></div><div class="toggle-thumb"></div>
-                      </label>
-                    </div>
                     <div class="menu-item">
-                      <div class="menu-item-label">CoT (推理过程)</div>
+                      <div class="menu-item-label">CoT (思维链)</div>
                       <label class="toggle" style="transform: scale(0.8);">
                         <input type="checkbox" v-model="showCoT"/>
                         <div class="toggle-track"></div><div class="toggle-thumb"></div>
@@ -2087,7 +2087,7 @@ export default {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `worldforge_api_nodes_${Date.now()}.json`;
+      a.download = `WorldForge_api_nodes_${Date.now()}.json`;
       a.click();
       URL.revokeObjectURL(url);
     };

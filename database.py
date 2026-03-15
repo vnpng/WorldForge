@@ -40,7 +40,7 @@ def upgrade_tables(cursor):
         print("正在为 SystemPrompts 表追加 is_public 字段...")
         cursor.execute("ALTER TABLE SystemPrompts ADD COLUMN is_public INTEGER DEFAULT 0")
     
-    # [V13.6.0+ 排序升级] 增加 sort_index 字段
+    # 增加 sort_index 字段
     if 'sort_index' not in columns:
         print("正在为 SystemPrompts 表追加 sort_index 字段...")
         cursor.execute("ALTER TABLE SystemPrompts ADD COLUMN sort_index INTEGER DEFAULT 0")
@@ -203,7 +203,7 @@ def init_db():
     # 更新系统版本标识
     cursor.execute("INSERT OR REPLACE INTO SystemConfig (key, value) VALUES ('db_version', '14.0.0')")
 
-    # V14.1.0: 为会话增加置顶功能
+    # 为会话增加置顶功能
     db_version = cursor.execute("SELECT value FROM SystemConfig WHERE key = 'db_version'").fetchone()
     if not db_version or db_version[0] < '14.1.0':
         print("正在升级数据库至 V14.1.0 (新增 Sessions.is_pinned)...")
