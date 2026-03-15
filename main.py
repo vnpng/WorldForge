@@ -166,6 +166,14 @@ async def get_current_user(auth: HTTPAuthorizationCredentials = Security(securit
     except jwt.PyJWTError:
         raise credentials_exception
 
+def require_role(allowed_roles: List[str]):
+    """[RBAC] 核心权限守卫依赖"""
+    async def role_checker(user: dict = Depends(get_current_user)):
+        if user.get("role") not in allowed_roles:
+            raise HTTPException(status_code=403, detail="权限不足，仅限管理员操作")
+        return user
+    return role_checker
+
 # --- Auth 业务路由 ---
 
 @app.post("/api/auth/register")
@@ -216,9 +224,7 @@ async def login(user_data: UserLogin):
     }
 
 @app.post("/api/auth/invite")
-async def generate_invite(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "superadmin":
-        raise HTTPException(status_code=403, detail="权限不足")
+async def generate_invite(current_user: dict = Depends(require_role(["superadmin"]))):
     conn = get_db_connection()
     import random, string
     new_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
@@ -228,9 +234,7 @@ async def generate_invite(current_user: dict = Depends(get_current_user)):
     return {"code": new_code}
 
 @app.get("/api/auth/invites")
-async def list_invites(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "superadmin":
-        raise HTTPException(status_code=403, detail="权限不足")
+async def list_invites(current_user: dict = Depends(require_role(["superadmin"]))):
     conn = get_db_connection()
     rows = conn.execute(
         "SELECT code, is_used, created_at FROM InviteCodes ORDER BY created_at DESC"
@@ -304,10 +308,13 @@ async def save_prompt(prompt: SystemPromptSchema, user: dict = Depends(get_curre
         target_user_id = user["id"]
     
     # [适配] 增加 intro 和 sort_index 写入
+    # 【安全加固】强制校验，非超管一律覆盖 is_public 为 0
+    final_is_public = prompt.is_public if user["role"] == "superadmin" else 0
+    
     cursor.execute('''
     INSERT OR REPLACE INTO SystemPrompts (id, name, intro, content, user_id, is_public, sort_index)
     VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (prompt.id, prompt.name, prompt.intro, prompt.content, target_user_id, prompt.is_public, prompt.sort_index))
+    ''', (prompt.id, prompt.name, prompt.intro, prompt.content, target_user_id, final_is_public, prompt.sort_index))
     conn.commit()
     conn.close()
     return {"status": "success"}

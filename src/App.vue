@@ -281,7 +281,7 @@
                   <div class="preset-desc">{{p.intro || '暂无简介'}}</div>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center">
-                  <label class="toggle" style="transform:scale(.9)">
+                  <label class="toggle" style="transform:scale(.9)" v-if="hasRole(['superadmin'])">
                     <input type="checkbox" :checked="p.isPublic" @change="toggleEnginePublic(p)"/>
                     <div class="toggle-track"></div><div class="toggle-thumb"></div>
                   </label>
@@ -326,8 +326,7 @@
                 </div>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
-                <div>
-                  <div v-if="currentUser.role === 'superadmin'" style="display:flex; align-items:center; gap:10px;">
+              <div v-if="hasRole(['superadmin'])" style="display:flex; align-items:center; gap:10px;">
                     <label class="toggle" style="transform:scale(.9)">
                       <input type="checkbox" v-model="editingEngine.isPublic"/>
                       <div class="toggle-track"></div><div class="toggle-thumb"></div>
@@ -661,7 +660,7 @@
                   <div class="form-field">
                     <div class="form-label">
                       <div class="form-label-left">用户昵称</div>
-                      <span v-if="currentUser.role === 'superadmin'" style="color:var(--purple-lt);font-size:var(--text-xs);"><i class="fas fa-crown"></i> 超管</span>
+                      <span v-if="hasRole(['superadmin'])" style="color:var(--purple-lt);font-size:var(--text-xs);"><i class="fas fa-crown"></i> 超管</span>
                     </div>
                     <input class="form-input" :value="currentUser.name" readonly style="opacity: 0.7; cursor: not-allowed;"/>
                   </div>
@@ -1040,7 +1039,7 @@
                         <div class="toggle-track"></div><div class="toggle-thumb"></div>
                       </label>
                     </div>
-                    <div class="menu-item" v-if="currentUser.role === 'superadmin' || currentUser.role === 'admin'">
+                    <div class="menu-item" v-if="hasRole(['superadmin', 'admin'])">
                       <div class="menu-item-label">调试 Prompt</div>
                       <label class="toggle" style="transform: scale(0.8);">
                         <input type="checkbox" v-model="showDebug"/>
@@ -1338,6 +1337,7 @@ export default {
     const inviteCode = ref('');
     // 真实用户状态
     const currentUser = ref({ id: '', name: '未登录', role: 'user' });
+    const hasRole = (roles) => roles.includes(currentUser.value.role); // [RBAC] 全局权限判断函数
     let nextId = Date.now(); // [新增] 定义全局自增 ID 起点
 
     // 页面初始化：读取本地存储恢复登录状态与偏好设置
@@ -2639,6 +2639,7 @@ export default {
     });
 
     return {
+      hasRole, // 导出 RBAC 函数供模板使用
       loggedIn, isLoginMode, loginUser, loginPass, inviteCode, doLogin, doRegister, doLogout,
       currentView,
       sidebarCollapsed, charPanelOpen, sessionsOpen,
