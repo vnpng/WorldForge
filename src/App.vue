@@ -14,7 +14,21 @@
       </div>
       <div class="login-field">
         <div class="login-label">密码</div>
-        <input class="login-input" type="password" v-model="loginPass" placeholder="输入密码" @keydown.enter="isLoginMode ? doLogin() : doRegister()"/>
+        <div style="position: relative; width: 100%;">
+          <input class="login-input" :type="showPass ? 'text' : 'password'" v-model="loginPass" placeholder="输入密码" @keydown.enter="isLoginMode ? doLogin() : doRegister()" style="width: 100%; padding-right: 40px;"/>
+          <div class="pass-toggle" @click="showPass = !showPass" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--grey); opacity: 0.7; z-index: 10;">
+            <i class="fas" :class="showPass ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </div>
+        </div>
+      </div>
+      <div class="login-field" v-if="!isLoginMode">
+        <div class="login-label">确认密码</div>
+        <div style="position: relative; width: 100%;">
+          <input class="login-input" :type="showPassConfirm ? 'text' : 'password'" v-model="loginPassConfirm" placeholder="请再次输入密码" @keydown.enter="doRegister" style="width: 100%; padding-right: 40px;"/>
+          <div class="pass-toggle" @click="showPassConfirm = !showPassConfirm" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--grey); opacity: 0.7; z-index: 10;">
+            <i class="fas" :class="showPassConfirm ? 'fa-eye-slash' : 'fa-eye'"></i>
+          </div>
+        </div>
       </div>
       <div class="login-field" v-if="!isLoginMode">
         <div class="login-label">邀请码</div>
@@ -1302,6 +1316,9 @@ export default {
     const isLoginMode = ref(true);
     const loginUser = ref('');
     const loginPass = ref('');
+    const loginPassConfirm = ref(''); // [新增] 注册确认密码
+    const showPass = ref(false); // [新增] 密码显示开关
+    const showPassConfirm = ref(false); // [新增] 确认密码显示开关
     const inviteCode = ref('');
     // 真实用户状态
     const currentUser = ref({ id: '', name: '未登录', role: 'user' });
@@ -1387,6 +1404,10 @@ export default {
     async function doRegister() {
       if (!loginUser.value.trim() || !loginPass.value.trim()) {
         alert('请输入用户名和密码');
+        return;
+      }
+      if (loginPass.value !== loginPassConfirm.value) {
+        alert('两次输入的密码不一致，请重新检查');
         return;
       }
       try {
@@ -2608,7 +2629,7 @@ export default {
 
     return {
       hasRole,
-      loggedIn, isLoginMode, loginUser, loginPass, inviteCode, doLogin, doRegister, doLogout,
+      loggedIn, isLoginMode, loginUser, loginPass, loginPassConfirm, showPass, showPassConfirm, inviteCode, doLogin, doRegister, doLogout,
       currentView,
       sidebarCollapsed, charPanelOpen, sessionsOpen,
       showConfirm, confirmTarget, confirmDeleteExec,
