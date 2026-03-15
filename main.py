@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import List, Optional, Any
 import os
@@ -36,7 +35,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 security = HTTPBearer()
 
 app = FastAPI(title="WorldForge API Server", version="v14.1")
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # --- 数据模型定义 ---
 
@@ -633,10 +631,6 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
         ai_stream_generator(profile['baseUrl'], headers, payload),
         media_type="text/event-stream"
     )
-
-@app.get("/")
-async def read_index():
-    return FileResponse(os.path.join("static", "index.html"))
 
 if __name__ == "__main__":
     import uvicorn
