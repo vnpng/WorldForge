@@ -2639,7 +2639,7 @@ export default {
     });
 
     return {
-      hasRole, // 导出 RBAC 函数供模板使用
+      hasRole,
       loggedIn, isLoginMode, loginUser, loginPass, inviteCode, doLogin, doRegister, doLogout,
       currentView,
       sidebarCollapsed, charPanelOpen, sessionsOpen,
