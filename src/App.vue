@@ -655,12 +655,12 @@
                 <div class="s-sub">配置应用名称和界面行为。</div>
                 <div class="form-grid" style="margin-bottom:16px">
                   <div class="form-field">
-                    <div class="form-label"><div class="form-label-left">应用名称</div></div>
-                    <input class="form-input" value="WorldForge"/>
+                    <div class="form-label"><div class="form-label-left">用户 ID</div></div>
+                    <input class="form-input" :value="currentUser.id" readonly style="opacity: 0.7; cursor: not-allowed;"/>
                   </div>
                   <div class="form-field">
                     <div class="form-label">
-                      <div class="form-label-left">用户昵称</div>
+                      <div class="form-label-left">用户名</div>
                       <span v-if="hasRole(['superadmin'])" style="color:var(--purple-lt);font-size:var(--text-xs);"><i class="fas fa-crown"></i> 超管</span>
                     </div>
                     <input class="form-input" :value="currentUser.name" readonly style="opacity: 0.7; cursor: not-allowed;"/>
