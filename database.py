@@ -56,6 +56,20 @@ def upgrade_tables(cursor):
         print("正在为 Profiles 表追加 user_id 字段...")
         cursor.execute("ALTER TABLE Profiles ADD COLUMN user_id TEXT")
 
+    # 4. 升级 Worlds 表：增加 is_public
+    cursor.execute("PRAGMA table_info(Worlds)")
+    columns = [row[1] for row in cursor.fetchall()]
+    if 'is_public' not in columns:
+        print("正在为 Worlds 表追加 is_public 字段...")
+        cursor.execute("ALTER TABLE Worlds ADD COLUMN is_public INTEGER DEFAULT 0")
+
+    # 5. 升级 Characters 表：增加 is_public
+    cursor.execute("PRAGMA table_info(Characters)")
+    columns = [row[1] for row in cursor.fetchall()]
+    if 'is_public' not in columns:
+        print("正在为 Characters 表追加 is_public 字段...")
+        cursor.execute("ALTER TABLE Characters ADD COLUMN is_public INTEGER DEFAULT 0")
+
 def init_legacy_data(cursor):
     """
     存量数据继承初始化逻辑：
@@ -164,6 +178,7 @@ def init_db():
         rules TEXT,
         extra_rules TEXT,
         sort_index INTEGER DEFAULT 0,
+        is_public INTEGER DEFAULT 0,
         created_at INTEGER
     )
     ''')
@@ -184,6 +199,7 @@ def init_db():
         style TEXT,
         custom TEXT,
         sort_index INTEGER DEFAULT 0,
+        is_public INTEGER DEFAULT 0,
         created_at INTEGER
     )
     ''')
