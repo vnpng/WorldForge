@@ -1450,6 +1450,8 @@ export default {
     }
 
     // ── API Wrapper (智能信使：统一处理 Token 与 401 拦截) ──
+    let isHandling401 = false; // [防抖锁] 防止并发请求弹出多个警告
+
     async function apiFetch(url, options = {}) {
       const token = localStorage.getItem('wf_token');
       const headers = {
@@ -1467,8 +1469,12 @@ export default {
         
         // 如果后端返回 401，说明 Token 过期或伪造，直接强制踢回登录页
         if (response.status === 401) {
-          alert('登录身份已过期，请重新登录。');
-          doLogout(true); // 传入 true 代表强制登出，不弹窗询问
+          if (!isHandling401) {
+            isHandling401 = true;
+            alert('登录身份已过期，请重新登录。');
+            doLogout(true); // 传入 true 代表强制登出，不弹窗询问
+            setTimeout(() => { isHandling401 = false; }, 2000); // 2秒后解锁，防止无限锁死
+          }
           throw new Error('Unauthorized');
         }
         
