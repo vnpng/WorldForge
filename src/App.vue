@@ -321,7 +321,7 @@
             <div style="display:flex; align-items:center; gap: 16px; margin-bottom: 32px;">
               <div class="icon-btn" @click="exitEdit('engine')" style="background:var(--ink-muted)"><i class="fas fa-arrow-left"></i></div>
               <div>
-                <div class="discover-title">{{ editingEngine.user_id ? '编辑引擎' : '新建引擎' }}</div>
+                <div class="discover-title">{{ editingEngine.user_id !== undefined ? '编辑引擎' : '新建引擎' }}</div>
                 <div class="discover-sub" style="margin-top:4px;">修改预设的系统级 Prompt。</div>
               </div>
             </div>
