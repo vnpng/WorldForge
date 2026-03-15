@@ -326,7 +326,8 @@
                 </div>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
-              <div v-if="hasRole(['superadmin'])" style="display:flex; align-items:center; gap:10px;">
+                <div>
+                  <div v-if="hasRole(['superadmin'])" style="display:flex; align-items:center; gap:10px;">
                     <label class="toggle" style="transform:scale(.9)">
                       <input type="checkbox" v-model="editingEngine.isPublic"/>
                       <div class="toggle-track"></div><div class="toggle-thumb"></div>
