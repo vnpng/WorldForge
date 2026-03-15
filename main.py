@@ -35,7 +35,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 security = HTTPBearer()
 
-app = FastAPI(title="WorldForge API Server", version="13.6.0")
+app = FastAPI(title="WorldForge API Server", version="13.6.1")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # --- 数据模型定义 ---
