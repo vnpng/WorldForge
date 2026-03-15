@@ -665,39 +665,6 @@
                     </div>
                     <input class="form-input" :value="currentUser.name" readonly style="opacity: 0.7; cursor: not-allowed;"/>
                   </div>
-                  <div class="form-field full">
-                    <div class="form-label"><div class="form-label-left">默认语言</div></div>
-                    <input class="form-input" value="简体中文"/>
-                  </div>
-                </div>
-                <div class="divider"></div>
-                <div class="setting-row">
-                  <div class="setting-row-info">
-                    <div class="setting-row-label">自动保存会话</div>
-                    <div class="setting-row-desc">每次发送消息后自动保存到本地</div>
-                  </div>
-                  <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-                </div>
-                <div class="setting-row">
-                  <div class="setting-row-info">
-                    <div class="setting-row-label">Markdown 渲染</div>
-                    <div class="setting-row-desc">在气泡中渲染 Markdown 格式内容</div>
-                  </div>
-                  <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-                </div>
-                <div class="setting-row">
-                  <div class="setting-row-info">
-                    <div class="setting-row-label">流式输出</div>
-                    <div class="setting-row-desc">逐字显示 AI 回复（需 API 支持）</div>
-                  </div>
-                  <label class="toggle"><input type="checkbox" checked/><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
-                </div>
-                <div class="setting-row">
-                  <div class="setting-row-info">
-                    <div class="setting-row-label">发送消息音效</div>
-                    <div class="setting-row-desc">发送和接收消息时播放提示音</div>
-                  </div>
-                  <label class="toggle"><input type="checkbox"/><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
                 </div>
                 
                 <div class="divider"></div>
