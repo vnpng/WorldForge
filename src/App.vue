@@ -299,7 +299,13 @@
                     <input type="checkbox" :checked="p.isPublic" @change="toggleEnginePublic(p)"/>
                     <div class="toggle-track"></div><div class="toggle-thumb"></div>
                   </label>
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="editEngine(p)"><i class="fas fa-pen"></i></div>
+                  <div
+                    class="icon-btn"
+                    style="width:28px;height:28px;font-size:var(--text-xs)"
+                    :style="(p.isPublic && !hasRole(['superadmin'])) ? 'opacity:0.3;cursor:not-allowed;' : ''"
+                    @click="(p.isPublic && !hasRole(['superadmin'])) ? null : editEngine(p)"
+                    :title="(p.isPublic && !hasRole(['superadmin'])) ? '公开引擎仅超管可修改' : '编辑'"
+                  ><i class="fas fa-pen"></i></div>
                   <div
                     class="icon-btn"
                     style="width:28px;height:28px;font-size:var(--text-xs)"
