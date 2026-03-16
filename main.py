@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Optional, Any
 import os
@@ -632,6 +633,16 @@ async def chat_proxy(req: ChatRequest, user: dict = Depends(get_current_user)):
         media_type="text/event-stream"
     )
 
+# --- 静态资源托管 (把打包好的 Vue 网页发出去) ---
+if os.path.exists("dist"):
+    app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
+    @app.get("/")
+    async def serve_frontend():
+        return FileResponse("dist/index.html")
+    @app.get("/favicon.ico")
+    async def serve_favicon():
+        return FileResponse("dist/favicon.ico")
+        
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
