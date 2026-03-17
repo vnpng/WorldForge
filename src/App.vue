@@ -2450,17 +2450,48 @@ export default {
       }
     }
 
-    const welcomeHints = ['开始新的冒险', '帮我写一段代码', '继续上次剧情', '头脑风暴想法'];
+    const welcomeHints = ['开始新的冒险', '帮 e.target.value = \'\';
+      };
+      reader.readAsText(file);
+    };
 
-    // --- Message Actions Logic ---
-    const stripHtml = (html) => html.replace(/<[^>]*>/g, '').trim();
+    // ── 通用兼容性复制工具 (解决 HTTP 下 navigator.clipboard 失效问题) ──
+    const copyToClipboard = async (text) => {
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (err) {
+          console.error('Modern copy failed:', err);
+        }
+      }
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        if (successful) return true;
+      } catch (err) {
+        console.error('Legacy copy failed:', err);
+      }
+      return false;
+    };
 
     const copyMsg = async (msg) => {
-      try {
-        await navigator.clipboard.writeText(stripHtml(msg.content));
+      const textToCopy = stripHtml(msg.content);
+      const ok = await copyToClipboard(textToCopy);
+      if (ok) {
         copiedMsgId.value = msg.id;
         setTimeout(() => { copiedMsgId.value = null; }, 1500);
-      } catch (err) { console.error('复制失败'); }
+      } else {
+        alert('复制失败，请手动选择文字复制。');
+      }
     };
 
     const deleteMsg = async (msg) => {
