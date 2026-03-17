@@ -2450,10 +2450,10 @@ export default {
       }
     }
 
-    const welcomeHints = ['开始新的冒险', '帮 e.target.value = \'\';
-      };
-      reader.readAsText(file);
-    };
+    const welcomeHints = ['开始新的冒险', '帮我写一段代码', '继续上次剧情', '头脑风暴想法'];
+
+    // --- Message Actions Logic ---
+    const stripHtml = (html) => html.replace(/<[^>]*>/g, '').trim();
 
     // ── 通用兼容性复制工具 (解决 HTTP 下 navigator.clipboard 失效问题) ──
     const copyToClipboard = async (text) => {
@@ -2640,12 +2640,12 @@ export default {
     };
 
     const copyInviteCode = async (code) => {
-      try {
-        await navigator.clipboard.writeText(code);
+      const ok = await copyToClipboard(code);
+      if (ok) {
         copiedInviteCode.value = code;
         setTimeout(() => { copiedInviteCode.value = false; }, 1500);
-      } catch (e) {
-        console.error('复制失败');
+      } else {
+        alert('复制失败');
       }
     };
 
