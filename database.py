@@ -72,22 +72,22 @@ def upgrade_tables(cursor):
 
 def init_legacy_data(cursor):
     """
-    存量数据继承初始化逻辑：
-    1. 将内置的核心预设标记为 'system' 且设为公开。
-    2. 将未归属的数据标记为 'legacy'。
+    [V14.2 优化] 存量数据继承初始化逻辑：
+    不再强制每次启动都重置核心引擎的状态。
+    1. 将未归属的数据标记为 'legacy' (仅执行一次)。
     """
-    core_prompt_ids = ['sp_default_rpg', 'sp_chat', 'sp_novel', 'sp_official_4', 'sp_official_5']
-    
-    for pid in core_prompt_ids:
-        cursor.execute('''
-            UPDATE SystemPrompts 
-            SET user_id = 'system', is_public = 1 
-            WHERE id = ?
-        ''', (pid,))
+    # [DEPRECATED] 核心预设强制公开逻辑已移除，由用户在前端自行管理
+    # core_prompt_ids = ['sp_default_rpg', 'sp_chat', 'sp_novel', 'sp_official_4', 'sp_official_5']
+    # for pid in core_prompt_ids:
+    #     cursor.execute('''
+    #         UPDATE SystemPrompts 
+    #         SET user_id = 'system', is_public = 1 
+    #         WHERE id = ?
+    #     ''', (pid,))
     
     cursor.execute("UPDATE Sessions SET user_id = 'legacy' WHERE user_id IS NULL")
     cursor.execute("UPDATE Profiles SET user_id = ? WHERE user_id IS NULL", ('legacy',))
-    cursor.execute("UPDATE SystemPrompts SET user_id = 'legacy' WHERE user_id IS NULL AND user_id != 'system'")
+    cursor.execute("UPDATE SystemPrompts SET user_id = 'legacy' WHERE user_id IS NULL AND (user_id != 'system' OR user_id IS NULL)")
 
 def init_db():
     """
