@@ -2411,7 +2411,15 @@ export default {
                      const rawActions = actionMatch[1].split('\n').filter(a => a.trim().length > 1);
                      actionChips.value = rawActions.map(a => a.replace(/^\d+\.\s*/, '').trim()).slice(0, 3);
                   }
-                  if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
+
+                  // [智能滚动] 只有当用户当前距离底部不足 150px 时才自动跟随
+                  if (chatAreaEl.value) {
+                    const { scrollTop, clientHeight, scrollHeight } = chatAreaEl.value;
+                    const isNearBottom = scrollHeight - scrollTop - clientHeight < 150;
+                    if (isNearBottom) {
+                      chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
+                    }
+                  }
                 }
               } catch (e) { /* 忽略不完整的 JSON 分片 */ }
             }
