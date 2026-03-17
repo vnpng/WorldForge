@@ -1440,12 +1440,13 @@ export default {
 
     function doLogout(force = false) {
       if (force || confirm('确定要退出登录吗？')) {
+        // 1. 清除本地持久化凭证
         localStorage.removeItem('wf_token');
         localStorage.removeItem('wf_user');
-        loggedIn.value = false;
-        loginPass.value = '';
-        activeProfileId.value = null;
-        currentUser.value = { id: '', name: '未登录', role: 'user' };
+        
+        // 2. 物理重置：强制刷新页面，彻底销毁 Vue 实例与所有内存状态
+        // 重新加载后，App.vue 的 onMounted 会发现没有 Token，从而干净利落地渲染登录页
+        window.location.reload();
       }
     }
 
