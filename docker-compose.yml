@@ -6,4 +6,5 @@ services:
       - "80:8000"
     volumes:
       - ./data:/app/data
+      - ./dist:/app/dist
     restart: always
