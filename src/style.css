@@ -1124,15 +1124,24 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
   .chat-area {
     padding: 12px !important;
   }
+  /* Fix scrollbar squeeze on mobile by making it non-occupying */
+  ::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+  }
   .msg-group {
-    max-width: calc(100% - 12px) !important; /* 统一气泡距离对侧的物理间距 */
+    max-width: calc(100% - 16px) !important; /* 调整为 12px padding + 4px margin */
+  }
+  .msg-group.user {
+    margin-right: 4px !important;
   }
   /* Expand AI bubble to full width and remove legacy desktop margin */
   .msg-group.ai {
-    width: 100% !important;
-    max-width: 100% !important;
+    width: calc(100% - 4px) !important;
+    max-width: calc(100% - 4px) !important;
     align-self: stretch !important;
     align-items: stretch !important;
+    margin-left: 4px !important; /* 响应用户要求增加 4px 左边距 */
   }
   .rpg .bubble.ai, .chat .bubble.ai {
     margin-left: 0 !important;
