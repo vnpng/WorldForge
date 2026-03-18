@@ -300,15 +300,13 @@
                     <div class="toggle-track"></div><div class="toggle-thumb"></div>
                   </label>
                   <div
-                    class="icon-btn"
-                    style="width:28px;height:28px;font-size:var(--text-xs)"
+                    class="icon-btn icon-btn-sm"
                     :style="(p.isPublic && !hasRole(['superadmin'])) ? 'opacity:0.3;cursor:not-allowed;' : ''"
                     @click="(p.isPublic && !hasRole(['superadmin'])) ? null : editEngine(p)"
                     :title="(p.isPublic && !hasRole(['superadmin'])) ? '公开引擎仅超管可修改' : '编辑'"
                   ><i class="fas fa-pen"></i></div>
                   <div
-                    class="icon-btn"
-                    style="width:28px;height:28px;font-size:var(--text-xs)"
+                    class="icon-btn icon-btn-sm"
                     :style="p.isPublic ? 'opacity:0.3;cursor:not-allowed;' : ''"
                     @click="!p.isPublic && confirmDelete(p, 'engine')"
                     :title="p.isPublic ? '请先取消系统公开后再删除' : '删除'"
@@ -387,8 +385,8 @@
                   <div class="preset-desc">{{w.intro || '暂无简介'}}</div>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center">
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="editWorld(w)"><i class="fas fa-pen"></i></div>
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="confirmDelete(w, 'world')"><i class="fas fa-trash"></i></div>
+                  <div class="icon-btn icon-btn-sm" @click="editWorld(w)"><i class="fas fa-pen"></i></div>
+                  <div class="icon-btn icon-btn-sm" @click="confirmDelete(w, 'world')"><i class="fas fa-trash"></i></div>
                 </div>
               </div>
             </div>
@@ -490,8 +488,8 @@
                   <div class="preset-desc">{{c.identity || '暂无身份'}}</div>
                 </div>
                 <div style="display:flex;gap:6px;align-items:center">
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="editChar(c)"><i class="fas fa-pen"></i></div>
-                  <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click="confirmDelete(c, 'char')"><i class="fas fa-trash"></i></div>
+                  <div class="icon-btn icon-btn-sm" @click="editChar(c)"><i class="fas fa-pen"></i></div>
+                  <div class="icon-btn icon-btn-sm" @click="confirmDelete(c, 'char')"><i class="fas fa-trash"></i></div>
                 </div>
               </div>
             </div>
@@ -737,8 +735,8 @@
                         </div>
                       </div>
                       <div style="display:flex; gap:6px; align-items:center">
-                        <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click.stop="startEditing(p)" title="编辑"><i class="fas fa-pen"></i></div>
-                        <div class="icon-btn" style="width:28px;height:28px;font-size:var(--text-xs)" @click.stop="deleteProfile(p.id)" title="删除"><i class="fas fa-trash"></i></div>
+                        <div class="icon-btn icon-btn-sm" @click.stop="startEditing(p)" title="编辑"><i class="fas fa-pen"></i></div>
+                        <div class="icon-btn icon-btn-sm" @click.stop="deleteProfile(p.id)" title="删除"><i class="fas fa-trash"></i></div>
                       </div>
                     </div>
                   </div>

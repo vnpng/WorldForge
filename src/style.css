@@ -326,6 +326,7 @@ body.light .toggle input:checked ~ .toggle-track { background: var(--purple); }
   color: var(--white-soft); cursor: pointer; font-size: var(--text-sm); transition: all 0.2s;
 }
 .icon-btn:hover { background: rgba(255,255,255,.06) !important; color: var(--white) !important; }
+.icon-btn-sm { width: 28px !important; height: 28px !important; font-size: var(--text-xs) !important; }
 body.light .icon-btn { color: #3a3d5c; }
 body.light .icon-btn:hover { background: rgba(0,0,0,0.06) !important; }
 
