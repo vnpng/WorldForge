@@ -1053,13 +1053,13 @@
                 </div>
 
                 <div class="modal-overlay" v-if="showEngineParams" @click.stop="showEngineParams=false" style="z-index: 300;">
-                  <div class="params-modal" @click.stop>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-                      <div class="s-title" style="margin-bottom:0; font-size:var(--text-lg);"><i class="fas fa-dice-d20" style="color:var(--purple-lt)"></i> 引擎高级参数</div>
+                  <div class="modal-box large" @click.stop>
+                    <div class="modal-header">
+                      <div class="modal-title"><i class="fas fa-dice-d20" style="color:var(--purple-lt)"></i> 引擎高级参数</div>
                       <div class="icon-btn" @click="showEngineParams=false"><i class="fas fa-times"></i></div>
                     </div>
                     
-                    <div style="max-height: 60vh; overflow-y: auto; padding-right: 4px;">
+                    <div class="modal-body" style="padding: 12px 24px;">
                       <div class="param-card">
                         <div class="param-header">
                           <div class="param-info"><i class="fas fa-history" style="color:var(--purple-lt)"></i> 携带历史记忆长度 (Context Limit)</div>
@@ -1110,7 +1110,9 @@
                       </div>
                     </div>
 
-                    <button class="btn btn-primary btn-md" style="width:100%; justify-content:center; margin-top:16px; border-radius:14px;" @click="showEngineParams=false">完成设定</button>
+                    <div class="modal-footer">
+                      <button class="btn btn-primary btn-md" style="width:100%; justify-content:center;" @click="showEngineParams=false">完成设定</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1204,58 +1206,34 @@
     </div>
   </div>
 
-  <!-- 编辑节点弹窗 -->
-  <div v-if="editingProfileId"
-    style="position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9999; display:flex; align-items:center; justify-content:center;"
-    @click.self="editingProfileId=null">
-    <div style="background:var(--ink-soft); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
-
-      <!-- 弹窗标题 -->
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-        <div style="font-size:var(--text-md); font-weight:700;">编辑节点</div>
-        <div class="icon-btn" @click="editingProfileId=null">
-          <i class="fas fa-times"></i>
-        </div>
+  <div class="modal-overlay" v-if="editingProfileId" @click.self="editingProfileId=null">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">编辑节点</div>
+        <div class="icon-btn" @click="editingProfileId=null"><i class="fas fa-times"></i></div>
       </div>
-
-      <!-- 表单 -->
-      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+      <div class="modal-body">
         <div class="form-field full">
           <div class="form-label">名称</div>
           <input class="form-input" v-model="tempEditForm.name" autocomplete="off"/>
         </div>
         <div class="form-field full">
           <div class="form-label">Base URL</div>
-          <input class="form-input" v-model="tempEditForm.baseUrl" autocomplete="off" placeholder="https://api.openai.com/v1"/>
+          <input class="form-input" v-model="tempEditForm.baseUrl" autocomplete="off"/>
         </div>
         <div class="form-field full">
           <div class="form-label">API Key</div>
-          <div style="display:flex; gap:8px;">
-            <input class="form-input" v-model="tempEditForm.apiKey"
-              type="text"
-              autocomplete="off"
-              name="wf-api-key-edit"
-              readonly
-              @focus="(e) => e.target.removeAttribute('readonly')"
-              placeholder="sk-..." style="flex:1"/>
-          </div>
+          <input class="form-input" v-model="tempEditForm.apiKey" type="text" autocomplete="off" readonly @focus="(e) => e.target.removeAttribute('readonly')" placeholder="sk-..."/>
         </div>
         <div class="form-field full">
           <div class="form-label">Model Name</div>
           <input class="form-input" v-model="tempEditForm.model" autocomplete="off"/>
         </div>
       </div>
-
-      <!-- 操作按钮 -->
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-primary btn-md" style="flex:1; justify-content:center;" @click="saveApiConfig">
-          保存修改
-        </button>
-        <button class="btn btn-ghost btn-md" style="flex:1; justify-content:center;" @click="editingProfileId=null">
-          取消
-        </button>
+      <div class="modal-footer">
+        <button class="btn btn-ghost btn-md" @click="editingProfileId=null">取消</button>
+        <button class="btn btn-primary btn-md" @click="saveApiConfig">保存修改</button>
       </div>
-
     </div>
   </div>
 
