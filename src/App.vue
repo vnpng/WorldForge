@@ -1780,11 +1780,13 @@ export default {
     };
 
     const addNewWorld = () => {
-      const nw = { id: String(Date.now()), name: '', intro: '', desc: '', society: '', history: '', geography: '', magic_system: '', rules: '', extra_rules: '', conflict: '' };
+      const maxIdx = worlds.value.length > 0 ? Math.max(...worlds.value.map(w => w.sort_index || 0)) : -1;
+      const nw = { id: String(Date.now()), name: '', intro: '', desc: '', society: '', history: '', geography: '', magic_system: '', rules: '', extra_rules: '', conflict: '', sort_index: maxIdx + 1 };
       editWorld(nw);
     };
     const addNewChar = () => {
-      const nc = { id: String(Date.now()), name: '', gender: '', age: '', race: '', identity: '', appearance: '', personality: '', item: '', style: '', custom: '' };
+      const maxIdx = characters.value.length > 0 ? Math.max(...characters.value.map(c => c.sort_index || 0)) : -1;
+      const nc = { id: String(Date.now()), name: '', gender: '', age: '', race: '', identity: '', appearance: '', personality: '', item: '', style: '', custom: '', sort_index: maxIdx + 1 };
       editChar(nc);
     };
 
@@ -2191,7 +2193,8 @@ export default {
       originalEditData.value = JSON.stringify(e);
     };
     const addNewEngine = () => {
-      const ne = { id: String(Date.now()), name: '', type: 'rpg', active: false, intro: '', desc: '', isPublic: false };
+      const maxIdx = systemPrompts.value.length > 0 ? Math.max(...systemPrompts.value.map(p => p.sort_index || 0)) : -1;
+      const ne = { id: String(Date.now()), name: '', type: 'rpg', active: false, intro: '', desc: '', isPublic: false, sort_index: maxIdx + 1 };
       editEngine(ne);
     };
 
