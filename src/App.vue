@@ -669,21 +669,52 @@
 
       <div class="view-container" v-if="currentView==='profile'">
         <div class="view-inner" style="height: 100%; display: flex; flex-direction: column;">
-          <div class="discover-header" style="margin-bottom: 24px; flex-shrink: 0;">
+          <div class="discover-header" style="margin-bottom: 32px; flex-shrink: 0;">
             <div class="discover-title">个人中心</div>
             <div class="discover-sub">管理你的资产、配置与应用偏好。</div>
           </div>
-          <div style="flex: 1; display: flex; overflow: hidden; background: var(--ink-soft); border: 1px solid rgba(255,255,255,.08); border-radius: var(--r-lg);">
-            <div class="settings-nav">
-              <div v-for="item in settingsNav" :key="item.key"
-                class="settings-nav-item" :class="{active:settingsTab===item.key}"
-                @click="settingsTab=item.key">
-                <i :class="item.icon"></i>
-                <div><div class="nav-label">{{item.label}}</div><div class="nav-desc">{{item.desc}}</div></div>
+          
+          <div class="settings-portal-list">
+            <div v-for="item in settingsNav" :key="item.key" 
+              class="settings-capsule" 
+              @click="safeNav(() => currentView = item.targetView)"
+            >
+              <div class="capsule-icon"><i :class="item.icon"></i></div>
+              <div class="capsule-info">
+                <div class="capsule-label">{{item.label}}</div>
+                <div class="capsule-desc">{{item.desc}}</div>
               </div>
+              <div class="capsule-arrow"><i class="fas fa-chevron-right"></i></div>
             </div>
 
-            <div class="settings-content">
+            <!-- Logout Button -->
+            <div style="margin-top: 24px; display: flex; justify-content: center;">
+              <button class="btn btn-danger btn-md" style="width: 100%; max-width: 400px; justify-content: center;" @click="doLogout()">
+                <i class="fas fa-sign-out-alt"></i> 退出当前账号
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail Views -->
+      <div class="view-container" v-if="currentView.startsWith('profile-')">
+        <div class="view-inner" style="height: 100%; display: flex; flex-direction: column;">
+          
+          <!-- Detail Header -->
+          <div class="discover-header" style="margin-bottom: 24px; flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+              <div class="icon-btn" @click="safeNav(() => currentView = 'profile')" style="background: var(--ink-muted); width: 32px; height: 32px;">
+                <i class="fas fa-arrow-left" style="font-size: 14px;"></i>
+              </div>
+              <div class="discover-title" style="padding-left: 0; margin-bottom: 0;">{{ settingsNav.find(n => n.targetView === currentView)?.label }}</div>
+            </div>
+            <div class="discover-sub" style="padding-left: 44px;">{{ settingsNav.find(n => n.targetView === currentView)?.desc }}</div>
+          </div>
+
+          <div style="flex: 1; overflow: hidden; background: var(--ink-soft); border: 1px solid rgba(255,255,255,.08); border-radius: var(--r-lg);">
+            <div class="settings-content" style="width: 100%;">
+              <!-- Content slots will be handled next -->
               <template v-if="settingsTab==='basic'">
                 <div class="s-title">基础设置</div>
                 <div class="s-sub">配置应用名称和界面行为。</div>
@@ -1594,12 +1625,12 @@ export default {
 
     const settingsNav = computed(() => {
       const items = [
-        { key:'basic',     icon:'fas fa-sliders-h',   label:'基础设置', desc:'应用名称和界面选项' },
-        { key:'api',       icon:'fas fa-server',       label:'API 设置', desc:'模型与密钥配置' },
-        { key:'data',      icon:'fas fa-database',     label:'数据管理', desc:'导入、导出、重置' },
+        { key:'basic',     icon:'fas fa-sliders-h',   label:'基础设置', desc:'用户ID与基本信息管理', targetView: 'profile-basic' },
+        { key:'api',       icon:'fas fa-server',       label:'API 设置', desc:'多节点模型与密钥配置', targetView: 'profile-api' },
+        { key:'data',      icon:'fas fa-database',     label:'数据管理', desc:'备份导出与资产恢复', targetView: 'profile-data' },
       ];
       if (currentUser.value.role === 'superadmin') {
-        items.push({ key:'admin', icon:'fas fa-crown', label:'超管面板', desc:'邀请码管理' });
+        items.push({ key:'admin', icon:'fas fa-crown', label:'超管面板', desc:'邀请码生成与管理', targetView: 'profile-admin' });
       }
       return items;
     });

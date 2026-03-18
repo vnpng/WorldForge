@@ -721,6 +721,77 @@ body.light .settings-nav-item.active { background: rgba(125,57,235,.1); color: #
 .nav-desc { font-size: var(--text-xs); color: var(--grey); margin-top: 1px; }
 
 
+/* ══ 个人中心门户 (Settings Portal) ══ */
+.settings-portal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 20px 0;
+}
+
+.settings-capsule {
+  display: flex;
+  align-items: center;
+  background: var(--ink-soft);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 18px 24px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 20px;
+}
+
+.settings-capsule:hover {
+  background: var(--ink-muted);
+  border-color: var(--purple-lt);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.settings-capsule:active {
+  transform: scale(0.98);
+}
+
+.capsule-icon {
+  width: 52px;
+  height: 52px;
+  background: var(--purple-dim);
+  border: 1px solid rgba(125,57,235,0.2);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--purple-lt);
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.capsule-info {
+  flex: 1;
+}
+
+.capsule-label {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.capsule-desc {
+  font-size: var(--text-sm);
+  color: var(--grey);
+  line-height: 1.4;
+}
+
+.capsule-arrow {
+  color: var(--grey);
+  opacity: 0.4;
+  font-size: var(--text-md);
+}
+
 .settings-content { flex: 1; overflow-y: auto; padding: 22px 26px; }
 .s-title { font-size: var(--text-lg); font-weight: 800; letter-spacing: -.02em; margin-bottom: 4px; padding-left: 20px; }
 .s-sub { font-size: var(--text-sm); color: var(--grey); margin-bottom: 20px; padding-left: 20px; }
