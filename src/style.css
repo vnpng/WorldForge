@@ -1042,7 +1042,7 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
   }
 
   /* 5. Input Bar: Iconify Text Buttons */
-  .tool-btn-text {
+  .tool-btn-text, .tool-btn {
     width: 40px !important;
     height: 40px !important;
     padding: 0 !important;
@@ -1052,15 +1052,16 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
     border-radius: 50% !important;
     background: var(--ink-muted) !important;
     border: 1px solid rgba(255,255,255,0.08) !important;
+    line-height: 0 !important; /* 消除行高占位 */
+    font-size: 0 !important;   /* 彻底隐藏文字 */
   }
-  /* Hide text nodes */
-  .tool-btn-text {
-    font-size: 0 !important;
-  }
-  .tool-btn-text i {
+  .tool-btn-text i, .tool-btn i {
     font-size: 16px !important;
     margin: 0 !important;
-    display: block !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 16px; height: 16px;
     line-height: 1 !important;
   }
 
