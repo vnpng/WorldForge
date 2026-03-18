@@ -73,35 +73,35 @@
           </div>
           <div class="session-name"><strong>发起聊天对话</strong></div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'rpg-start'}" @click="currentView='rpg-start'; currentSessionId = null">
+        <div class="session-item" :class="{active: currentView === 'rpg-start'}" @click="currentView='rpg-start'; currentSessionId = null; mobileSidebarOpen = false">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-dice-d20" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name"><strong>发起 RPG 冒险</strong></div>
         </div>
         <div class="sb-divider"></div>
-        <div class="session-item" :class="{active: currentView === 'discover' || currentView === 'card-detail'}" @click="currentView = 'discover'; currentSessionId = null">
+        <div class="session-item" :class="{active: currentView === 'discover' || currentView === 'card-detail'}" @click="currentView = 'discover'; currentSessionId = null; mobileSidebarOpen = false">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-compass" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name">发现</div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'creators'}" @click="currentView = 'creators'; currentSessionId = null">
+        <div class="session-item" :class="{active: currentView === 'creators'}" @click="currentView = 'creators'; currentSessionId = null; mobileSidebarOpen = false">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-paint-brush" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name">创作者</div>
         </div>
         <div class="sb-divider"></div>
-        <div class="session-item" :class="{active: currentView === 'engine-mgr'}" @click="currentView = 'engine-mgr'; currentSessionId = null">
+        <div class="session-item" :class="{active: currentView === 'engine-mgr'}" @click="currentView = 'engine-mgr'; currentSessionId = null; mobileSidebarOpen = false">
           <div class="session-dot"><i class="fas fa-layer-group" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">引擎管理</div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'world-mgr'}" @click="currentView = 'world-mgr'; editingWorld = null; currentSessionId = null">
+        <div class="session-item" :class="{active: currentView === 'world-mgr'}" @click="currentView = 'world-mgr'; editingWorld = null; currentSessionId = null; mobileSidebarOpen = false">
           <div class="session-dot"><i class="fas fa-globe" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">世界管理</div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'char-mgr'}" @click="currentView = 'char-mgr'; editingChar = null; currentSessionId = null">
+        <div class="session-item" :class="{active: currentView === 'char-mgr'}" @click="currentView = 'char-mgr'; editingChar = null; currentSessionId = null; mobileSidebarOpen = false">
           <div class="session-dot"><i class="fas fa-user-ninja" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">角色管理</div>
         </div>
@@ -159,7 +159,7 @@
       <div class="sb-divider"></div>
 
       <div class="sb-footer">
-        <div class="sb-footer-inner" @click="currentView='profile'; currentSessionId=null" title="个人中心">
+        <div class="sb-footer-inner" @click="currentView='profile'; currentSessionId=null; mobileSidebarOpen = false" title="个人中心">
           <div class="user-card-sb">
             <div class="user-avatar-sb">
               <img :src="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" alt="avatar">
