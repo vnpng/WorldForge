@@ -178,32 +178,24 @@
           <i class="fas fa-bars"></i>
         </div>
         <template v-if="currentView==='discover'">
-          <div class="top-title"><i class="fas fa-compass" style="color:var(--grey)"></i> 发现探索</div>
         </template>
         <template v-else-if="currentView==='creators'">
-          <div class="top-title"><i class="fas fa-paint-brush" style="color:var(--grey)"></i> 创作者中心</div>
         </template>
         <template v-else-if="currentView==='engine-mgr'">
-          <div class="top-title"><i class="fas fa-layer-group" style="color:var(--grey)"></i> 引擎管理</div>
         </template>
         <template v-else-if="currentView==='world-mgr'">
-          <div class="top-title"><i class="fas fa-globe" style="color:var(--grey)"></i> 世界管理</div>
         </template>
         <template v-else-if="currentView==='char-mgr'">
-          <div class="top-title"><i class="fas fa-user-ninja" style="color:var(--grey)"></i> 角色管理</div>
         </template>
         <template v-else-if="currentView==='profile'">
-          <div class="top-title"><i class="fas fa-user" style="color:var(--grey)"></i> 个人中心</div>
         </template>
         <template v-else-if="currentView==='card-detail'">
           <div class="back-btn-top" @click="currentView='discover'"><i class="fas fa-arrow-left"></i> 返回发现</div>
         </template>
         <template v-else-if="currentView==='rpg-start'">
-          <div class="top-title"><i class="fas fa-dice-d20" style="color:var(--grey)"></i> 新建开局</div>
         </template>
         <template v-else-if="currentView==='chat'">
           <template v-if="isWelcome">
-            <div class="top-title" style="color:var(--grey); font-weight: normal;"><i class="fas fa-sparkles"></i> 新建会话</div>
           </template>
           <template v-else>
             <div class="mode-tag" :class="currentMode">

@@ -292,8 +292,7 @@ body.light .sb-footer-inner:hover .settings-btn { color: #1a1c2e; }
 }
 body.light .status-bar { border-bottom-color: rgba(0,0,0,.06); }
 
-.top-title { font-size: var(--text-md); font-weight: 700; color: var(--white); display: flex; align-items: center; gap: 8px; }
-body.light .top-title { color: #1a1c2e; }
+.top-title { display: none; }
 .back-btn-top { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-sm); font-weight: 600; color: var(--grey); cursor: pointer; transition: color .15s; }
 .back-btn-top:hover { color: var(--white); }
 body.light .back-btn-top:hover { color: #1a1c2e; }
