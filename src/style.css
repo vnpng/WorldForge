@@ -1046,23 +1046,25 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
     width: 40px !important;
     height: 40px !important;
     padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
     border-radius: 50% !important;
     background: var(--ink-muted) !important;
     border: 1px solid rgba(255,255,255,0.08) !important;
-    line-height: 0 !important; /* 消除行高占位 */
-    font-size: 0 !important;   /* 彻底隐藏文字 */
+    position: relative !important; /* 为绝对定位图标提供原点 */
+    font-size: 0 !important;
+    display: block !important;
   }
   .tool-btn-text i, .tool-btn i {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     font-size: 16px !important;
     margin: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 16px; height: 16px;
+    display: block !important;
     line-height: 1 !important;
+    width: 16px;
+    height: 16px;
+    text-align: center;
   }
 
   /* 6. Status Bar Slimming */
