@@ -53,8 +53,11 @@
   <!-- APP -->
   <div id="app-layout" v-if="loggedIn" :class="{'hide-cot':!showCoT,'hide-debug':!showDebug}" @click="closeAllDropdowns(); showToolsMenu=false; showProfileMenu=false; showCharDrawer=false; showActionList=false">
     
+    <!-- MOBILE OVERLAY -->
+    <div class="sb-overlay" v-if="mobileSidebarOpen" @click="mobileSidebarOpen = false"></div>
+
     <!-- SIDEBAR -->
-    <div class="sidebar" :class="{collapsed:sidebarCollapsed}">
+    <div class="sidebar" :class="{collapsed:sidebarCollapsed, 'mobile-open': mobileSidebarOpen}">
       <div class="sb-topbar">
         <div class="sb-toggle" @click.stop="sidebarCollapsed=!sidebarCollapsed"><i class="fas fa-bars"></i></div>
         <div class="sb-brand">World<span>Forge</span></div>
@@ -171,6 +174,9 @@
     <div class="main-stage">
       <!-- Status bar -->
       <div class="status-bar">
+        <div class="sb-mobile-toggle" @click.stop="mobileSidebarOpen = true">
+          <i class="fas fa-bars"></i>
+        </div>
         <template v-if="currentView==='discover'">
           <div class="top-title"><i class="fas fa-compass" style="color:var(--grey)"></i> 发现探索</div>
         </template>
@@ -1486,7 +1492,7 @@ export default {
     const showToolsMenu    = ref(false);
     const showProfileMenu  = ref(false);
     const showEngineParams = ref(false); 
-
+    const mobileSidebarOpen = ref(false);
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -1847,12 +1853,14 @@ export default {
     const newChatSession = () => {
       currentSessionId.value = null;
       currentView.value = 'chat';
+      mobileSidebarOpen.value = false;
     };
 
     function selectSession(id) {
       currentSessionId.value = id;
       openDropdown.value = null;
       currentView.value = 'chat'; // Ensure we switch to chat view when selecting a session
+      mobileSidebarOpen.value = false;
       nextTick(() => {
         if (chatAreaEl.value) chatAreaEl.value.scrollTop = chatAreaEl.value.scrollHeight;
       });
@@ -2722,6 +2730,7 @@ export default {
       resetAdvParams,
       inviteList, lastGeneratedCode, copiedInviteCode, generateInvite, copyInviteCode,
       toggleEnginePublic,
+      mobileSidebarOpen
     };
   }
 }
