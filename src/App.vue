@@ -754,8 +754,7 @@
                       class="preset-card"
                       :style="{
                         background: activeProfileId === p.id ? 'rgba(125, 57, 235, 0.12)' : 'var(--ink-muted)',
-                        border: activeProfileId === p.id ? '1.5px solid var(--purple-lt)' : '1.5px solid transparent',
-                        boxShadow: activeProfileId === p.id ? '0 0 15px rgba(125, 57, 235, 0.15)' : 'none'
+                        border: activeProfileId === p.id ? '1.5px solid var(--purple-lt)' : '1.5px solid transparent'
                       }"
                       @click="activeProfileId = p.id"
                     >

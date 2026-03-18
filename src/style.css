@@ -28,8 +28,6 @@
   --gap-main: 32px;
   --gap-card: 20px;
   --gap-mobile: 16px;
-  --glow-purple: 0 0 15px rgba(125, 57, 235, 0.2);
-  --glow-green: 0 0 15px rgba(191,247,41, 0.15);
   --shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
