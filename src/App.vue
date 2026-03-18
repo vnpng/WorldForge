@@ -1111,7 +1111,7 @@
                     </div>
 
                     <div class="modal-footer">
-                      <button class="btn btn-primary btn-md" style="width:100%; justify-content:center;" @click="showEngineParams=false">完成设定</button>
+                      <button class="btn btn-primary btn-md" style="width:100%; justify-content:center; border-radius: 99px;" @click="showEngineParams=false">完成设定</button>
                     </div>
                   </div>
                 </div>
@@ -1162,9 +1162,9 @@
         <div style="font-size: 36px; margin-bottom: 12px;">🗑️</div>
         <div style="font-size: var(--text-md); color: var(--white-soft);">确定要删除 <strong>「{{confirmTarget?.name}}」</strong> 吗？<br>此操作不可撤销。</div>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost btn-md" @click="showConfirm=false">取消</button>
-        <button class="btn btn-danger btn-md" @click="confirmDeleteExec"><i class="fas fa-trash"></i> 确认删除</button>
+      <div class="modal-footer" style="justify-content: center; gap: 16px;">
+        <button class="btn btn-ghost btn-md" style="flex: 1; justify-content: center;" @click="showConfirm=false">取消</button>
+        <button class="btn btn-danger btn-md" style="flex: 1; justify-content: center;" @click="confirmDeleteExec"><i class="fas fa-trash"></i> 确认删除</button>
       </div>
     </div>
   </div>
@@ -1192,7 +1192,7 @@
           <div class="form-label">Model Name</div>
           <input class="form-input" v-model="newProfileForm.model" autocomplete="off" placeholder="例如：gpt-4o"/>
         </div>
-        <div style="border-top:1px solid var(--border); margin: 8px 0;"></div>
+        <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 16px 0;"></div>
         <div style="font-size:var(--text-xs); color:var(--grey); font-weight:700;">一键粘贴配置（名称,URL,Key,模型）</div>
         <div style="display:flex; gap:8px;">
           <textarea class="form-textarea" v-model="quickAddText" style="flex:1; min-height:80px; font-family:var(--font-mono); font-size:var(--text-xs);" placeholder="一行一条，可粘贴多行&#10;格式：Name,https://...,sk-...,gpt-4"></textarea>
@@ -2005,17 +2005,21 @@ export default {
     }
 
     async function deleteProfile(id) {
-      if (!confirm('确定删除此 API 节点吗？')) return;
-      try {
-        await apiFetch(`/api/profiles/${id}`, { method: 'DELETE' });
-        await loadProfiles();
-        if (activeProfileId.value === id) {
-          activeProfileId.value = profiles.value.length > 0 ? profiles.value[0].id : null;
-        }
-        if (editingProfileId.value === id) {
-          editingProfileId.value = null;
-        }
-      } catch (e) { alert('删除失败'); }
+      const p = profiles.value.find(x => x.id === id);
+      confirmTarget.value = p || { name: '该节点' };
+      confirmCb.value = async () => {
+        try {
+          await apiFetch(`/api/profiles/${id}`, { method: 'DELETE' });
+          await loadProfiles();
+          if (activeProfileId.value === id) {
+            activeProfileId.value = profiles.value.length > 0 ? profiles.value[0].id : null;
+          }
+          if (editingProfileId.value === id) {
+            editingProfileId.value = null;
+          }
+        } catch (e) { alert('删除失败'); }
+      };
+      showConfirm.value = true;
     }
 
     // 移除 watch(editingProfile)，因为现在改为显式保存模式
