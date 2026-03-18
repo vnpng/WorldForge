@@ -1794,6 +1794,11 @@ export default {
         if (!setupForm.engineId && systemPrompts.value.filter(p => p.type === 'rpg').length > 0) {
           setupForm.engineId = systemPrompts.value.filter(p => p.type === 'rpg')[0].id;
         }
+
+        // [CRITICAL FIX] 确保超管数据在此处随资产一并完整加载
+        if (currentUser.value.role === 'superadmin') {
+          loadInvites();
+        }
       } catch (e) {
         console.error('加载资产失败:', e);
       }
