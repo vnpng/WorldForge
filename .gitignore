@@ -23,3 +23,4 @@ dist-ssr
 *.db
 data/*.db
 data/
+docs/
