@@ -643,8 +643,26 @@
               <div class="select-panel">
                 <div class="panel-header"><span><i class="fas fa-server" style="color:var(--purple-lt)"></i> 选择引擎</span></div>
                 <div class="panel-list">
-                  <div v-for="e in rpgEngines" :key="e.id" class="list-item" :class="{selected: setupForm.engineId===e.id}" @click="setupForm.engineId=e.id">
-                    <div class="item-name">{{e.name}}</div><div class="item-desc">{{e.intro || '暂无简介'}}</div>
+                  <div v-for="e in rpgEngines" :key="e.id" 
+                    class="preset-card" 
+                    :style="{
+                      background: setupForm.engineId === e.id ? 'rgba(125, 57, 235, 0.12)' : 'var(--ink-muted)',
+                      border: setupForm.engineId === e.id ? '1.5px solid var(--purple-lt)' : '1.5px solid transparent'
+                    }"
+                    @click="setupForm.engineId=e.id"
+                  >
+                    <div class="preset-card-content" style="display:flex; align-items:center; gap:12px;">
+                      <div :style="{
+                        width: '10px', height: '10px', borderRadius: '50%',
+                        background: setupForm.engineId === e.id ? 'var(--purple-lt)' : 'transparent',
+                        border: setupForm.engineId === e.id ? 'none' : '2px solid var(--grey)',
+                        flex: 'none'
+                      }"></div>
+                      <div>
+                        <div style="font-size:var(--text-sm); font-weight:700;" :style="{ color: setupForm.engineId === e.id ? 'var(--white)' : 'var(--white-soft)' }">{{e.name}}</div>
+                        <div style="font-size:var(--text-xs);" :style="{ color: setupForm.engineId === e.id ? 'var(--purple-lt)' : 'var(--grey)' }">{{e.intro || '暂无简介'}}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -652,8 +670,26 @@
                 <div class="panel-header"><span><i class="fas fa-globe" style="color:var(--purple-lt)"></i> 选择世界</span></div>
                 <div class="panel-list">
                   <div v-if="worlds.length===0" class="empty-state">暂无世界设定</div>
-                  <div v-for="w in worlds" :key="w.id" class="list-item" :class="{selected: setupForm.worldId===w.id}" @click="setupForm.worldId=w.id">
-                    <div class="item-name">{{w.name}}</div><div class="item-desc">{{w.desc}}</div>
+                  <div v-for="w in worlds" :key="w.id" 
+                    class="preset-card" 
+                    :style="{
+                      background: setupForm.worldId === w.id ? 'rgba(125, 57, 235, 0.12)' : 'var(--ink-muted)',
+                      border: setupForm.worldId === w.id ? '1.5px solid var(--purple-lt)' : '1.5px solid transparent'
+                    }"
+                    @click="setupForm.worldId=w.id"
+                  >
+                    <div class="preset-card-content" style="display:flex; align-items:center; gap:12px;">
+                      <div :style="{
+                        width: '10px', height: '10px', borderRadius: '50%',
+                        background: setupForm.worldId === w.id ? 'var(--purple-lt)' : 'transparent',
+                        border: setupForm.worldId === w.id ? 'none' : '2px solid var(--grey)',
+                        flex: 'none'
+                      }"></div>
+                      <div>
+                        <div style="font-size:var(--text-sm); font-weight:700;" :style="{ color: setupForm.worldId === w.id ? 'var(--white)' : 'var(--white-soft)' }">{{w.name}}</div>
+                        <div style="font-size:var(--text-xs);" :style="{ color: setupForm.worldId === w.id ? 'var(--purple-lt)' : 'var(--grey)' }">{{w.desc}}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -661,8 +697,26 @@
                 <div class="panel-header"><span><i class="fas fa-user-ninja" style="color:var(--green)"></i> 选择角色</span></div>
                 <div class="panel-list">
                   <div v-if="characters.length===0" class="empty-state">暂无角色设定</div>
-                  <div v-for="c in characters" :key="c.id" class="list-item" :class="{selected: setupForm.characterId===c.id}" @click="setupForm.characterId=c.id">
-                    <div class="item-name">{{c.name}}</div><div class="item-desc">{{c.identity}}</div>
+                  <div v-for="c in characters" :key="c.id" 
+                    class="preset-card" 
+                    :style="{
+                      background: setupForm.characterId === c.id ? 'rgba(125, 57, 235, 0.12)' : 'var(--ink-muted)',
+                      border: setupForm.characterId === c.id ? '1.5px solid var(--purple-lt)' : '1.5px solid transparent'
+                    }"
+                    @click="setupForm.characterId=c.id"
+                  >
+                    <div class="preset-card-content" style="display:flex; align-items:center; gap:12px;">
+                      <div :style="{
+                        width: '10px', height: '10px', borderRadius: '50%',
+                        background: setupForm.characterId === c.id ? 'var(--purple-lt)' : 'transparent',
+                        border: setupForm.characterId === c.id ? 'none' : '2px solid var(--grey)',
+                        flex: 'none'
+                      }"></div>
+                      <div>
+                        <div style="font-size:var(--text-sm); font-weight:700;" :style="{ color: setupForm.characterId === c.id ? 'var(--white)' : 'var(--white-soft)' }">{{c.name}}</div>
+                        <div style="font-size:var(--text-xs);" :style="{ color: setupForm.characterId === c.id ? 'var(--purple-lt)' : 'var(--grey)' }">{{c.identity}}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
