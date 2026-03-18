@@ -1119,6 +1119,18 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
   .msg-group {
     max-width: 95% !important;
   }
+  /* Expand AI bubble to full width and remove legacy desktop margin */
+  .msg-group.ai {
+    width: 100% !important;
+  }
+  .rpg .bubble.ai, .chat .bubble.ai {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 12px 0 !important;
+  }
+  .bubble.ai > div {
+    width: 100% !important;
+  }
   .action-vertical-item {
     padding: 14px 16px !important;
   }
