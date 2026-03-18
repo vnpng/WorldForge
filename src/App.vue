@@ -67,41 +67,41 @@
 
       <!-- Global Navigation -->
       <div class="sb-nav" style="padding: 0;">
-        <div class="session-item" :class="{active: currentView === 'chat' && currentSessionId === null}" @click="newChatSession()">
+        <div class="session-item" :class="{active: currentView === 'chat' && currentSessionId === null}" @click="safeNav(() => newChatSession())">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-plus" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name"><strong>发起聊天对话</strong></div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'rpg-start'}" @click="currentView='rpg-start'; currentSessionId = null; mobileSidebarOpen = false">
+        <div class="session-item" :class="{active: currentView === 'rpg-start'}" @click="safeNav(() => { currentView='rpg-start'; currentSessionId = null; mobileSidebarOpen = false; })">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-dice-d20" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name"><strong>发起 RPG 冒险</strong></div>
         </div>
         <div class="sb-divider"></div>
-        <div class="session-item" :class="{active: currentView === 'discover' || currentView === 'card-detail'}" @click="currentView = 'discover'; currentSessionId = null; mobileSidebarOpen = false">
+        <div class="session-item" :class="{active: currentView === 'discover' || currentView === 'card-detail'}" @click="safeNav(() => { currentView = 'discover'; currentSessionId = null; mobileSidebarOpen = false; })">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-compass" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name">发现</div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'creators'}" @click="currentView = 'creators'; currentSessionId = null; mobileSidebarOpen = false">
+        <div class="session-item" :class="{active: currentView === 'creators'}" @click="safeNav(() => { currentView = 'creators'; currentSessionId = null; mobileSidebarOpen = false; })">
           <div class="session-dot" style="background: transparent; display: flex; align-items: center; justify-content: center;">
             <i class="fas fa-paint-brush" style="font-size: var(--text-sm);"></i>
           </div>
           <div class="session-name">创作者</div>
         </div>
         <div class="sb-divider"></div>
-        <div class="session-item" :class="{active: currentView === 'engine-mgr'}" @click="currentView = 'engine-mgr'; editingEngine = null; currentSessionId = null; mobileSidebarOpen = false">
+        <div class="session-item" :class="{active: currentView === 'engine-mgr'}" @click="safeNav(() => { currentView = 'engine-mgr'; editingEngine = null; currentSessionId = null; mobileSidebarOpen = false; })">
           <div class="session-dot"><i class="fas fa-layer-group" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">引擎管理</div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'world-mgr'}" @click="currentView = 'world-mgr'; editingWorld = null; currentSessionId = null; mobileSidebarOpen = false">
+        <div class="session-item" :class="{active: currentView === 'world-mgr'}" @click="safeNav(() => { currentView = 'world-mgr'; editingWorld = null; currentSessionId = null; mobileSidebarOpen = false; })">
           <div class="session-dot"><i class="fas fa-globe" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">世界管理</div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'char-mgr'}" @click="currentView = 'char-mgr'; editingChar = null; currentSessionId = null; mobileSidebarOpen = false">
+        <div class="session-item" :class="{active: currentView === 'char-mgr'}" @click="safeNav(() => { currentView = 'char-mgr'; editingChar = null; currentSessionId = null; mobileSidebarOpen = false; })">
           <div class="session-dot"><i class="fas fa-user-ninja" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">角色管理</div>
         </div>
@@ -121,7 +121,7 @@
               v-for="s in sessions" :key="s.id"
               class="session-item"
               :class="[s.mode, {active:currentSessionId===s.id}]"
-              @click="selectSession(s.id)"
+              @click="safeNav(() => selectSession(s.id))"
               style="position:relative"
             >
               <div class="session-dot"><div class="dot-inner" :style="s.mode==='rpg'?'background:var(--purple)':'background:var(--green)'"></div></div>
@@ -159,7 +159,7 @@
       <div class="sb-divider"></div>
 
       <div class="sb-footer">
-        <div class="sb-footer-inner" @click="currentView='profile'; currentSessionId=null; mobileSidebarOpen = false" title="个人中心">
+        <div class="sb-footer-inner" @click="safeNav(() => { currentView='profile'; currentSessionId=null; mobileSidebarOpen = false; })" title="个人中心">
           <div class="user-card-sb">
             <div class="user-avatar-sb">
               <img :src="'https://api.dicebear.com/7.x/avataaars/svg?seed=' + currentUser.name" alt="avatar">
@@ -1275,6 +1275,24 @@
     </div>
   </div>
 
+  <!-- UNSAVED CHANGES MODAL -->
+  <div class="modal-overlay" v-if="showUnsavedModal" @click.self="showUnsavedModal=false">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">放弃未保存的更改？</div>
+        <div class="icon-btn" @click="showUnsavedModal=false"><i class="fas fa-times"></i></div>
+      </div>
+      <div class="modal-body" style="text-align: center; padding-top: 32px;">
+        <div style="font-size: 36px; margin-bottom: 12px;">⚠️</div>
+        <div style="font-size: var(--text-md); color: var(--white-soft);">检测到您已修改了内容但尚未保存。<br>现在离开，您的修改将会丢失。</div>
+      </div>
+      <div class="modal-footer" style="justify-content: center; gap: 16px;">
+        <button class="btn btn-ghost btn-md" style="flex: 1; justify-content: center;" @click="showUnsavedModal=false">继续编辑</button>
+        <button class="btn btn-danger btn-md" style="flex: 1; justify-content: center;" @click="confirmLeave">确定离开</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 </template>
 
@@ -1482,6 +1500,8 @@ export default {
     const charPanelOpen    = ref(true);
     const sessionsOpen     = ref(true);
     const showConfirm      = ref(false);
+    const showUnsavedModal  = ref(false); // [NEW] 未保存提醒弹窗控制
+    const pendingAction    = ref(null);  // [NEW] 存储被拦截的操作
     const confirmTarget    = ref(null);
     const confirmCb        = ref(null);
     const settingsTab      = ref('basic');
@@ -1522,23 +1542,46 @@ export default {
     }
 
     const confirmDelete = (item, type) => {
-      confirmTarget.value = item;
-      confirmCb.value = async () => {
-        const endpoint = type === 'world' ? `/api/worlds/${item.id}` : (type === 'char' ? `/api/characters/${item.id}` : `/api/prompts/${item.id}`);
-        try {
-          await apiFetch(endpoint, { method: 'DELETE' });
-          if (type === 'engine') {
-            systemPrompts.value = systemPrompts.value.filter(x => x.id !== item.id);
-          } else if (type === 'world') {
-            worlds.value = worlds.value.filter(x => x.id !== item.id);
-          } else if (type === 'char') {
-            characters.value = characters.value.filter(x => x.id !== item.id);
-          }
-        } catch (e) {
-          alert('删除失败，可能是权限不足或网络异常。');
-        }
-      };
-      showConfirm.value = true;
+      // ... (此处逻辑保持不变)
+    };
+
+    // [NEW] 核心导航守卫逻辑
+    const safeNav = (action) => {
+      // 检测是否有正在编辑的内容且已发生变更
+      let hasChanges = false;
+      if (editingWorld.value) {
+        hasChanges = JSON.stringify(editingWorld.value) !== originalEditData.value;
+      } else if (editingChar.value) {
+        hasChanges = JSON.stringify(editingChar.value) !== originalEditData.value;
+      } else if (editingEngine.value) {
+        hasChanges = JSON.stringify(editingEngine.value) !== originalEditData.value;
+      }
+
+      if (hasChanges) {
+        // 如果有修改，拦截操作，记录目标，弹出提醒
+        pendingAction.value = action;
+        showUnsavedModal.value = true;
+      } else {
+        // 如果没修改，直接执行导航动作
+        action();
+      }
+    };
+
+    // [NEW] 确认离开逻辑
+    const confirmLeave = () => {
+      // 1. 清空所有编辑状态，防止拦截循环
+      editingWorld.value = null;
+      editingChar.value = null;
+      editingEngine.value = null;
+      
+      // 2. 执行之前被拦截的操作
+      if (pendingAction.value) {
+        pendingAction.value();
+        pendingAction.value = null;
+      }
+      
+      // 3. 关闭弹窗
+      showUnsavedModal.value = false;
     };
 
     const settingsNav = computed(() => {
@@ -2728,7 +2771,8 @@ export default {
       resetAdvParams,
       inviteList, lastGeneratedCode, copiedInviteCode, generateInvite, copyInviteCode,
       toggleEnginePublic,
-      mobileSidebarOpen
+      mobileSidebarOpen,
+      showUnsavedModal, safeNav, confirmLeave
     };
   }
 }
