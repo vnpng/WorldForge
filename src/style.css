@@ -56,6 +56,11 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
 body.light ::-webkit-scrollbar-thumb { background: rgba(0,0,0,.1); }
 
+/* Prevent layout shift when scrollbar appears */
+.sb-body, .view-container, .chat-area, .modal-body, .settings-content, .panel-list {
+  scrollbar-gutter: stable;
+}
+
 /* ══ LOGIN ══ */
 .login-page {
   position: fixed; inset: 0; background: var(--ink);
