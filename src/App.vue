@@ -1821,6 +1821,13 @@ export default {
       currentView.value = 'chat';
       // 立即持久化到后端
       await syncSession(id);
+      if (window.posthog) {
+        window.posthog.capture('game_start', { 
+          worldId: setupForm.worldId, 
+          engineId: setupForm.engineId, 
+          characterId: setupForm.characterId 
+        });
+      }
       // 自动触发序章生成
       await sendMessage('开始游戏，请生成序章。', true);
     };
@@ -2285,6 +2292,14 @@ export default {
       const text = (typeof rawText === 'string' && rawText.trim()) ? rawText.trim() : inputText.value.trim();
       if (!text || !activeSession.value) return;
 
+      if (window.posthog) {
+        window.posthog.capture('chat_send', { 
+          mode: currentMode.value, 
+          length: text.length, 
+          is_silent: silent 
+        });
+      }
+
       // 1. 数字快捷选择逻辑
       if (currentMode.value === 'rpg' && actionChips.value.length > 0 && /^\d+$/.test(text)) {
         const selectedChips = text.split('').map(num => actionChips.value[parseInt(num) - 1]).filter(c => c);
@@ -2523,6 +2538,9 @@ export default {
         const userMsg = msgs[aiIdx - 1];
         if (userMsg.role === 'user') {
           const userText = stripHtml(userMsg.content);
+          if (window.posthog) {
+            window.posthog.capture('chat_regen', { mode: currentMode.value });
+          }
           msgs.splice(aiIdx - 1, 2); // 删除用户消息和AI消息
           await syncSession(currentSessionId.value);
           await sendMessage(userText); // 重新发送
