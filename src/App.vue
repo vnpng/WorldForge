@@ -2257,7 +2257,7 @@ export default {
     const editingEngine = ref(null);
 
     const editEngine = (e) => {
-      editingEngine.value = e;
+      editingEngine.value = JSON.parse(JSON.stringify(e));
       originalEditData.value = JSON.stringify(e);
     };
     const addNewEngine = () => {
