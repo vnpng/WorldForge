@@ -714,8 +714,9 @@
 
           <div style="flex: 1; overflow: hidden; background: var(--ink-soft); border: 1px solid rgba(255,255,255,.08); border-radius: var(--r-lg);">
             <div class="settings-content" style="width: 100%;">
-              <!-- Content slots will be handled next -->
-              <template v-if="settingsTab==='basic'">
+              
+              <!-- Basic Settings -->
+              <template v-if="currentView==='profile-basic'">
                 <div class="s-title">基础设置</div>
                 <div class="s-sub">配置应用名称和界面行为。</div>
                 <div class="form-grid" style="margin-bottom:16px">
@@ -731,17 +732,10 @@
                     <input class="form-input" :value="currentUser.name" readonly style="opacity: 0.7; cursor: not-allowed;"/>
                   </div>
                 </div>
-                
-                <div class="divider"></div>
-                
-                <div style="display:flex; justify-content:center; padding-top:8px;">
-                  <button class="btn btn-danger btn-md" @click="doLogout">
-                    <i class="fas fa-sign-out-alt"></i> 退出登录
-                  </button>
-                </div>
               </template>
 
-              <template v-if="settingsTab==='api'">
+              <!-- API Settings -->
+              <template v-if="currentView==='profile-api'">
                 <div style="display:flex; flex-direction:column; min-height:100%;">
 
                   <!-- 标题栏 -->
@@ -753,7 +747,7 @@
                   </div>
 
                   <!-- 节点列表 -->
-                  <div class="manage-list" style="margin-bottom:20px;">
+                  <div class="manage-list" :key="manageKey" style="margin-bottom:20px;">
                     <div v-if="profiles.length === 0" style="color:var(--grey); font-size:var(--text-sm); padding:12px 0;">
                       暂无节点，点击"新建节点"添加
                     </div>
@@ -802,79 +796,54 @@
                 </div>
               </template>
 
-              <template v-if="settingsTab==='data'">
+              <!-- Data Management -->
+              <template v-if="currentView==='profile-data'">
                 <div class="s-title">数据管理</div>
-                <div class="s-sub">导出备份或导入恢复你的核心数据。</div>
-                <div style="display:flex;flex-direction:column;gap:10px">
-                  <!-- Sessions -->
-                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:var(--text-sm);font-weight:700">导出所有对话/存档数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">将所有会话记录导出为 JSON 文件</div></div>
-                    <button class="btn btn-ghost btn-md" @click="exportSessions"><i class="fas fa-file-export"></i> 导出</button>
+                <div class="s-sub">导出备份或导入恢复你的核心资产。</div>
+                <div style="display:flex; flex-direction:column; gap:14px; margin-top: 10px;">
+                  <div class="api-config-card" style="flex-direction:row; align-items:center; justify-content:space-between; padding: 16px;">
+                    <div><div style="font-size:var(--text-sm); font-weight:700">对话/存档数据</div></div>
+                    <div style="display:flex; gap:8px;">
+                      <button class="btn btn-ghost btn-sm" @click="exportSessions"><i class="fas fa-file-export"></i> 导出</button>
+                      <button class="btn btn-ghost btn-sm" @click="$refs.importSessionsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
+                    </div>
                   </div>
-                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:var(--text-sm);font-weight:700">导入对话/存档数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">从 JSON 文件恢复会话记录，每条作为新存档导入</div></div>
-                    <button class="btn btn-ghost btn-md" @click="$refs.importSessionsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
-                    <input type="file" ref="importSessionsInput" style="display:none" accept=".json" @change="importSessions">
+                  <div class="api-config-card" style="flex-direction:row; align-items:center; justify-content:space-between; padding: 16px;">
+                    <div><div style="font-size:var(--text-sm); font-weight:700">世界设定数据</div></div>
+                    <div style="display:flex; gap:8px;">
+                      <button class="btn btn-ghost btn-sm" @click="exportWorlds"><i class="fas fa-file-export"></i> 导出</button>
+                      <button class="btn btn-ghost btn-sm" @click="$refs.importWorldsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
+                    </div>
                   </div>
-
-                  <!-- Worlds -->
-                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:var(--text-sm);font-weight:700">导出所有世界数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">将所有世界设定导出为 JSON 文件</div></div>
-                    <button class="btn btn-ghost btn-md" @click="exportWorlds"><i class="fas fa-file-export"></i> 导出</button>
+                  <div class="api-config-card" style="flex-direction:row; align-items:center; justify-content:space-between; padding: 16px;">
+                    <div><div style="font-size:var(--text-sm); font-weight:700">角色设定数据</div></div>
+                    <div style="display:flex; gap:8px;">
+                      <button class="btn btn-ghost btn-sm" @click="exportChars"><i class="fas fa-file-export"></i> 导出</button>
+                      <button class="btn btn-ghost btn-sm" @click="$refs.importCharsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
+                    </div>
                   </div>
-                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:var(--text-sm);font-weight:700">导入单个/多个世界数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">从 JSON 文件导入世界设定，每条作为新记录导入</div></div>
-                    <button class="btn btn-ghost btn-md" @click="$refs.importWorldsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
-                    <input type="file" ref="importWorldsInput" style="display:none" accept=".json" @change="importWorlds">
-                  </div>
-
-                  <!-- Characters -->
-                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:var(--text-sm);font-weight:700">导出所有角色数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">将所有角色设定导出为 JSON 文件</div></div>
-                    <button class="btn btn-ghost btn-md" @click="exportChars"><i class="fas fa-file-export"></i> 导出</button>
-                  </div>
-                  <div class="api-config-card" style="flex-direction:row;align-items:center;justify-content:space-between">
-                    <div><div style="font-size:var(--text-sm);font-weight:700">导入单个/多个角色数据</div><div style="font-size:var(--text-xs);color:var(--grey);margin-top:2px">从 JSON 文件导入角色设定，每条作为新记录导入</div></div>
-                    <button class="btn btn-ghost btn-md" @click="$refs.importCharsInput.click()"><i class="fas fa-file-import"></i> 导入</button>
-                    <input type="file" ref="importCharsInput" style="display:none" accept=".json" @change="importChars">
-                  </div>
-
                 </div>
               </template>
 
-              <template v-if="settingsTab==='admin'">
+              <!-- Super Admin -->
+              <template v-if="currentView==='profile-admin'">
                 <div class="s-title">超管面板</div>
                 <div class="s-sub">邀请码管理，仅超级管理员可见。</div>
-
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
-                  <button class="btn btn-primary btn-md" @click="generateInvite">
-                    <i class="fas fa-plus"></i> 生成新邀请码
-                  </button>
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px; margin-top: 10px;">
+                  <button class="btn btn-primary btn-md" @click="generateInvite"><i class="fas fa-plus"></i> 生成新邀请码</button>
                   <div v-if="lastGeneratedCode" style="display:flex; align-items:center; gap:8px; background:rgba(125,57,235,0.12); border:1.5px solid var(--purple-lt); border-radius:8px; padding:6px 14px;">
                     <span style="font-size:var(--text-sm); font-weight:700; letter-spacing:2px; color:var(--purple-lt);">{{ lastGeneratedCode }}</span>
-                    <div class="icon-btn" style="width:24px;height:24px;font-size:var(--text-xs);" @click="copyInviteCode(lastGeneratedCode)" title="复制">
-                      <i :class="copiedInviteCode === lastGeneratedCode ? 'fas fa-check' : 'fas fa-copy'" :style="copiedInviteCode === lastGeneratedCode ? 'color:var(--green)' : ''"></i>
-                    </div>
+                    <div class="icon-btn" style="width:24px;height:24px;font-size:var(--text-xs);" @click="copyInviteCode(lastGeneratedCode)" title="复制"><i :class="copiedInviteCode === lastGeneratedCode ? 'fas fa-check' : 'fas fa-copy'" :style="copiedInviteCode === lastGeneratedCode ? 'color:var(--green)' : ''"></i></div>
                   </div>
                 </div>
-
-                <div style="display:flex; flex-direction:column; gap:6px;">
-                  <div v-if="inviteList.length === 0" style="color:var(--grey); font-size:var(--text-sm); padding:12px 0;">
-                    暂无邀请码记录
-                  </div>
-                  <div
-                    v-for="item in inviteList" :key="item.code"
-                    style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:8px; background:var(--ink-muted);"
-                    :style="{ opacity: item.is_used ? 0.45 : 1 }"
-                  >
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <div v-if="inviteList.length === 0" style="color:var(--grey); font-size:var(--text-sm); padding:12px 0;">暂无邀请码记录</div>
+                  <div v-for="item in inviteList" :key="item.code" class="preset-card" style="justify-content:space-between; padding: 12px 16px; opacity: item.is_used ? 0.5 : 1;">
                     <div style="display:flex; align-items:center; gap:12px;">
-                      <span style="font-size:var(--text-sm); font-weight:700; letter-spacing:2px; color:var(--white-soft);">{{ item.code }}</span>
-                      <span v-if="item.is_used" style="font-size:var(--text-xs); color:var(--grey); background:rgba(255,255,255,0.06); padding:2px 8px; border-radius:4px;">已使用</span>
-                      <span v-else style="font-size:var(--text-xs); color:var(--green); background:rgba(191,247,41,0.08); padding:2px 8px; border-radius:4px;">未使用</span>
+                      <span style="font-weight:700; letter-spacing:1px; color: var(--white-soft);">{{ item.code }}</span>
+                      <span v-if="item.is_used" style="font-size:10px; color:var(--grey); background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px;">已使用</span>
                     </div>
-                    <div v-if="!item.is_used" class="icon-btn" style="width:24px;height:24px;font-size:var(--text-xs);" @click="copyInviteCode(item.code)" title="复制">
-                      <i :class="copiedInviteCode === item.code ? 'fas fa-check' : 'fas fa-copy'" :style="copiedInviteCode === item.code ? 'color:var(--green)' : ''"></i>
-                    </div>
+                    <div v-if="!item.is_used" class="icon-btn icon-btn-sm" @click="copyInviteCode(item.code)"><i class="fas fa-copy"></i></div>
                   </div>
                 </div>
               </template>
