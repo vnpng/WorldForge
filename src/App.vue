@@ -190,7 +190,6 @@
         <template v-else-if="currentView==='profile'">
         </template>
         <template v-else-if="currentView==='card-detail'">
-          <div class="back-btn-top" @click="currentView='discover'"><i class="fas fa-arrow-left"></i> 返回发现</div>
         </template>
         <template v-else-if="currentView==='rpg-start'">
         </template>
@@ -328,11 +327,11 @@
             </div>
           </template>
           <template v-else>
-            <div style="display:flex; align-items:center; gap: 16px; margin-bottom: 32px;">
-              <div class="icon-btn" @click="exitEdit('engine')" style="background:var(--ink-muted)"><i class="fas fa-arrow-left"></i></div>
-              <div>
-                <div class="discover-title">{{ editingEngine.user_id !== undefined ? '编辑引擎' : '新建引擎' }}</div>
-                <div class="discover-sub" style="margin-top:4px;">修改预设的系统级 Prompt。</div>
+            <div style="display:flex; align-items:flex-start; gap: 12px; margin-bottom: 32px;">
+              <div class="icon-btn" @click="exitEdit('engine')" style="background:var(--ink-muted); width: 32px; height: 32px; flex-shrink: 0; margin-top: 4px;"><i class="fas fa-arrow-left" style="font-size: 14px;"></i></div>
+              <div style="flex: 1; min-width: 0;">
+                <div class="discover-title" style="padding-left: 0; margin-bottom: 4px;">{{ editingEngine.user_id !== undefined ? '编辑引擎' : '新建引擎' }}</div>
+                <div class="discover-sub" style="padding-left: 0; opacity: 0.8;">修改预设的系统级 Prompt。</div>
               </div>
             </div>
             <div class="config-section" style="margin-bottom:0">
@@ -406,11 +405,11 @@
             </div>
           </template>
           <template v-else>
-            <div style="display:flex; align-items:center; gap: 16px; margin-bottom: 32px;">
-              <div class="icon-btn" @click="exitEdit('world')" style="background:var(--ink-muted)"><i class="fas fa-arrow-left"></i></div>
-              <div>
-                <div class="discover-title">{{ editingWorld.user_id ? '编辑世界' : '新建世界' }}</div>
-                <div class="discover-sub" style="margin-top:4px;">修改世界观的详细设定。</div>
+            <div style="display:flex; align-items:flex-start; gap: 12px; margin-bottom: 32px;">
+              <div class="icon-btn" @click="exitEdit('world')" style="background:var(--ink-muted); width: 32px; height: 32px; flex-shrink: 0; margin-top: 4px;"><i class="fas fa-arrow-left" style="font-size: 14px;"></i></div>
+              <div style="flex: 1; min-width: 0;">
+                <div class="discover-title" style="padding-left: 0; margin-bottom: 4px;">{{ editingWorld.user_id ? '编辑世界' : '新建世界' }}</div>
+                <div class="discover-sub" style="padding-left: 0; opacity: 0.8;">修改世界观的详细设定。</div>
               </div>
             </div>
             <div class="config-section" style="margin-bottom:0">
@@ -511,11 +510,11 @@
             </div>
           </template>
           <template v-else>
-            <div style="display:flex; align-items:center; gap: 16px; margin-bottom: 32px;">
-              <div class="icon-btn" @click="exitEdit('char')" style="background:var(--ink-muted)"><i class="fas fa-arrow-left"></i></div>
-              <div>
-                <div class="discover-title">{{ editingChar.user_id ? '编辑角色' : '新建角色' }}</div>
-                <div class="discover-sub" style="margin-top:4px;">修改角色的详细设定。</div>
+            <div style="display:flex; align-items:flex-start; gap: 12px; margin-bottom: 32px;">
+              <div class="icon-btn" @click="exitEdit('char')" style="background:var(--ink-muted); width: 32px; height: 32px; flex-shrink: 0; margin-top: 4px;"><i class="fas fa-arrow-left" style="font-size: 14px;"></i></div>
+              <div style="flex: 1; min-width: 0;">
+                <div class="discover-title" style="padding-left: 0; margin-bottom: 4px;">{{ editingChar.user_id ? '编辑角色' : '新建角色' }}</div>
+                <div class="discover-sub" style="padding-left: 0; opacity: 0.8;">修改角色的详细设定。</div>
               </div>
             </div>
             <div class="config-section" style="margin-bottom:0">
@@ -593,6 +592,15 @@
 
       <div class="view-container" v-if="currentView==='card-detail'">
         <div class="view-inner">
+          <div class="discover-header" style="margin-bottom: 24px; flex-shrink: 0; display: flex; align-items: flex-start; gap: 12px;">
+            <div class="icon-btn" @click="currentView='discover'" style="background: var(--ink-muted); width: 32px; height: 32px; flex-shrink: 0; margin-top: 4px;">
+              <i class="fas fa-arrow-left" style="font-size: 14px;"></i>
+            </div>
+            <div style="flex: 1; min-width: 0;">
+              <div class="discover-title" style="padding-left: 0; margin-bottom: 4px;">详情预览</div>
+              <div class="discover-sub" style="padding-left: 0; opacity: 0.8;">查看此世界的详细设定与背景。</div>
+            </div>
+          </div>
           <div class="detail-view">
             <div class="detail-header">
               <div class="detail-cover"><i :class="selectedCard?.icon || 'fas fa-globe'"></i></div>
@@ -702,14 +710,14 @@
         <div class="view-inner" style="height: 100%; display: flex; flex-direction: column;">
           
           <!-- Detail Header -->
-          <div class="discover-header" style="margin-bottom: 24px; flex-shrink: 0;">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
-              <div class="icon-btn" @click="safeNav(() => currentView = 'profile')" style="background: var(--ink-muted); width: 32px; height: 32px;">
-                <i class="fas fa-arrow-left" style="font-size: 14px;"></i>
-              </div>
-              <div class="discover-title" style="padding-left: 0; margin-bottom: 0;">{{ settingsNav.find(n => n.targetView === currentView)?.label }}</div>
+          <div class="discover-header" style="margin-bottom: 24px; flex-shrink: 0; display: flex; align-items: flex-start; gap: 12px;">
+            <div class="icon-btn" @click="safeNav(() => currentView = 'profile')" style="background: var(--ink-muted); width: 32px; height: 32px; flex-shrink: 0; margin-top: 4px;">
+              <i class="fas fa-arrow-left" style="font-size: 14px;"></i>
             </div>
-            <div class="discover-sub" style="padding-left: 44px;">{{ settingsNav.find(n => n.targetView === currentView)?.desc }}</div>
+            <div style="flex: 1; min-width: 0;">
+              <div class="discover-title" style="padding-left: 0; margin-bottom: 4px;">{{ settingsNav.find(n => n.targetView === currentView)?.label }}</div>
+              <div class="discover-sub" style="padding-left: 0; opacity: 0.8;">{{ settingsNav.find(n => n.targetView === currentView)?.desc }}</div>
+            </div>
           </div>
 
           <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--ink-soft); border: 1px solid rgba(255,255,255,.08); border-radius: var(--r-lg);">
