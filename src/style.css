@@ -1122,7 +1122,7 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
 
   /* 10. Visual Refinements & Touch Feedback */
   .chat-area {
-    padding: 12px !important;
+    padding: 16px 20px !important; /* 统一左右 20px 基准间距 */
   }
   /* Fix scrollbar squeeze on mobile by making it non-occupying */
   ::-webkit-scrollbar {
@@ -1130,18 +1130,18 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
     height: 0 !important;
   }
   .msg-group {
-    max-width: calc(100% - 16px) !important; /* 调整为 12px padding + 4px margin */
+    max-width: 100% !important;
+    margin: 0 !important; /* 清除所有额外偏移，依赖容器 padding */
   }
   .msg-group.user {
-    margin-right: 4px !important;
+    max-width: 88% !important; /* 用户气泡略窄，保留左侧呼吸感 */
   }
-  /* Expand AI bubble to full width and remove legacy desktop margin */
+  /* Expand AI bubble to full width */
   .msg-group.ai {
-    width: calc(100% - 4px) !important;
-    max-width: calc(100% - 4px) !important;
+    width: 100% !important;
+    max-width: 100% !important;
     align-self: stretch !important;
     align-items: stretch !important;
-    margin-left: 4px !important; /* 响应用户要求增加 4px 左边距 */
   }
   .rpg .bubble.ai, .chat .bubble.ai {
     margin-left: 0 !important;
