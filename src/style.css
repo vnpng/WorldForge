@@ -1059,12 +1059,74 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
     line-height: 1 !important;
   }
 
-  /* 6. General Adjustments */
+  /* 6. Status Bar Slimming */
+  .status-sep, .status-api, .status-right {
+    display: none !important;
+  }
+  .status-session {
+    max-width: 180px;
+    font-size: var(--text-sm);
+  }
+
+  /* 7. Modal & Form Adaptation */
+  .modal-box, .modal-box.large {
+    width: 95vw !important;
+    max-height: 90vh !important;
+    margin: 10px;
+  }
+  .modal-body {
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .modal-footer {
+    padding: 12px 16px !important;
+  }
+
+  /* 8. Content Grid & Admin List Verticalization */
+  .panel-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .wf-admin-list {
+    gap: 8px !important;
+  }
+  .preset-card {
+    padding: 10px 12px !important;
+  }
+  .preset-card-actions {
+    min-width: 70px !important;
+    gap: 6px !important;
+  }
+
+  /* 9. Drawer & Inventory Adjustments */
+  .char-drawer {
+    padding: 16px !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+  .drawer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .drawer-inv-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  /* 10. General Adjustments */
   .status-bar {
-    padding: 0 16px;
+    padding: 0 12px;
   }
   .view-container {
-    padding: 20px 16px;
+    padding: 16px 12px;
+  }
+  .discover-title {
+    font-size: 24px !important;
+  }
+  .discover-sub {
+    font-size: var(--text-sm) !important;
   }
 }
 
