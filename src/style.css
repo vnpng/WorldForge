@@ -994,13 +994,18 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
     left: -300px;
     bottom: 0;
     z-index: 1000;
-    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    box-shadow: none;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 300px;
     width: 300px;
   }
   .sidebar.mobile-open {
     transform: translateX(300px);
+  }
+
+  /* Hide redundant toggle inside sidebar on mobile */
+  .sidebar .sb-toggle {
+    display: none !important;
   }
   
   /* 2. Overlay */
@@ -1036,6 +1041,8 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
     width: 40px !important;
     height: 40px !important;
     padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
     justify-content: center !important;
     border-radius: 50% !important;
     background: var(--ink-muted) !important;
@@ -1048,6 +1055,8 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
   .tool-btn-text i {
     font-size: 16px !important;
     margin: 0 !important;
+    display: block !important;
+    line-height: 1 !important;
   }
 
   /* 6. General Adjustments */
