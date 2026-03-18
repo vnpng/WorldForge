@@ -896,6 +896,37 @@ body.light .char-drawer { background: var(--ink-soft); border-color: rgba(0,0,0,
 .action-vertical-item:last-child { border-bottom: none; }
 .action-vertical-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
 
+/* ══ PARAMETER CARDS (参数调节卡片) ══ */
+.param-card {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 16px; margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+.param-card:hover { border-color: rgba(125, 57, 235, 0.3); }
+body.light .param-card { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); }
+
+.param-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.param-info { font-size: var(--text-sm); font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--white-soft); }
+body.light .param-info { color: #3a3d5c; }
+
+/* 数值跟随容器 */
+.param-control-wrap { position: relative; padding: 20px 0 10px; margin-top: 10px; }
+.param-floating-value {
+  position: absolute; bottom: 100%; transform: translateX(-50%);
+  background: var(--purple); color: #fff; padding: 2px 8px; border-radius: 6px;
+  font-size: var(--text-xs); font-weight: 800; pointer-events: none; white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10;
+}
+.param-floating-value::after {
+  content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: var(--purple);
+}
+
+.param-desc-box { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
+.p-text { font-size: var(--text-xs); line-height: 1.5; color: var(--grey); }
+.p-text strong { color: var(--white-soft); margin-right: 4px; }
+body.light .p-text strong { color: #5a6080; }
+
 /* ══ UNIFIED MODALS (统一弹窗系统) ══ */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.65);
