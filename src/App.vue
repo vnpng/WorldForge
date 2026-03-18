@@ -221,6 +221,18 @@
             <div class="discover-title">欢迎，冒险者！</div>
             <div class="discover-sub">探索社区创造的奇妙世界与角色。</div>
           </div>
+
+          <!-- 发现页快速入口占位区 -->
+          <div class="discover-quick-start" style="margin-bottom: 32px;">
+            <div class="select-panel">
+              <div class="panel-header" style="opacity: 0.5;">
+                <span><i class="fas fa-bolt"></i> 快速开始</span>
+              </div>
+              <div style="height: 100px; display: flex; align-items: center; justify-content: center; color: var(--grey); border: 1px dashed rgba(255,255,255,0.1); border-radius: var(--r-sm); margin-top: 12px; font-size: var(--text-sm);">
+                功能基座已就绪，等待您的设计指令...
+              </div>
+            </div>
+          </div>
           
           <div v-for="(sec, sIdx) in discoverSections" :key="sec.title" class="discover-section">
             <div class="section-divider"></div>
@@ -282,10 +294,10 @@
               </div>
               <button class="btn btn-primary btn-md" @click="addNewEngine()"><i class="fas fa-plus"></i> 新建预设</button>
             </div>
-            <div ref="engineListRef" style="min-height: 50px;">
+            <div ref="engineListRef" class="wf-admin-list">
               <div v-for="p in systemPrompts" :key="p.id" class="preset-card" :class="{active:p.active}">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <div style="flex:1">
+                <div class="preset-card-content">
                   <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
                     <div class="preset-name">{{p.name}}</div>
                     <span class="tag tag-rpg" v-if="p.type==='rpg'" style="font-size:var(--text-xs);padding:1px 7px">RPG</span>
@@ -294,7 +306,7 @@
                   </div>
                   <div class="preset-desc">{{p.intro || '暂无简介'}}</div>
                 </div>
-                <div style="display:flex;gap:6px;align-items:center">
+                <div class="preset-card-actions">
                   <label class="toggle" style="transform:scale(.9)" v-if="hasRole(['superadmin'])">
                     <input type="checkbox" :checked="p.isPublic" @change="toggleEnginePublic(p)"/>
                     <div class="toggle-track"></div><div class="toggle-thumb"></div>
@@ -375,16 +387,16 @@
               <button class="btn btn-primary btn-md" @click="addNewWorld()"><i class="fas fa-plus"></i> 新建世界</button>
             </div>
             <div v-if="worlds.length===0" class="empty-state">暂无世界设定</div>
-            <div ref="worldListRef" style="min-height: 50px;">
+            <div ref="worldListRef" class="wf-admin-list">
               <div v-for="w in worlds" :key="w.id" class="preset-card">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <div style="flex:1">
+                <div class="preset-card-content">
                   <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
                     <div class="preset-name">{{w.name}}</div>
                   </div>
                   <div class="preset-desc">{{w.intro || '暂无简介'}}</div>
                 </div>
-                <div style="display:flex;gap:6px;align-items:center">
+                <div class="preset-card-actions">
                   <div class="icon-btn icon-btn-sm" @click="editWorld(w)" title="编辑"><i class="fas fa-pen"></i></div>
                   <div class="icon-btn icon-btn-sm" @click="confirmDelete(w, 'world')" title="删除"><i class="fas fa-trash"></i></div>
                 </div>
@@ -478,16 +490,16 @@
               <button class="btn btn-primary btn-md" @click="addNewChar()"><i class="fas fa-plus"></i> 新建角色</button>
             </div>
             <div v-if="characters.length===0" class="empty-state">暂无角色设定</div>
-            <div ref="charListRef" style="min-height: 50px;">
+            <div ref="charListRef" class="wf-admin-list">
               <div v-for="c in characters" :key="c.id" class="preset-card">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
-                <div style="flex:1">
+                <div class="preset-card-content">
                   <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
                     <div class="preset-name">{{c.name}}</div>
                   </div>
                   <div class="preset-desc">{{c.identity || '暂无身份'}}</div>
                 </div>
-                <div style="display:flex;gap:6px;align-items:center">
+                <div class="preset-card-actions">
                   <div class="icon-btn icon-btn-sm" @click="editChar(c)" title="编辑"><i class="fas fa-pen"></i></div>
                   <div class="icon-btn icon-btn-sm" @click="confirmDelete(c, 'char')" title="删除"><i class="fas fa-trash"></i></div>
                 </div>
@@ -706,13 +718,13 @@
                   </div>
 
                   <!-- 节点列表 -->
-                  <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;">
+                  <div class="wf-admin-list" style="margin-bottom:20px;">
                     <div v-if="profiles.length === 0" style="color:var(--grey); font-size:var(--text-sm); padding:12px 0;">
                       暂无节点，点击"新建节点"添加
                     </div>
                     <div
                       v-for="p in profiles" :key="p.id"
-                      style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:10px; cursor:pointer; transition: all 0.2s;"
+                      class="preset-card"
                       :style="{
                         background: activeProfileId === p.id ? 'rgba(125, 57, 235, 0.12)' : 'var(--ink-muted)',
                         border: activeProfileId === p.id ? '1.5px solid var(--purple-lt)' : '1.5px solid transparent',
@@ -720,7 +732,7 @@
                       }"
                       @click="activeProfileId = p.id"
                     >
-                      <div style="display:flex; align-items:center; gap:12px;">
+                      <div class="preset-card-content" style="display:flex; align-items:center; gap:12px;">
                         <!-- 激活指示器 -->
                         <div :style="{
                           width: '10px', height: '10px', borderRadius: '50%',
@@ -734,7 +746,7 @@
                           <div style="font-size:var(--text-xs);" :style="{ color: activeProfileId === p.id ? 'var(--purple-lt)' : 'var(--grey)' }">{{ p.model }}</div>
                         </div>
                       </div>
-                      <div style="display:flex; gap:6px; align-items:center">
+                      <div class="preset-card-actions">
                         <div class="icon-btn icon-btn-sm" @click.stop="startEditing(p)" title="编辑"><i class="fas fa-pen"></i></div>
                         <div class="icon-btn icon-btn-sm" @click.stop="deleteProfile(p.id)" title="删除"><i class="fas fa-trash"></i></div>
                       </div>

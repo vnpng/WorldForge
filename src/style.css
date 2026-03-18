@@ -769,17 +769,37 @@ body.light .api-config-card { background: rgba(0,0,0,.04); border-color: rgba(0,
 
 
 
-/* Presets */
+/* ══ 资产卡片与管理 (Card/Admin) ══ */
+.wf-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .preset-card {
-  border-radius: var(--r-sm); padding: 12px 14px;
+  border-radius: var(--r-sm); padding: 12px 16px;
   background: var(--ink-muted); border: 1px solid rgba(255,255,255,.08);
-  cursor: pointer; display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
-  transition: background .15s;
+  cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  transition: all 0.2s;
 }
 body.light .preset-card { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.08); }
-.preset-card:hover { background: rgba(255,255,255,.05); }
-.preset-name { font-size: var(--text-sm); font-weight: 700; }
-.preset-desc { font-size: var(--text-xs); color: var(--grey); margin-top: 2px; }
+.preset-card:hover { background: rgba(255,255,255,.05); border-color: var(--purple-glow); }
+.preset-card.active { border-color: var(--purple-lt); background: var(--purple-dim); }
+
+.preset-card-content { flex: 1; min-width: 0; }
+.preset-name { font-size: var(--text-sm); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.preset-desc { font-size: var(--text-xs); color: var(--grey); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* 操作按钮组固定宽度，确保对齐 */
+.preset-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  min-width: 80px;
+}
+
 .drag-handle { color: var(--grey); cursor: grab; font-size: var(--text-xs); opacity: .5; }
 
 /* Settings footer */
