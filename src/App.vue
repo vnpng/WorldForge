@@ -93,7 +93,7 @@
           <div class="session-name">创作者</div>
         </div>
         <div class="sb-divider"></div>
-        <div class="session-item" :class="{active: currentView === 'engine-mgr'}" @click="currentView = 'engine-mgr'; currentSessionId = null; mobileSidebarOpen = false">
+        <div class="session-item" :class="{active: currentView === 'engine-mgr'}" @click="currentView = 'engine-mgr'; editingEngine = null; currentSessionId = null; mobileSidebarOpen = false">
           <div class="session-dot"><i class="fas fa-layer-group" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">引擎管理</div>
         </div>
