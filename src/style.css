@@ -1120,7 +1120,7 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
     padding: 12px !important;
   }
   .msg-group {
-    max-width: 95% !important;
+    max-width: calc(100% - 12px) !important; /* 统一气泡距离对侧的物理间距 */
   }
   /* Expand AI bubble to full width and remove legacy desktop margin */
   .msg-group.ai {
@@ -1128,7 +1128,6 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
     max-width: 100% !important;
     align-self: stretch !important;
     align-items: stretch !important;
-    padding-left: 16px !important; /* 关键：左侧往回收，产生呼吸感 */
   }
   .rpg .bubble.ai, .chat .bubble.ai {
     margin-left: 0 !important;
