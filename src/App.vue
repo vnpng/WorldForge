@@ -93,15 +93,15 @@
           <div class="session-name">创作者</div>
         </div>
         <div class="sb-divider"></div>
-        <div class="session-item" :class="{active: currentView === 'engine-mgr'}" @click="safeNav(() => { currentView = 'engine-mgr'; editingEngine = null; currentSessionId = null; mobileSidebarOpen = false; })">
+        <div class="session-item" :class="{active: currentView === 'engine-mgr'}" @click="safeNav(() => { currentView = 'engine-mgr'; editingEngine = null; currentSessionId = null; mobileSidebarOpen = false; loadAssets(); })">
           <div class="session-dot"><i class="fas fa-layer-group" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">引擎管理</div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'world-mgr'}" @click="safeNav(() => { currentView = 'world-mgr'; editingWorld = null; currentSessionId = null; mobileSidebarOpen = false; })">
+        <div class="session-item" :class="{active: currentView === 'world-mgr'}" @click="safeNav(() => { currentView = 'world-mgr'; editingWorld = null; currentSessionId = null; mobileSidebarOpen = false; loadAssets(); })">
           <div class="session-dot"><i class="fas fa-globe" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">世界管理</div>
         </div>
-        <div class="session-item" :class="{active: currentView === 'char-mgr'}" @click="safeNav(() => { currentView = 'char-mgr'; editingChar = null; currentSessionId = null; mobileSidebarOpen = false; })">
+        <div class="session-item" :class="{active: currentView === 'char-mgr'}" @click="safeNav(() => { currentView = 'char-mgr'; editingChar = null; currentSessionId = null; mobileSidebarOpen = false; loadAssets(); })">
           <div class="session-dot"><i class="fas fa-user-ninja" style="font-size: var(--text-sm);"></i></div>
           <div class="session-name">角色管理</div>
         </div>
@@ -291,7 +291,7 @@
                 <div class="discover-sub" style="margin-top:4px;">“ 引擎 决定了AI以何种方式演绎你的世界——剧情推演、叙事风格、战斗规则、事件逻辑，都由它掌控。”</div>
               </div>
             </div>
-            <div ref="engineListRef" class="manage-list">
+            <div ref="engineListRef" class="manage-list" :key="manageKey">
               <div v-for="p in systemPrompts" :key="p.id" class="preset-card" :class="{active:p.active}">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 <div class="preset-card-content">
@@ -386,7 +386,7 @@
               </div>
             </div>
             <div v-if="worlds.length===0" class="empty-state">暂无世界设定</div>
-            <div ref="worldListRef" class="manage-list">
+            <div ref="worldListRef" class="manage-list" :key="manageKey">
               <div v-for="w in worlds" :key="w.id" class="preset-card">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 <div class="preset-card-content">
@@ -491,7 +491,7 @@
               </div>
             </div>
             <div v-if="characters.length===0" class="empty-state">暂无角色设定</div>
-            <div ref="charListRef" class="manage-list">
+            <div ref="charListRef" class="manage-list" :key="manageKey">
               <div v-for="c in characters" :key="c.id" class="preset-card">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 <div class="preset-card-content">
@@ -1502,6 +1502,7 @@ export default {
     const showConfirm      = ref(false);
     const showUnsavedModal  = ref(false); // [NEW] 未保存提醒弹窗控制
     const pendingAction    = ref(null);  // [NEW] 存储被拦截的操作
+    const manageKey        = ref(0);     // [NEW] 强制重置渲染锁
     const confirmTarget    = ref(null);
     const confirmCb        = ref(null);
     const settingsTab      = ref('basic');
@@ -1549,12 +1550,14 @@ export default {
     const safeNav = (action) => {
       // 检测是否有正在编辑的内容且已发生变更
       let hasChanges = false;
-      if (editingWorld.value) {
-        hasChanges = JSON.stringify(editingWorld.value) !== originalEditData.value;
-      } else if (editingChar.value) {
-        hasChanges = JSON.stringify(editingChar.value) !== originalEditData.value;
-      } else if (editingEngine.value) {
-        hasChanges = JSON.stringify(editingEngine.value) !== originalEditData.value;
+      if (originalEditData.value) {
+        if (editingWorld.value) {
+          hasChanges = JSON.stringify(editingWorld.value) !== originalEditData.value;
+        } else if (editingChar.value) {
+          hasChanges = JSON.stringify(editingChar.value) !== originalEditData.value;
+        } else if (editingEngine.value) {
+          hasChanges = JSON.stringify(editingEngine.value) !== originalEditData.value;
+        }
       }
 
       if (hasChanges) {
@@ -1569,19 +1572,24 @@ export default {
 
     // [NEW] 确认离开逻辑
     const confirmLeave = () => {
-      // 1. 清空所有编辑状态，防止拦截循环
+      // 1. 立即关闭弹窗，防止 UI 卡死
+      showUnsavedModal.value = false;
+
+      // 2. 彻底销毁所有编辑状态与原始快照，防止 safeNav 再次拦截
       editingWorld.value = null;
       editingChar.value = null;
       editingEngine.value = null;
+      originalEditData.value = null;
       
-      // 2. 执行之前被拦截的操作
+      // 3. 强制更新渲染锁，物理销毁旧列表缓存
+      manageKey.value++;
+      
+      // 4. 执行之前被拦截的操作
       if (pendingAction.value) {
-        pendingAction.value();
-        pendingAction.value = null;
+        const action = pendingAction.value;
+        pendingAction.value = null; // 先置空再执行，防止并发冲突
+        action();
       }
-      
-      // 3. 关闭弹窗
-      showUnsavedModal.value = false;
     };
 
     const settingsNav = computed(() => {
@@ -2772,7 +2780,8 @@ export default {
       inviteList, lastGeneratedCode, copiedInviteCode, generateInvite, copyInviteCode,
       toggleEnginePublic,
       mobileSidebarOpen,
-      showUnsavedModal, safeNav, confirmLeave
+      showUnsavedModal, safeNav, confirmLeave,
+      loadAssets, manageKey
     };
   }
 }
