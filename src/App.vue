@@ -298,9 +298,8 @@
                 <div class="discover-sub" style="margin-top:4px;"><strong style="color: #ffffff;">· 官方引擎库 · 为不同世界观量身定制的叙事核心 ·</strong></div>
                 <div class="discover-sub" style="margin-top:4px;">“ 引擎 决定了AI以何种方式演绎你的世界——剧情推演、叙事风格、战斗规则、事件逻辑，都由它掌控。”</div>
               </div>
-              <button class="btn btn-primary btn-md" @click="addNewEngine()"><i class="fas fa-plus"></i> 新建预设</button>
             </div>
-            <div ref="engineListRef" class="wf-admin-list">
+            <div ref="engineListRef" class="manage-list">
               <div v-for="p in systemPrompts" :key="p.id" class="preset-card" :class="{active:p.active}">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 <div class="preset-card-content">
@@ -331,6 +330,9 @@
                   ><i class="fas fa-trash"></i></div>
                 </div>
               </div>
+            </div>
+            <div class="manage-actions-bottom">
+              <button class="btn btn-primary btn-md" @click="addNewEngine()"><i class="fas fa-plus"></i> 新建引擎预设</button>
             </div>
           </template>
           <template v-else>
@@ -373,7 +375,7 @@
                 </div>
                 <div style="display:flex; gap:12px;">
                   <button class="btn btn-ghost btn-md" @click="exitEdit('engine')">退出编辑</button>
-                  <button class="btn btn-primary btn-md" @click="saveEdit('engine')" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
+                  <button class="btn btn-primary btn-md" @click="saveEdit('engine')" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存</button>
                   <button class="btn btn-primary btn-md" @click="saveEdit('engine', true)" :disabled="!editingEngine.name" :style="(!editingEngine.name) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-check-circle"></i> 保存并返回</button>
                 </div>
               </div>
@@ -390,10 +392,9 @@
                 <div class="discover-title">世界管理</div>
                 <div class="discover-sub" style="margin-top:4px;">定义故事世界的背景框架，AI 将在此框架内推演叙事。</div>
               </div>
-              <button class="btn btn-primary btn-md" @click="addNewWorld()"><i class="fas fa-plus"></i> 新建世界</button>
             </div>
             <div v-if="worlds.length===0" class="empty-state">暂无世界设定</div>
-            <div ref="worldListRef" class="wf-admin-list">
+            <div ref="worldListRef" class="manage-list">
               <div v-for="w in worlds" :key="w.id" class="preset-card">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 <div class="preset-card-content">
@@ -407,6 +408,9 @@
                   <div class="icon-btn icon-btn-sm" @click="confirmDelete(w, 'world')" title="删除"><i class="fas fa-trash"></i></div>
                 </div>
               </div>
+            </div>
+            <div class="manage-actions-bottom">
+              <button class="btn btn-primary btn-md" @click="addNewWorld()"><i class="fas fa-plus"></i> 新建世界设定</button>
             </div>
           </template>
           <template v-else>
@@ -477,7 +481,7 @@
               </div>
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-md" @click="exitEdit('world')">退出编辑</button>
-                <button class="btn btn-primary btn-md" @click="saveEdit('world')" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
+                <button class="btn btn-primary btn-md" @click="saveEdit('world')" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存</button>
                 <button class="btn btn-primary btn-md" @click="saveEdit('world', true)" :disabled="!editingWorld.name || !editingWorld.intro" :style="(!editingWorld.name || !editingWorld.intro) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
@@ -493,10 +497,9 @@
                 <div class="discover-title">角色管理</div>
                 <div class="discover-sub" style="margin-top:4px;">设定你扮演的角色信息。</div>
               </div>
-              <button class="btn btn-primary btn-md" @click="addNewChar()"><i class="fas fa-plus"></i> 新建角色</button>
             </div>
             <div v-if="characters.length===0" class="empty-state">暂无角色设定</div>
-            <div ref="charListRef" class="wf-admin-list">
+            <div ref="charListRef" class="manage-list">
               <div v-for="c in characters" :key="c.id" class="preset-card">
                 <div class="drag-handle"><i class="fas fa-grip-vertical"></i></div>
                 <div class="preset-card-content">
@@ -510,6 +513,9 @@
                   <div class="icon-btn icon-btn-sm" @click="confirmDelete(c, 'char')" title="删除"><i class="fas fa-trash"></i></div>
                 </div>
               </div>
+            </div>
+            <div class="manage-actions-bottom">
+              <button class="btn btn-primary btn-md" @click="addNewChar()"><i class="fas fa-plus"></i> 新建角色设定</button>
             </div>
           </template>
           <template v-else>
@@ -585,7 +591,7 @@
               </div>
               <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:24px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.06);">
                 <button class="btn btn-ghost btn-md" @click="exitEdit('char')">退出编辑</button>
-                <button class="btn btn-primary btn-md" @click="saveEdit('char')" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存更改</button>
+                <button class="btn btn-primary btn-md" @click="saveEdit('char')" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-save"></i> 保存</button>
                 <button class="btn btn-primary btn-md" @click="saveEdit('char', true)" :disabled="!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity" :style="(!editingChar.name || !editingChar.gender || !editingChar.age || !editingChar.identity) ? 'opacity:0.3;cursor:not-allowed;' : ''"><i class="fas fa-check-circle"></i> 保存并返回</button>
               </div>
             </div>
@@ -724,7 +730,7 @@
                   </div>
 
                   <!-- 节点列表 -->
-                  <div class="wf-admin-list" style="margin-bottom:20px;">
+                  <div class="manage-list" style="margin-bottom:20px;">
                     <div v-if="profiles.length === 0" style="color:var(--grey); font-size:var(--text-sm); padding:12px 0;">
                       暂无节点，点击"新建节点"添加
                     </div>
