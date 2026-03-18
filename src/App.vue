@@ -1073,8 +1073,9 @@
                           <input type="range" class="custom-slider" v-model="advParams.contextLimit" min="1" max="50">
                         </div>
                         <div class="param-desc-box">
-                          <div class="p-text"><strong>作用:</strong> 严格限制每次 API 请求时，发送给大模型的对话条数。</div>
-                          <div class="p-text"><strong>建议:</strong> 日常跑团推荐设为 4 ~ 6。</div>
+                          <div class="p-text"><strong>作用:</strong> 严格限制每次 API 请求时，发送给大模型的对话条数（你发1句+AI回1句=2条）。</div>
+                          <div class="p-text"><strong>原理:</strong> 得益于本程序的“前端状态面板”架构，即便只传最近 2-6 条对话，AI 依然能通过读取面板来保持世界观和人设不崩塌。</div>
+                          <div class="p-text"><strong>建议:</strong> 日常跑团推荐设为 <strong>4 ~ 6</strong>。设置过高会导致 Token 消耗成倍暴涨。</div>
                         </div>
                       </div>
 
@@ -1090,8 +1091,8 @@
                           <input type="range" class="custom-slider" v-model="advParams.stmThreshold" min="1" max="20">
                         </div>
                         <div class="param-desc-box">
-                          <div class="p-text"><strong>作用:</strong> 决定 AI 面板中“短期记忆”最多能容纳几条。</div>
-                          <div class="p-text"><strong>建议:</strong> 默认推荐 6。</div>
+                          <div class="p-text"><strong>作用:</strong> 决定 AI 面板中“短期记忆”最多能容纳几条。超过此数值时，AI 会强制触发记忆压缩，将老旧的 STM 概括并移入 LTM 表中！</div>
+                          <div class="p-text"><strong>建议:</strong> 默认推荐 <strong>6</strong>。太低会导致 AI 频繁压缩记忆浪费算力，太高会导致短期记忆面板过长引起遗忘。</div>
                         </div>
                       </div>
 
@@ -1107,8 +1108,8 @@
                           <input type="range" class="custom-slider" v-model="advParams.rpgTemp" min="0" max="2" step="0.1">
                         </div>
                         <div class="param-desc-box">
-                          <div class="p-text"><strong>作用:</strong> 决定大模型在“RPG模式”下生成文本的随机性。</div>
-                          <div class="p-text"><strong>建议:</strong> 推荐设为 0.8 ~ 1.0。</div>
+                          <div class="p-text"><strong>作用:</strong> 决定大模型在“RPG跑团模式”下生成文本的随机性、发散程度与词汇华丽度。</div>
+                          <div class="p-text"><strong>建议:</strong> 对于小说/跑团推演，推荐设为 <strong>0.8 ~ 1.0</strong> 之间。过高(>1.2)易发散幻觉，过低(<0.5)回复如机械般死板。</div>
                         </div>
                       </div>
 
@@ -1125,7 +1126,7 @@
                         </div>
                         <div class="param-desc-box">
                           <div class="p-text"><strong>作用:</strong> 决定左侧蓝色“普通对话模式”下的随机性。</div>
-                          <div class="p-text"><strong>建议:</strong> 推荐设为 0.5 ~ 0.6。</div>
+                          <div class="p-text"><strong>建议:</strong> 日常问答、写代码或查资料，需要逻辑严密，推荐设为 <strong>0.5 ~ 0.6</strong>。</div>
                         </div>
                       </div>
 
