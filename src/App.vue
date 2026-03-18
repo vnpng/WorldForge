@@ -1133,8 +1133,9 @@
                     </div>
 
 
-                    <div class="modal-footer">
-                      <button class="btn btn-primary btn-md" style="width:100%; justify-content:center; border-radius: 99px;" @click="showEngineParams=false">完成设定</button>
+                    <div class="modal-footer" style="gap: 12px;">
+                      <button class="btn btn-ghost btn-md" style="flex: 1; justify-content: center;" @click="resetAdvParams">恢复默认</button>
+                      <button class="btn btn-primary btn-md" style="flex: 2; justify-content: center; border-radius: 99px;" @click="showEngineParams=false">完成设定</button>
                     </div>
                   </div>
                 </div>
@@ -1273,12 +1274,19 @@ export default {
 
     // ── 全局状态变量 (预先定义，防止 ReferenceError) ──
     const streamingEnabled = ref(true); 
-    const advParams = reactive({
+    const DEFAULT_ADV_PARAMS = {
       contextLimit: 10,
       stmThreshold: 6,
       rpgTemp: 0.8,
       chatTemp: 0.6
-    });
+    };
+    const advParams = reactive({ ...DEFAULT_ADV_PARAMS });
+    
+    const resetAdvParams = () => {
+      if (confirm('确定要将所有引擎参数恢复至初始状态吗？')) {
+        Object.assign(advParams, DEFAULT_ADV_PARAMS);
+      }
+    };
     const actionChips = ref([]); 
     const showActionList = ref(false); 
     const systemPrompts = ref([]); 
@@ -2680,6 +2688,7 @@ export default {
       engineListRef, worldListRef, charListRef,
       showScrollBottom, scrollToBottom, onChatScroll,
       isStreaming, stopStreaming, currentReader, formatDate,
+      resetAdvParams,
       inviteList, lastGeneratedCode, copiedInviteCode, generateInvite, copyInviteCode,
       toggleEnginePublic,
     };
