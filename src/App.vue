@@ -1150,40 +1150,30 @@
     </div>
   </div>
 
-  <!-- Confirm modal -->
   <div class="modal-overlay" v-if="showConfirm" @click.self="showConfirm=false">
-    <div class="confirm-modal">
-      <div class="confirm-header">
-        <div style="font-size:var(--text-md);font-weight:700">确认删除</div>
-        <div class="icon-btn" @click="showConfirm=false" style="width:28px;height:28px"><i class="fas fa-times"></i></div>
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">确认删除</div>
+        <div class="icon-btn" @click="showConfirm=false"><i class="fas fa-times"></i></div>
       </div>
-      <div class="confirm-body">
-        <div class="confirm-icon">🗑️</div>
-        <div class="confirm-text">确定要删除 <strong>「{{confirmTarget?.name}}」</strong> 吗？<br>此操作不可撤销。</div>
+      <div class="modal-body" style="text-align: center; padding-top: 32px;">
+        <div style="font-size: 36px; margin-bottom: 12px;">🗑️</div>
+        <div style="font-size: var(--text-md); color: var(--white-soft);">确定要删除 <strong>「{{confirmTarget?.name}}」</strong> 吗？<br>此操作不可撤销。</div>
       </div>
-      <div class="confirm-footer">
+      <div class="modal-footer">
         <button class="btn btn-ghost btn-md" @click="showConfirm=false">取消</button>
         <button class="btn btn-danger btn-md" @click="confirmDeleteExec"><i class="fas fa-trash"></i> 确认删除</button>
       </div>
     </div>
   </div>
 
-  <!-- 新建节点弹窗 -->
-  <div v-if="showNewProfileModal"
-    style="position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9999; display:flex; align-items:center; justify-content:center;"
-    @click.self="closeNewProfileModal()">
-    <div style="background:var(--ink-soft); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:24px; width:420px; max-width:90vw; max-height:85vh; overflow-y:auto;">
-
-      <!-- 弹窗标题 -->
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
-        <div style="font-size:var(--text-md); font-weight:700;">新建节点</div>
-        <div class="icon-btn" @click="closeNewProfileModal()">
-          <i class="fas fa-times"></i>
-        </div>
+  <div class="modal-overlay" v-if="showNewProfileModal" @click.self="closeNewProfileModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">新建节点</div>
+        <div class="icon-btn" @click="closeNewProfileModal()"><i class="fas fa-times"></i></div>
       </div>
-
-      <!-- 表单 -->
-      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+      <div class="modal-body">
         <div class="form-field full">
           <div class="form-label">名称</div>
           <input class="form-input" v-model="newProfileForm.name" autocomplete="off" placeholder="我的节点"/>
@@ -1194,46 +1184,23 @@
         </div>
         <div class="form-field full">
           <div class="form-label">API Key</div>
-          <div style="display:flex; gap:8px;">
-            <input class="form-input" v-model="newProfileForm.apiKey"
-              type="text"
-              autocomplete="off"
-              name="wf-api-key-new"
-              readonly
-              @focus="(e) => e.target.removeAttribute('readonly')"
-              placeholder="sk-..." style="flex:1"/>
-          </div>
+          <input class="form-input" v-model="newProfileForm.apiKey" type="text" autocomplete="off" readonly @focus="(e) => e.target.removeAttribute('readonly')" placeholder="sk-..."/>
         </div>
         <div class="form-field full">
           <div class="form-label">Model Name</div>
           <input class="form-input" v-model="newProfileForm.model" autocomplete="off" placeholder="例如：gpt-4o"/>
         </div>
+        <div style="border-top:1px solid var(--border); margin: 8px 0;"></div>
+        <div style="font-size:var(--text-xs); color:var(--grey); font-weight:700;">一键粘贴配置（名称,URL,Key,模型）</div>
+        <div style="display:flex; gap:8px;">
+          <textarea class="form-textarea" v-model="quickAddText" style="flex:1; min-height:80px; font-family:var(--font-mono); font-size:var(--text-xs);" placeholder="一行一条，可粘贴多行&#10;格式：Name,https://...,sk-...,gpt-4"></textarea>
+          <button class="btn btn-primary btn-md" style="width:60px; justify-content:center; align-self:flex-end;" @click="quickAddProfiles">添加</button>
+        </div>
       </div>
-
-      <!-- 操作按钮 -->
-      <div style="display:flex; gap:10px; margin-bottom:20px;">
-        <button class="btn btn-primary btn-md" style="flex:1; justify-content:center;" @click="saveNewProfile">
-          保存节点
-        </button>
-        <button class="btn btn-ghost btn-md" style="flex:1; justify-content:center;" @click="closeNewProfileModal()">
-          取消
-        </button>
+      <div class="modal-footer">
+        <button class="btn btn-ghost btn-md" @click="closeNewProfileModal()">取消</button>
+        <button class="btn btn-primary btn-md" @click="saveNewProfile">保存节点</button>
       </div>
-
-      <!-- 分隔线 -->
-      <div style="border-top:1px solid var(--border); margin-bottom:16px;"></div>
-
-      <!-- 一键粘贴配置 -->
-      <div style="font-size:var(--text-xs); color:var(--grey); font-weight:700; margin-bottom:8px;">一键粘贴配置（名称,URL,Key,模型）</div>
-      <div style="display:flex; gap:8px;">
-        <textarea class="form-textarea" v-model="quickAddText"
-          style="flex:1; min-height:80px; font-family:var(--font-mono); font-size:var(--text-xs);"
-          placeholder="一行一条，可粘贴多行&#10;格式：Name,https://...,sk-...,gpt-4"></textarea>
-        <button class="btn btn-primary btn-md" style="width:60px; justify-content:center; align-self:flex-end;" @click="quickAddProfiles">
-          添加
-        </button>
-      </div>
-
     </div>
   </div>
 
