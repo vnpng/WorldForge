@@ -1116,12 +1116,16 @@ body.light .modal-footer { border-top-color: rgba(0,0,0,.06); }
   }
 
   /* 10. Visual Refinements & Touch Feedback */
+  .chat-area {
+    padding: 12px !important;
+  }
   .msg-group {
     max-width: 95% !important;
   }
   /* Expand AI bubble to full width and remove legacy desktop margin */
   .msg-group.ai {
     width: 100% !important;
+    max-width: 100% !important;
   }
   .rpg .bubble.ai, .chat .bubble.ai {
     margin-left: 0 !important;
