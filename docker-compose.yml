@@ -3,7 +3,7 @@ services:
   worldforge:
     build: .
     ports:
-      - "80:8000"
+      - "5000:8000"
     volumes:
       - ./data:/app/data
       - ./dist:/app/dist
